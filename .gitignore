@@ -44,9 +44,12 @@ desktop.ini
 # ---------------------------------------------------------------------------
 # Lo que SÍ se versiona a propósito (no borrar de aquí):
 #   .obsidian/app.json           preferencias del editor
-#   .obsidian/appearance.json    tema y tipografía
-#   .obsidian/core-plugins.json  qué plugins tenés activos
-#   .obsidian/graph.json         filtros y colores de la vista de grafo
+# tema y tipografía
+.obsidian/appearance.json    
+# qué plugins tenés activos
+.obsidian/core-plugins.json  
+# filtros y colores de la vista de grafo
+.obsidian/graph.json       
 #   .obsidian/templates.json     carpeta de plantillas
 #   .obsidian/hotkeys.json       atajos personalizados
 # Así, al clonar el vault en otra máquina, recuperás tu configuración.
