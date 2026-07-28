@@ -1,0 +1,64 @@
+---
+tipo: tema
+tags: [n8n, agentes]
+---
+
+# n8n
+
+Herramienta de automatización visual: se encadenan nodos (disparador → acciones) en vez de escribir el script. Sirve para conectar servicios entre sí y para montar agentes sencillos sin código.
+
+## Introducción
+
+- [Curso de N8N desde CERO (completo) — Soy Dalto](https://www.youtube.com/watch?v=4eRPQmzO_Nw) — en castellano, de cero.
+
+## n8n y Google Sheets
+
+- [Google Sheets in n8n — Read, Append, Update, Filter & Delete — Ryan & Matt Data Science](https://www.youtube.com/watch?v=M3z_X_hiUC8&list=PLcQVY5V2UY4K0mpuJ-oYO_LI25w5VDUD5&index=3) — las cinco operaciones sobre una hoja de cálculo.
+
+## Credenciales
+
+- [How to Connect Google Drive to N8N — Ryan & Matt Data Science](https://www.youtube.com/watch?v=WJwjNi5VYSE&list=PLcQVY5V2UY4K0mpuJ-oYO_LI25w5VDUD5&index=3) — el vídeo que siguen los pasos de abajo.
+
+> [!warning] El paso que más se olvida
+> Hay que pulsar **Publish App** en la pantalla de consentimiento de OAuth. Si no, la conexión falla más adelante en n8n sin decir por qué.
+
+### Pasos para obtener las credenciales
+
+#### 1. Configuración en Google Cloud Platform
+
+- **Crear un nuevo proyecto:** Ve a [Google Cloud Console](https://console.cloud.google.com/), abre el selector de proyectos en la parte superior y haz clic en **"New Project"** [[01:12](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=72)]. Ponle un nombre descriptivo (por ejemplo, *NG Drive tutorial*) y créalo [[01:18](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=78)]. Asegúrate de seleccionar el proyecto que acabas de crear [[01:36](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=96)].
+- **Habilitar la API de Google Drive:** Haz clic en el menú de las tres líneas, ve a **APIs & Services > Library** [[01:58](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=118)]. Busca "Google Drive API", selecciónala y haz clic en **"Enable"** [[02:12](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=132)].
+
+#### 2. Configurar la Pantalla de Consentimiento de OAuth
+
+- **Iniciar configuración:** Dentro de *APIs & Services*, ve a la pestaña **OAuth consent screen** y haz clic en **"Get Started"** [[02:30](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=150)].
+- **Información de la App:** Dale un nombre a la aplicación, ingresa tu correo electrónico y selecciona el tipo de usuario **"External"** [[02:40](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=160)]. Vuelve a introducir tu correo en la sección de información de contacto y haz clic en continuar hasta crearla [[02:58](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=178)].
+- **¡Paso Crucial! Publicar la App:** Ve a la pestaña de audiencia (*Audience*) y haz clic obligatoriamente en **"Publish App"** y luego en **"Confirm"** [[03:18](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=198)]. Si no publicas la aplicación, tendrás problemas de conexión más adelante en n8n [[03:22](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=202)].
+
+#### 3. Obtener el enlace de redirección de n8n
+
+- Abre tu flujo de **n8n**, añade el nodo de Google Drive y en la sección de credenciales selecciona **"Create New Credentials"** [[03:34](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=214)].
+- Copia el enlace que aparece en el campo **"OAuth Redirect URL"** [[04:23](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=263)].
+
+#### 4. Crear las Credenciales en Google Cloud
+
+- Regresa a Google Cloud, ve a **APIs & Services > Credentials** [[03:50](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=230)].
+- Haz clic en **"Create Credentials"** y selecciona **"OAuth client ID"** [[03:57](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=237)].
+- En *Application type*, selecciona **"Web application"** [[04:03](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=243)].
+- Desplázate hacia abajo hasta **"Authorized redirect URIs"**, haz clic en *Add URI* y **pega la URL de redirección** que copiaste de n8n [[04:23](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=263)]. Haz clic en **"Create"** [[04:30](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=270)].
+- Google te proporcionará un **Client ID** y un **Client Secret**. Cópialos [[04:36](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=276)].
+
+#### 5. Vincular y Autorizar en n8n
+
+- Regresa a la ventana de credenciales en n8n y pega el **Client ID** y el **Client Secret** en sus campos correspondientes [[04:47](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=287)].
+- Haz clic en el botón **"Sign in with Google"** [[05:08](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=308)].
+- Selecciona tu cuenta de Google. Aparecerá una advertencia diciendo que "Google hasn't verified this app" (Google no ha verificado esta aplicación), lo cual es normal; haz clic en **"Advanced"** y luego en **"Go to n8n cloud (unsafe)"** [[05:13](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=313)].
+- Concede todos los permisos necesarios seleccionando las casillas y presiona **"Continue"** [[05:27](http://www.youtube.com/watch?v=WJwjNi5VYSE&t=327)].
+
+## Agente de AI simple
+
+- [How to Build your first AI Agent in N8N (Super Easy) — Ryan & Matt Data Science](https://www.youtube.com/watch?v=0CBxVZrDZeo&list=PLcQVY5V2UY4K0mpuJ-oYO_LI25w5VDUD5&index=5) — el primer agente, una vez resueltas las credenciales.
+
+## Relacionado
+
+- [[Claude y MCPs]]

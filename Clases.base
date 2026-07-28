@@ -1,0 +1,26 @@
+filters:
+  and:
+    - tipo == "clase"
+views:
+  - type: table
+    name: Por fecha
+    order:
+      - file.name
+      - fecha
+      - modulo
+      - tags
+    sort:
+      - property: fecha
+        direction: ASC
+  - type: table
+    name: Por módulo
+    order:
+      - modulo
+      - fecha
+      - file.name
+      - tags
+    sort:
+      - property: modulo
+        direction: ASC
+      - property: fecha
+        direction: ASC
