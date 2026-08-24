@@ -30,3 +30,4 @@ def validate_user(username, minlen):
 ## Relacionado
 
 - [[2026-06-29 - Testing con unittest]]
+- [[Tarea - Excepciones, testing y APIs]] — ejercicios de repaso sobre esta sesión.

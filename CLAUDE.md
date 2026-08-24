@@ -69,4 +69,4 @@ Reported and left unfixed pending the vault owner's decision. Do not assume they
 
 ## Language
 
-Notes, headings and commit messages are in Spanish (Rioplatense: *acá*, *vos*, *anotá*). Match the surrounding register when editing. Code, code comments in class notes and property names stay as they are — they are transcripts of what was taught.
+Notes, headings and commit messages are in Spanish. Match the surrounding register when editing. Code, code comments in class notes and property names stay as they are — they are transcripts of what was taught.
