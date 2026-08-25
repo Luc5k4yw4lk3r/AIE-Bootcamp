@@ -1,25 +1,9 @@
 # ---------------------------------------------------------------------------
-# Obsidian — estado local de la interfaz
-# Cambia cada vez que abrís, movés o cerrás una pestaña. Es ruido puro en el
-# historial y es la principal fuente de conflictos si sincronizás el vault
-# entre varias máquinas.
+# Obsidian — configuración local completa
+# Preferencias del editor, tema, plugins, caché, estado de Sync y de la
+# interfaz. Todo específico de este dispositivo/cuenta; nunca viaja al repo.
 # ---------------------------------------------------------------------------
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-
-# ---------------------------------------------------------------------------
-# Obsidian — caché y datos derivados
-# Se regeneran solos a partir de las notas.
-# ---------------------------------------------------------------------------
-.obsidian/cache
-.obsidian/*.mdb
-
-# ---------------------------------------------------------------------------
-# Obsidian Sync — estado de sincronización
-# Es específico de este dispositivo y de tu cuenta. Nunca debe viajar al repo.
-# ---------------------------------------------------------------------------
-.obsidian/sync.json
-.obsidian/sync-state.json
+.obsidian/
 
 # ---------------------------------------------------------------------------
 # Papelera de Obsidian
@@ -40,17 +24,3 @@ ehthumbs.db
 desktop.ini
 *~
 *.swp
-
-# ---------------------------------------------------------------------------
-# Lo que SÍ se versiona a propósito (no borrar de aquí):
-#   .obsidian/app.json           preferencias del editor
-# tema y tipografía
-.obsidian/appearance.json    
-# qué plugins tenés activos
-.obsidian/core-plugins.json  
-# filtros y colores de la vista de grafo
-.obsidian/graph.json       
-#   .obsidian/templates.json     carpeta de plantillas
-#   .obsidian/hotkeys.json       atajos personalizados
-# Así, al clonar el vault en otra máquina, recuperás tu configuración.
-# ---------------------------------------------------------------------------
