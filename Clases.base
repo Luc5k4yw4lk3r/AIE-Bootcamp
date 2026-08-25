@@ -12,6 +12,8 @@ views:
     sort:
       - property: fecha
         direction: ASC
+    columnSize:
+      file.name: 388
   - type: table
     name: Por módulo
     order:
