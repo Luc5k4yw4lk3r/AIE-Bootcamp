@@ -41,7 +41,6 @@ Esta primera sesión da el vocabulario común del bloque y arranca el caso. El v
 
 La segunda mitad de la sesión es lo que hace que este bloque no sea un curso genérico de gestión: el ciclo de vida de un proyecto de IA **es distinto**. Es experimental, el resultado depende de datos que cambian y no solo de código que se escribe, y el sistema se degrada solo aunque nadie toque nada. Eso obliga a prometer distinto, a estimar distinto y a mantener distinto.
 
-El entregable es el primer artefacto del expediente de VEGA: un **project charter** de una página. Las nueve sesiones siguientes cuelgan de él.
 
 ### Dónde estás dentro del bloque
 
@@ -124,15 +123,15 @@ vega-project/
 
 ### Proyecto y gestión
 
-| Término | Definición |
-|---|---|
-| **Proyecto** | Un esfuerzo **único y transitorio** que se emprende para alcanzar objetivos planificados, definidos en términos de outputs, outcomes o beneficios. Tiene principio y fin definidos, produce algo nuevo o modificado, y se organiza con un equipo armado para eso. *Analogía:* una mudanza es un proyecto; vivir en la casa, no. |
-| **Business-as-usual (BAU)** | El trabajo operativo continuo y repetitivo de una organización: no tiene fecha de fin, no produce algo nuevo y no se arma un equipo temporal para hacerlo. En Nortia, "atender 1.900 contactos al día" es BAU; "construir VEGA" es proyecto. |
-| **Gestión de proyectos** | La aplicación de procesos, métodos, conocimiento y experiencia para alcanzar los objetivos del proyecto dentro de parámetros acordados (alcance, plazo, coste, calidad). No es "hacer un Gantt": es tomar y sostener decisiones bajo restricciones. |
-| **Entregable (deliverable)** | Un artefacto concreto y verificable que el proyecto produce y que alguien puede aceptar o rechazar. `docs/00-charter.md` es un entregable; "avanzar en el análisis" no lo es. |
-| **Criterios de aceptación** | Las condiciones que un entregable tiene que cumplir para que el que lo recibe lo dé por bueno. Escribirlos antes de construir evita la discusión de "yo esperaba otra cosa". |
-| **Project charter** | El documento de arranque de un proyecto: fija el problema, el objetivo, el alcance dentro y fuera, los criterios de éxito, los riesgos principales y los supuestos. Es el contrato de sentido común entre el sponsor y el equipo. *Analogía:* el acta de constitución. |
-| **Supuesto (assumption)** | Algo que estás dando por cierto sin haberlo confirmado, y que si resulta falso rompe el plan. Un supuesto declarado es información; un supuesto no declarado es una bomba de tiempo. |
+| Término                                            | Definición                                                                                                                                                                                                                                                                                                                      |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Proyecto**                                       | Un esfuerzo **único y transitorio** que se emprende para alcanzar objetivos planificados, definidos en términos de outputs, outcomes o beneficios. Tiene principio y fin definidos, produce algo nuevo o modificado, y se organiza con un equipo armado para eso. *Analogía:* una mudanza es un proyecto; vivir en la casa, no. |
+| **Soporte a Produccion - Business-as-usual (BAU)** | El trabajo operativo continuo y repetitivo de una organización: no tiene fecha de fin, no produce algo nuevo y no se arma un equipo temporal para hacerlo. *En Nortia, "atender 1.900 contactos al día" es BAU; "construir VEGA" es proyecto.*                                                                                  |
+| **Gestión de proyectos**                           | La aplicación de procesos, métodos, conocimiento y experiencia para alcanzar los objetivos del proyecto dentro de parámetros acordados (alcance, plazo, coste, calidad). No es "hacer un Gantt": es tomar y sostener decisiones bajo restricciones.                                                                             |
+| **Entregable (deliverable)**                       | Un artefacto concreto y verificable que el proyecto produce y que alguien puede aceptar o rechazar. `docs/00-charter.md` es un entregable; "avanzar en el análisis" no lo es.                                                                                                                                                   |
+| **Criterios de aceptación**                        | Las condiciones que un entregable tiene que cumplir para que el que lo recibe lo dé por bueno. Escribirlos antes de construir evita la discusión de "yo esperaba otra cosa".                                                                                                                                                    |
+| **Project charter**                                | El documento de arranque de un proyecto: fija el problema, el objetivo, el alcance dentro y fuera, los criterios de éxito, los riesgos principales y los supuestos. Es el contrato de sentido común entre el sponsor y el equipo. *Analogía:* el acta de constitución.                                                          |
+| **Supuesto (assumption)**                          | Algo que estás dando por cierto sin haberlo confirmado, y que si resulta falso rompe el plan. Un supuesto declarado es información; un supuesto no declarado es una bomba de tiempo.                                                                                                                                            |
 
 ### Ciclo de vida y SDLC
 
