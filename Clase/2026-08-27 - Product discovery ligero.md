@@ -17,6 +17,9 @@
 | Trabajo del lab (discovery de VEGA, en equipo) | ~1 h 30 min |
 | **Total de estudio fuera de clase** | **≈ 4 h 15 min** |
 
+**Artefacto: Sesion version web**
+https://claude.ai/code/artifact/02c4218f-12bf-4f11-a641-3f5321a1e392
+
 ---
 
 ## 1. Objetivos de aprendizaje

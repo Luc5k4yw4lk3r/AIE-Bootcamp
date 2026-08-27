@@ -16,6 +16,10 @@
 | Trabajo del lab (charter de VEGA, en equipo) | ~1 h |
 | **Total de estudio fuera de clase** | **≈ 3 h 15 min** |
 
+**Artefacto: Sesion version web**
+
+https://claude.ai/code/artifact/7394d7fe-acf2-4422-bb0d-d1ba2469d3b4
+
 ---
 
 ## 1. Objetivos de aprendizaje
@@ -846,3 +850,7 @@ Estas se mencionan en el material pero no llevan enlace verificado. Si querés i
 - W. W. Royce, *Managing the Development of Large Software Systems*, Proc. IEEE WESCON, agosto de 1970.
 - Ryseff, J.; De Bruhl, B. F.; Newberry, S. J., *The Root Causes of Failure for Artificial Intelligence Projects and How They Can Succeed: Avoiding the Anti-Patterns of AI*, RAND Corporation, 2024 (RR-A2680-1).
 - F. P. Brooks, *The Mythical Man-Month*, edición de aniversario, Addison-Wesley, 1995.
+
+## 11. Solucion
+### Entregable
+[[2026-08-24 - Gestión de proyectos y ciclo de vida del softwar - Solucion - Charter]]

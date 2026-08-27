@@ -1,4 +1,4 @@
-# Clase — Proyectos de n8n con Vibecoding
+# Clase — Proyectos de n8n con Claude Code y Vibecoding
 
 **Stack de la clase:** n8n self-hosted + Claude Code + n8n MCP + n8n Skills + documentación en OKF
 
