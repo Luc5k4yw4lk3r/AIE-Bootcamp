@@ -39,13 +39,23 @@ Reducir el tiempo promedio que tardan los agentes en resolver consultas y reduci
 
 ## 6. Riesgos top 5
 
-| Riesgo                   | Probabilidad | Impacto | Respuesta y mitigación                                                              | Dueño  |
-| ------------------------ | ------------ | ------- | ----------------------------------------------------------------------------------- | ------ |
-| Riesgo de adopcion       | baja         | medio   | Mitigar. En etapas de diseno pedir feedback a los usuarios finales. Capacitaciones. | PO-RAC |
-| Riesgo de alucinacion    | alta         | alta    | Mitigar. Redireccionar a un agente. Hacer un menu. Notificar a los usuarios.        | PO     |
-| Contratacion de personal | media        | alto    | Transferir. Tercerizar las contrataciones                                           | DO     |
-| IT equipo saturado       | media        | alto    | Mitigar. Persuacion Transferir: Contrataciones de IT                                | IT     |
+| Riesgo                                    | Probabilidad | Impacto | Respuesta y mitigación                                                              | Dueño  |
+| ----------------------------------------- | ------------ | ------- | ----------------------------------------------------------------------------------- | ------ |
+| Riesgo de adopcion                        | baja         | medio   | Mitigar. En etapas de diseno pedir feedback a los usuarios finales. Capacitaciones. | PO-RAC |
+| Riesgo de alucinacion                     | alta         | alto    | Mitigar. Redireccionar a un agente. Hacer un menu. Notificar a los usuarios.        | PO     |
+| Contratacion de personal                  | media        | alto    | Transferir. Tercerizar las contrataciones                                           | DO     |
+| IT equipo saturado                        | media        | alto    | Mitigar. Persuacion Transferir: Contrataciones de IT                                | IT     |
+| Adopcion de usuarios                      | media        | media   | Rechazo al nuevo canal de comunicacion                                              | RAC    |
+| Riesgo de documentacion no representativa | media        | alto    |                                                                                     | DO     |
 
 ## 7. Supuestos
+Los usuarios tienen las PCs con performance suficiente para correr los nuevos aplicativos.
+Las PCs contiene licencias de software aprobado.
+Que los 4100 documentos sean legibles por una AI
+El CRM tiene una performance adecuada para el trabajo de los agentes
+Existen 10 modelos de documentos. 
+Se entrengaran los documentos mas relevantes y representen mejor a la totalidad de documentos
 
 ## 8. Qué no sabemos todavía
+¿Cuántos de esos documentos de la intranet están desactualizados y van a generar respuestas de modelos caducas?
+¿El equipo de atención al cliente cuenta con hardware/terminales compatibles con la nueva herramienta?
