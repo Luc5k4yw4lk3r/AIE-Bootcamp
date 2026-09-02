@@ -20,7 +20,7 @@ Reglas para que el vault no vuelva a degradarse. Si dudás, mirá una nota exist
 | `Plantillas/` | Plantillas del plugin Templates | — |
 | `Adjuntos/` | Imágenes y PDFs | — |
 
-La raíz solo tiene [[Home]], [[CONVENCIONES]] y las notas índice.
+La raíz solo tiene [[Home]], [[CONVENCIONES]] y las notas índice. Única excepción: el `README.md` y los archivos de configuración de agentes (`AGENTS.md`, `CLAUDE.md`, `opencode.json`), que tienen que estar en la raíz para que las herramientas los encuentren. No son notas del vault.
 
 ## Nombres de archivo
 
@@ -37,7 +37,7 @@ Toda nota empieza con un bloque YAML. `tipo` es obligatorio; el resto depende de
 ---
 tipo: clase          # clase | tarea | tema | proyecto | recurso | indice
 fecha: 2026-06-22    # solo en clase
-modulo: 2            # solo en clase y tarea
+modulo: 2            # solo en clase y tarea; `A` es el módulo transversal
 estado: pendiente    # solo en tarea y proyecto
 tags: [python, regex, linux]
 ---
@@ -48,7 +48,7 @@ tags: [python, regex, linux]
 | `tipo` | `clase` · `tarea` · `tema` · `proyecto` · `recurso` · `indice` |
 | `estado` (tarea) | `pendiente` · `en-progreso` · `hecha` |
 | `estado` (proyecto) | `idea` · `en-progreso` · `terminado` |
-| `modulo` | `1` · `2` · `3` · `4` |
+| `modulo` | `1` · `2` · `3` · `4` · `A` |
 
 > [!important] La propiedad se llama `tags`, no `temas`
 > Obsidian trata `tags` como propiedad especial: alimenta el panel de tags, el autocompletado y la búsqueda `tag:#python`. Con cualquier otro nombre eso no funciona.
@@ -57,7 +57,7 @@ tags: [python, regex, linux]
 
 Usá solo estos. Si hace falta uno nuevo, agregalo primero a esta lista.
 
-`python` · `bash` · `linux` · `regex` · `archivos` · `csv` · `poo` · `testing` · `excepciones` · `apis` · `git` · `llm` · `prompting` · `agentes` · `n8n` · `web` · `algoritmos` · `proyectos` · `bootcamp`
+`python` · `bash` · `linux` · `regex` · `archivos` · `csv` · `poo` · `testing` · `excepciones` · `apis` · `git` · `llm` · `rag` · `prompting` · `agentes` · `n8n` · `web` · `algoritmos` · `proyectos` · `requisitos` · `modelado` · `agil` · `estimacion` · `bootcamp`
 
 ## Enlaces
 
