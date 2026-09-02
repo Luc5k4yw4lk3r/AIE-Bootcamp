@@ -36,7 +36,7 @@ El vault se migró desde una exportación cruda de Notion. Esa migración está 
 
 Las tres que rompen en silencio si se ignoran:
 
-- Los apuntes de clase se llaman `AAAA-MM-DD - Tema.md`. Sin día de la semana, sin número de sesión — eran inconsistentes en el origen y se quitaron a propósito.
+- Los apuntes de clase se llaman `AAAA-MM-DD - Tema.md`. Sin día de la semana, sin número de sesión — eran inconsistentes en el origen y se quitaron a propósito. Excepción viva: las sesiones del módulo A sin fecha confirmada se llaman `MA·SNN - Tema.md`, y una mezcla las dos formas (`2026-08-28 - MA·S04 - ...`). Es deuda de nombrado conocida, decidida por el dueño del vault; no la renombres sin que te lo pidan.
 - Los tags de tema van en la propiedad de frontmatter **`tags`**, nunca `temas`. Obsidian solo alimenta el panel de tags, el autocompletado y la búsqueda `tag:` desde `tags`. El vocabulario es cerrado (19 valores); agregar uno significa agregarlo antes a `CONVENCIONES.md`.
 - Los enlaces entre notas son wikilinks (`[[Nota]]`), los adjuntos son embeds (`![[archivo.png]]`). Un enlace Markdown a un archivo local rompe los backlinks y el grafo.
 
@@ -57,12 +57,7 @@ Dos cosas que hay que entender antes de tocar los regex del script:
 
 Línea base en el commit inicial `df59b95`: 37 notas, 118 wikilinks, 0 rotos, todo el frontmatter YAML válido. La cantidad de notas va cambiando; los invariantes que tienen que valer son **0 wikilinks rotos** y **0 notas sin frontmatter válido**.
 
-Estado al 2026-09-01: 53 notas, 0 wikilinks rotos, 0 residuo de Notion. Dos chequeos en rojo, y son **deuda conocida, no una regresión que acabás de meter**:
-
-- 8 URLs desnudas — 7 artifacts de claude.ai en apuntes de agosto y un Drive en `Proyectos/Proyectos.md`.
-- 13 notas sin frontmatter — las de agosto (`MA·S05`–`MA·S07`, RAG en n8n, discovery, spec-driven) y las cuatro de `Adjuntos/`.
-
-Si vas a saldarlas, es una tarea en sí misma: pedila explícitamente antes de arrancar.
+Estado al 2026-09-02: 54 notas, **6/6 chequeos sin hallazgos**. La deuda de agosto —8 URLs desnudas y 13 notas sin frontmatter— quedó saldada. Si el script te da rojo, es algo que se introdujo después: arreglalo, no lo documentes acá.
 
 ## Gotchas del vault
 
@@ -84,7 +79,7 @@ Valen en cualquier máquina:
 
 ## Estructura
 
-Las notas índice están en la raíz del repositorio, al lado de la carpeta que describen (`Clase.md` ↔ `Clase/`); esto refleja la estructura de páginas de Notion de la que viene el vault y es intencional. `Home.md` es el punto de entrada. `Temas/` y `Recursos/` no tienen nota índice y se llegan desde `Home.md`.
+Las notas índice están en la raíz del repositorio, al lado de la carpeta que describen (`Clase.md` ↔ `Clase/`); esto refleja la estructura de páginas de Notion de la que viene el vault y es intencional. La excepción es `Proyectos/Proyectos.md`, que vive dentro de su carpeta: el wikilink `[[Proyectos]]` resuelve igual, pero rompe la simetría con el resto. `Home.md` es el punto de entrada. `Temas/` y `Recursos/` no tienen nota índice y se llegan desde `Home.md`.
 
 `Clases.base` es una vista de Obsidian Bases sobre `tipo: clase`. Su YAML parsea y Obsidian 1.12.7 soporta Bases, pero la vista **nunca se renderizó** — tratala como no verificada.
 
