@@ -1,3 +1,10 @@
+---
+tipo: clase
+fecha: 2026-08-05
+modulo: 3
+tags: [n8n, agentes]
+---
+
 # Clase — Proyectos de n8n con Claude Code y Vibecoding
 
 **Stack de la clase:** n8n self-hosted + Claude Code + n8n MCP + n8n Skills + documentación en OKF

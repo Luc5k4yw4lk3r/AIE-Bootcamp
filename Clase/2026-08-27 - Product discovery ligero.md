@@ -1,3 +1,10 @@
+---
+tipo: clase
+fecha: 2026-08-27
+modulo: A
+tags: [proyectos, requisitos]
+---
+
 # MA·S02 — Product discovery ligero
 
 **Módulo:** A — Ingeniería de Software para AI Engineers *(módulo extra, transversal; se dicta entre el módulo 06 y el 07)*
@@ -17,8 +24,7 @@
 | Trabajo del lab (discovery de VEGA, en equipo) | ~1 h 30 min |
 | **Total de estudio fuera de clase** | **≈ 4 h 15 min** |
 
-**Artefacto: Sesion version web**
-https://claude.ai/code/artifact/02c4218f-12bf-4f11-a641-3f5321a1e392
+**Artefacto:** [La sesión en versión web](https://claude.ai/code/artifact/02c4218f-12bf-4f11-a641-3f5321a1e392) — el apunte completo como página navegable.
 
 ---
 

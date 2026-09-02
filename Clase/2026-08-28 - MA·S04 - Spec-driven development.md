@@ -1,3 +1,10 @@
+---
+tipo: clase
+fecha: 2026-08-28
+modulo: A
+tags: [proyectos, requisitos, agentes]
+---
+
 # MA·S04 — Spec-driven development
 
 **Módulo:** A — Ingeniería de Software para AI Engineers *(módulo extra, transversal; se dicta entre el módulo 06 y el 07)*
@@ -32,6 +39,8 @@
 | Cierre: repaso del PRD | 5 | Sección 5, paso 0 |
 
 > 📝 **Nota para el profesor:** el plan del módulo no fija ni la fecha ni el reparto interno de los 180 minutos; esto es una propuesta funcional. El único bloque que conviene no comprimir es el lab: la autopsia de lo que inventó el agente es donde aterriza la sesión entera, y necesita al menos 20 de esos 80 minutos.
+
+**Artefacto:** [La sesión en versión web](https://claude.ai/code/artifact/bacfdeb3-2174-46ab-aa5b-45d7331edaf2) — el apunte completo como página navegable.
 
 ---
 

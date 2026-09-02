@@ -1,3 +1,10 @@
+---
+tipo: clase
+fecha: 2026-08-24
+modulo: A
+tags: [proyectos]
+---
+
 # MA·S01 — Gestión de proyectos y ciclo de vida del software
 
 **Módulo:** A — Ingeniería de Software para AI Engineers *(módulo extra, transversal; se dicta entre el módulo 06 y el 07)*
@@ -16,9 +23,7 @@
 | Trabajo del lab (charter de VEGA, en equipo) | ~1 h |
 | **Total de estudio fuera de clase** | **≈ 3 h 15 min** |
 
-**Artefacto: Sesion version web**
-
-https://claude.ai/code/artifact/7394d7fe-acf2-4422-bb0d-d1ba2469d3b4
+**Artefacto:** [La sesión en versión web](https://claude.ai/code/artifact/7394d7fe-acf2-4422-bb0d-d1ba2469d3b4) — el apunte completo como página navegable.
 
 ---
 
@@ -853,4 +858,4 @@ Estas se mencionan en el material pero no llevan enlace verificado. Si querés i
 
 ## 11. Solucion
 ### Entregable
-[[2026-08-24 - Gestión de proyectos y ciclo de vida del softwar - Solucion - Charter]]
+[[MA·S01 - Gestión de proyectos y ciclo de vida del softwar - Solucion - Charter]]

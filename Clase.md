@@ -8,6 +8,7 @@ tags: [bootcamp]
 Apuntes de cada sesión en vivo, en orden cronológico. Cada nota lleva un `## Resumen` arriba con lo que se vio y el código tal como quedó en clase.
 
 > Los archivos se nombran `AAAA-MM-DD - Tema`. Ver [[CONVENCIONES]].
+> Las sesiones del módulo A que todavía no tienen fecha confirmada se nombran `MA·SNN - Tema`.
 
 ## Módulo 2 — Python y Linux
 
@@ -26,11 +27,29 @@ Apuntes de cada sesión en vivo, en orden cronológico. Cada nota lleva un `## R
 | 01 jul | [[2026-07-01 - Linux - Comandos de archivos y procesos]] | `mkdir`, `mv`, `cp`, `rm`, `ps aux`, `kill` |
 | 02 jul | [[2026-07-02 - Bash - Scripting inicial]] | shebang, variables, primer script |
 
-## Módulo 3 — APIs
+## Módulo 3 — APIs y automatización con n8n
 
 | Fecha | Sesión | Temas |
 |---|---|---|
 | 07 jul | [[2026-07-07 - Python Requests - Consumo de APIs]] | `requests`, `GET`/`POST`, errores, timeouts, headers |
+| 03 ago | [[2026-08-03 - RAG en n8n]] | chunking, embeddings, retrieval + reranking, metadata |
+| 05 ago | [[2026-08-05 - Proyectos de n8n con Claude Code]] | n8n vía MCP, pack de skills, vibecoding |
+
+## Módulo A — Ingeniería de Software para AI Engineers
+
+Módulo transversal de 7 sesiones, entre el 06 y el 07. Hilo conductor: el proyecto VEGA de Nortia Energía. Las últimas tres todavía no tienen fecha confirmada.
+
+| Fecha | Sesión | Temas |
+|---|---|---|
+| 24 ago | [[2026-08-24 - Gestión de proyectos y ciclo de vida del software]] | ciclo de vida, charter, roles |
+| 27 ago | [[2026-08-27 - Product discovery ligero]] | stakeholders, journey map, oportunidades |
+| 28 ago | [[2026-08-28 - Análisis de requerimientos de la elicitación a la especificación]] | elicitación, requisitos, PRD |
+| 28 ago | [[2026-08-28 - MA·S04 - Spec-driven development]] | specs ejecutables, `CLAUDE.md`, agentes de código |
+| — | [[MA·S05 - Modelado - UML estructural y dinámico, C4 y ADRs]] | UML, C4, ADRs, Mermaid en el repo |
+| — | [[MA·S06 - Metodologías ágiles]] | Scrum, Kanban, gestión con alcance cambiante |
+| — | [[MA·S07 - Estimación, costeo y defensa del proyecto]] | estimación, costeo, defensa |
+
+Entregables del caso VEGA: [[MA·S01 - Gestión de proyectos y ciclo de vida del softwar - Solucion - Charter|Charter]] · [[MA·S02 - Oportunidades - Discovery de VEGA|Oportunidades]] · [[MA·S03 - Product Requirements Document (PRD)|PRD]] · [[MA·S04 - SPEC-001 · Respuesta cuando la consulta no está en la base de conocimiento|SPEC-001]]
 
 ## Material de apoyo
 

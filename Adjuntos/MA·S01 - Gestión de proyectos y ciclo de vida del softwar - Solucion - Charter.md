@@ -1,3 +1,9 @@
+---
+tipo: proyecto
+estado: en-progreso
+modulo: A
+tags: [proyectos]
+---
 
 # Project Charter — VEGA
 

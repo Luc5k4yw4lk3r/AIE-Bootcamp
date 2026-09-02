@@ -1,3 +1,10 @@
+---
+tipo: clase
+fecha: 2026-08-28
+modulo: A
+tags: [proyectos, requisitos]
+---
+
 # MA·S03 — Análisis de requerimientos: de la elicitación a la especificación
 
 **Módulo:** A — Ingeniería de Software para AI Engineers *(módulo extra, transversal; se dicta entre el módulo 06 y el 07)*
@@ -26,6 +33,8 @@
 | **Lab: entrevista simulada + consolidación** | **90** | Sección 6 de este documento |
 
 > 📝 **Nota para el profesor:** el plan del módulo solo fija el lab en ≈90 min; el resto del reparto es una propuesta. La especificación del PRD queda como trabajo fuera de clase, tal como ya indica el plan.
+
+**Artefacto:** [La sesión en versión web](https://claude.ai/code/artifact/3f0c2dd4-628e-4ce8-b61f-61f330f65e48) — el apunte completo como página navegable.
 
 ---
 

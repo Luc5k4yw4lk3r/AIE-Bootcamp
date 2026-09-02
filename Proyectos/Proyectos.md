@@ -34,8 +34,8 @@ Vías posibles para conseguir los datos, de más a menos deseable:
 > Definir objetivo, entradas y salidas con el esquema de los 5 bloques.
 
 ---
-
-## Spotify Migrator — Mar
+## Mar
+### Spotify Migrator — Mar
 
 **Objetivo (*Goal*)** — poder migrar la información de Spotify a otras plataformas.
 
@@ -54,9 +54,16 @@ Vías posibles para conseguir los datos, de más a menos deseable:
 
 ---
 
-## Escudo — Mar
+### Escudo — Mar
 
 [Documento del proyecto en Drive](https://drive.google.com/file/d/12VQLLxj3RdxHGxM1RrT213CBIsliPeK3/view?usp=sharing)
+
+> [!question] Pendiente
+> Volcar acá el objetivo, entradas y salidas para no depender del Drive.
+
+### Jobs - Mar
+
+[Documento del proyecto en Drive](https://drive.google.com/file/d/1hOOv0h6AC5pSgNlpK7hmyIwvKR3MgMmB/view?usp=sharing)
 
 > [!question] Pendiente
 > Volcar acá el objetivo, entradas y salidas para no depender del Drive.
@@ -88,3 +95,7 @@ Vías posibles para conseguir los datos, de más a menos deseable:
 
 > [!question] Pendiente
 > Sin proyecto definido todavía.
+
+## Teresa
+### Generacion de contenido educativo
+
