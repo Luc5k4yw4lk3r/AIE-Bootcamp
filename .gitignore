@@ -24,3 +24,10 @@ ehthumbs.db
 desktop.ini
 *~
 *.swp
+
+# ---------------------------------------------------------------------------
+# Permisos locales de Claude Code
+# Los genera la app por dispositivo. Los comandos compartidos de .claude/ y
+# .opencode/ sí se versionan.
+# ---------------------------------------------------------------------------
+.claude/settings.local.json
