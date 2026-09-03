@@ -14,18 +14,10 @@ Fecha: 02-09-2026 ·
 Versión: 1.0
 
 ## 1. Problema
-El objetivo principal de es **democratizar la creación de contenido de marketing profesional**. Busca que emprendedores, pymes o profesionales sin un equipo de diseño dedicado puedan generar campañas, copys publicitarios, fotografías de producto de alta calidad y hasta sitios web, de manera rápida, gratuita y respetando siempre la identidad única de su negocio.
-
-~~Las empresas destinan mucho tiempo a la generacion de contenido sin  experiencia y obtienen resultados de baja calidad.~~
-
-~~Los agentes de atencion al cliente pasan un 60% del tiempo buscando informacion entre los documentos y tienen 11minutos de media  por caso.  Actualmente existen 4100 documentos y el CRM donde  los agentes buscan esta informacion, y esto causa problemas operativos los dias de  alto volumen de consultas.~~ 
-
-## 2. Objetivo
 Para las pequeñas empresas, el mayor problema en marketing no suele ser la falta de esfuerzo, sino la **falta de consistencia e identidad visual**. Muchas veces las marcas publican en redes sociales, actualizan su web o lanzan anuncios con estilos, tonos de voz y colores completamente diferentes, lo que genera una percepción fragmentada. Además, contratar estudios de fotografía o agencias para la creación diaria de contenido resulta muy costoso. Pomelli resuelve esta brecha al unificar la estética de la marca y reducir drásticamente los costos y tiempos de producción.
 
-~~Optimizar los procesos de comunicacion y metricas con los clientes en redes sociales.~~
-
-~~Reducir el tiempo promedio que tardan los agentes en resolver consultas y reducir la cantidad de contactos de los clientes.~~
+## 2. Objetivo
+El objetivo principal de es **democratizar la creación de contenido de marketing profesional**. Busca que emprendedores, pymes o profesionales sin un equipo de diseño dedicado puedan generar campañas, copys publicitarios, fotografías de producto de alta calidad y hasta sitios web, de manera rápida, gratuita y respetando siempre la identidad única de su negocio.
 
 ## 3. Alcance — fuera
 ### Estrategia y toma de decisiones
@@ -39,11 +31,6 @@ Para las pequeñas empresas, el mayor problema en marketing no suele ser la falt
 - **Desarrollo web de Backend (Código profundo):** Si bien Pomelli puede diseñar y estructurar visualmente una _landing page_ o un sitio web básico, no puede desarrollar sistemas de gestión de inventario, pasarelas de pago complejas o bases de datos a medida.
 - **Validación legal o de cumplimiento (Compliance):** La IA no sabe si un texto publicitario o una afirmación sobre un producto infringe leyes locales o normativas específicas de industrias reguladas (como la médica, legal o financiera). La revisión de que el contenido sea legalmente viable siempre queda fuera de su alcance.
 
-- ~~Modificaciones e integraciones con el CRM~~
-- ~~7 semanas de capacitacion~~
-- ~~Disminucion del staff~~
-- ~~Contacto con clientes proactivamente~~
-
 ## 4. Alcance — dentro
 Abarcar distintas áreas del flujo de trabajo de marketing digital a través de varias funciones clave:
 - **Business DNA (ADN del Negocio):** Analiza automáticamente la URL de un sitio web o los documentos subidos por el usuario para extraer los colores, tipografías, tono de voz y estilo general, construyendo un perfil de marca. 
@@ -51,41 +38,41 @@ Abarcar distintas áreas del flujo de trabajo de marketing digital a través de 
 - **Generador de Campañas y Redes Sociales:** Crea publicaciones listas para usar en plataformas como Instagram y Facebook, incluyendo el texto persuasivo y las imágenes.
 - **Photoshoot (Fotografía de Producto):** Toma una foto sencilla de un producto (incluso sacada con un celular) y la transforma en una imagen con calidad de estudio utilizando tecnología avanzada de generación de imágenes (fondos adaptados, estilo de vida, etc.).
 - ~~**Creación de Sitios Web:** A partir del perfil de marca, puede diseñar y estructurar páginas web completas en pocos clics.~~
-- **Metricas:** 
-
-
-- ~~Sistema de gestion documental~~
-- ~~Mejorar la claridad de las facturas~~
-- ~~PoC asistente~~ 
+- **Metricas:** Engagement (interacciones de la comunidad de seguidores en el post/reel), alcance (estadística geográfica, demográfica del público al que ha llegado esa publicación), interacciones (likes, comparticiones, comentarios, guardados, reposts, re-publicación en stories...)
 
 ## 5. Criterios de éxito
 
-| Métrica                            | Valor objetivo                 | Plazo          | Cómo se mide                   |
-| ---------------------------------- | ------------------------------ | -------------- | ------------------------------ |
-| ~~Tiempo de resolucion~~               | ~~Reduccion del 30% minimo~~       | ~~Fin del piloto~~ | ~~Metricas de telefonia actuales~~ |
-| ~~PoC asistente~~                      | ~~Validacion de respuesta en 90%~~ | ~~PoC~~            | ~~Evaluacion y tests~~             |
-| ~~Reduccion de llamadas por facturas~~ | ~~Reduccion del 30% minimo~~       | ~~Fin del piloto~~ | ~~Metricas de telefonia actuales~~ |
+| Métrica                                           | Valor objetivo                                                                                                                                                                                                                                                    | Plazo          | Cómo se mide |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------ |
+| Reduccion de tiempos de produccion de entregables | Se generan entregables 30% mas rapido                                                                                                                                                                                                                             |                |              |
+| Índice de Fricción (Prompts per Export)           | El usuario necesite **menos de 3 iteraciones** para lograr un contenido final                                                                                                                                                                                     | Fin del piloto | Usuario      |
+| En usuarios incremento de las  redes sociales     | 25% mas de interacciones en redes                                                                                                                                                                                                                                 |                |              |
+| En usuarios Incrementar la reputacion online      | 25% mas de reputacion en redes                                                                                                                                                                                                                                    |                |              |
+| Retención Semanal (WAU - Weekly Active Users)     | Una retención de más del 20-30% en la segunda semana es un excelente indicador                                                                                                                                                                                    |                |              |
+| La prueba de sustitución                          | se realiza una encuesta a los usuarios activos y más del 40% afirma que, gracias a la herramienta, **dejaron de usar herramientas como Canva, cancelaron suscripciones a bancos de imágenes o dejaron de depender de un diseñador freelance** para tareas menores |                |              |
+
 
 
 ## 6. Riesgos top 5
 
-| Riesgo                                    | Probabilidad | Impacto | Respuesta y mitigación                                                              | Dueño  |
-| ----------------------------------------- | ------------ | ------- | ----------------------------------------------------------------------------------- | ------ |
-| ~~Riesgo de adopcion~~                        | ~~baja~~         | ~~medio~~   | ~~Mitigar. En etapas de diseno pedir feedback a los usuarios finales. Capacitaciones.~~ | ~~PO-RAC~~ |
-| ~~Riesgo de alucinacion~~                     | ~~alta~~         | ~~alto~~    | ~~Mitigar. Redireccionar a un agente. Hacer un menu. Notificar a los usuarios.~~        | ~~PO~~     |
-| ~~Contratacion de personal~~                  | ~~media~~        | ~~alto~~    | ~~Transferir. Tercerizar las contrataciones~~                                           | ~~DO~~     |
-| ~~IT equipo saturado~~                        | ~~media~~        | ~~alto~~    | ~~Mitigar. Persuacion Transferir: Contrataciones de IT~~                                | ~~IT~~     |
-| ~~Adopcion de usuarios~~                      | ~~media~~        | ~~media~~   | ~~Rechazo al nuevo canal de comunicacion~~                                              | ~~RAC~~    |
-| ~~Riesgo de documentacion no representativa~~ | ~~media~~        | ~~alto~~    |                                                                                     | ~~DO~~     |
+| Riesgo                                        | Probabilidad | Impacto   | Respuesta y mitigación                                                                  | Dueño      |
+| --------------------------------------------- | ------------ | --------- | --------------------------------------------------------------------------------------- | ---------- |
+| Competencia de grandes companias              | media/alta   | Alto      | Aceptacion. Mitigar con fidelizacion de clientes                                        | Alberto    |
+| Riesgo de alucinacion                         | alta         | alto      | Mitigar. Redireccionar a un agente. Hacer un menu. Notificar a los usuarios.            | PO         |
+| Suba de costos de tokens                      | media        | media     | Mitigar. Se traslada el costo a los usuarios.                                           |            |
+| Adopcion de usuarios                          | media        | media     | Rechazo al nuevo canal de comunicacion                                                  |            |
+
 
 ## 7. Supuestos
-~~Los usuarios tienen las PCs con performance suficiente para correr los nuevos aplicativos.~~
-~~Las PCs contiene licencias de software aprobado.~~
-~~Que los 4100 documentos sean legibles por una AI~~
-~~El CRM tiene una performance adecuada para el trabajo de los agentes~~
-~~Existen 10 modelos de documentos.~~ 
-~~Se entrengaran los documentos mas relevantes y representen mejor a la totalidad de documentos~~
+- **A las pymes les importa la consistencia de marca:** Asumimos que los dueños de negocios valoran mantener su paleta de colores y tono de voz. En la realidad, es posible que a muchos solo les interese publicar _cualquier cosa_ rápido, sin importar si respeta el "ADN de la marca".
+
+- **Las pymes tienen un buen punto de partida:** Asumimos que la URL o el logo que el usuario ingresa tiene la calidad suficiente para que la IA extraiga un manual de marca. El riesgo es que la mayoría de los sitios web de pymes tengan un diseño deficiente, lo que generará contenido feo desde el inicio (_garbage in, garbage out_).
+
+- **La calidad de la IA es "suficientemente buena":** Suponemos que los resultados generados tienen la calidad mínima aceptable para reemplazar a un fotógrafo junior o a un redactor freelance.
 
 ## 8. Qué no sabemos todavía
-~~¿Cuántos de esos documentos de la intranet están desactualizados y van a generar respuestas de modelos caducas?~~
-~~¿El equipo de atención al cliente cuenta con hardware/terminales compatibles con la nueva herramienta?~~
+- **Disposición a pagar (Pricing):** ¿Estarán dispuestos a pagar una suscripción mensual recurrente, o preferirán pagar por créditos (por cada imagen generada)? Además, ¿por qué pagarían por esto si ChatGPT o Canva ya ofrecen herramientas de IA a bajo costo?
+    
+- **Economía unitaria (Unit Economics):** Generar imágenes y procesar lenguaje natural con IA en la nube es costoso. No sabemos si el costo de los servidores (cálculo de GPU y tokens) será lo suficientemente bajo como para que la empresa sea rentable.
+    
+- **El problema del Copyright y la Legalidad:** Aún no sabemos cómo reaccionarán las pymes frente a la incertidumbre legal de usar imágenes generadas por IA que no tienen derechos de autor claros, o si plataformas como Instagram penalizarán el contenido 100% automatizado en el futuro.
