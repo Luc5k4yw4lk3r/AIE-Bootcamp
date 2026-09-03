@@ -1,0 +1,67 @@
+---
+tipo: proyecto
+estado: en-progreso
+modulo: A
+tags: [proyectos]
+---
+# AI Creative Scaling & Performance Ads
+
+Sponsor:  Alberto Coronado
+Stakeholders identificados:
+- **Alberto Coronado** - Founder
+
+Fecha: 02-09-2026 · 
+Versión: 1.0
+
+## 1. Problema
+Las empresas destinan mucho tiempo a la generacion de contenido sin  experiencia y obtienen resultados de baja calidad.
+
+~~Los agentes de atencion al cliente pasan un 60% del tiempo buscando informacion entre los documentos y tienen 11minutos de media  por caso.  Actualmente existen 4100 documentos y el CRM donde  los agentes buscan esta informacion, y esto causa problemas operativos los dias de  alto volumen de consultas.~~ 
+
+## 2. Objetivo
+Optimizar los procesos de comunicacion y metricas con los clientes en redes sociales.
+
+~~Reducir el tiempo promedio que tardan los agentes en resolver consultas y reducir la cantidad de contactos de los clientes.~~
+
+## 3. Alcance — fuera
+- ~~Modificaciones e integraciones con el CRM~~
+- ~~7 semanas de capacitacion~~
+- ~~Disminucion del staff~~
+- ~~Contacto con clientes proactivamente~~
+
+## 4. Alcance — dentro
+- ~~Sistema de gestion documental~~
+- ~~Mejorar la claridad de las facturas~~
+- ~~PoC asistente~~ 
+
+## 5. Criterios de éxito
+
+| Métrica                            | Valor objetivo                 | Plazo          | Cómo se mide                   |
+| ---------------------------------- | ------------------------------ | -------------- | ------------------------------ |
+| ~~Tiempo de resolucion~~               | ~~Reduccion del 30% minimo~~       | ~~Fin del piloto~~ | ~~Metricas de telefonia actuales~~ |
+| ~~PoC asistente~~                      | ~~Validacion de respuesta en 90%~~ | ~~PoC~~            | ~~Evaluacion y tests~~             |
+| ~~Reduccion de llamadas por facturas~~ | ~~Reduccion del 30% minimo~~       | ~~Fin del piloto~~ | ~~Metricas de telefonia actuales~~ |
+
+
+## 6. Riesgos top 5
+
+| Riesgo                                    | Probabilidad | Impacto | Respuesta y mitigación                                                              | Dueño  |
+| ----------------------------------------- | ------------ | ------- | ----------------------------------------------------------------------------------- | ------ |
+| ~~Riesgo de adopcion~~                        | ~~baja~~         | ~~medio~~   | ~~Mitigar. En etapas de diseno pedir feedback a los usuarios finales. Capacitaciones.~~ | ~~PO-RAC~~ |
+| ~~Riesgo de alucinacion~~                     | ~~alta~~         | ~~alto~~    | ~~Mitigar. Redireccionar a un agente. Hacer un menu. Notificar a los usuarios.~~        | ~~PO~~     |
+| ~~Contratacion de personal~~                  | ~~media~~        | ~~alto~~    | ~~Transferir. Tercerizar las contrataciones~~                                           | ~~DO~~     |
+| ~~IT equipo saturado~~                        | ~~media~~        | ~~alto~~    | ~~Mitigar. Persuacion Transferir: Contrataciones de IT~~                                | ~~IT~~     |
+| ~~Adopcion de usuarios~~                      | ~~media~~        | ~~media~~   | ~~Rechazo al nuevo canal de comunicacion~~                                              | ~~RAC~~    |
+| ~~Riesgo de documentacion no representativa~~ | ~~media~~        | ~~alto~~    |                                                                                     | ~~DO~~     |
+
+## 7. Supuestos
+~~Los usuarios tienen las PCs con performance suficiente para correr los nuevos aplicativos.~~
+~~Las PCs contiene licencias de software aprobado.~~
+~~Que los 4100 documentos sean legibles por una AI~~
+~~El CRM tiene una performance adecuada para el trabajo de los agentes~~
+~~Existen 10 modelos de documentos.~~ 
+~~Se entrengaran los documentos mas relevantes y representen mejor a la totalidad de documentos~~
+
+## 8. Qué no sabemos todavía
+~~¿Cuántos de esos documentos de la intranet están desactualizados y van a generar respuestas de modelos caducas?~~
+~~¿El equipo de atención al cliente cuenta con hardware/terminales compatibles con la nueva herramienta?~~
