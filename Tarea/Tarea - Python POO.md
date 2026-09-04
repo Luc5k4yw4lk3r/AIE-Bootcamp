@@ -23,4 +23,4 @@ tags: [python, poo]
 ## Relacionado
 
 - [[Tarea - Algoritmos]]
-- [[Fundamentos de Programación]]
+- [[M02·S01 - Fundamentos de Programación]]

@@ -30,5 +30,5 @@ Para obtener mejores resultados, ya sea de forma incremental o en un único prom
 
 ## Relacionado
 
-- [[Prompting - Curso de Andrew Ng]]
+- [[M02·S01 - Prompting - Curso de Andrew Ng]]
 - [[Proyectos]]

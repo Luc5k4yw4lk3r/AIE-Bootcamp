@@ -109,4 +109,4 @@ os.listdir("website")
 ## Relacionado
 
 - [[2026-06-18 - Revisión Python - Archivos CSV]]
-- [[Python y Sistemas Operativos]]
+- [[M02·S03 - Python y Sistemas Operativos]]

@@ -122,4 +122,4 @@ log_modificado = re.sub(r"^(\d{4})-(\d{2})-(\d{2})", r"\3/\2/\1", log_text, flag
 
 ## Relacionado
 
-- [[Python y Sistemas Operativos]]
+- [[M02·S03 - Python y Sistemas Operativos]]

@@ -76,5 +76,5 @@ Curso completo de Andrew Ng sobre cómo pasar de usar la IA como buscador a usar
 
 ## Relacionado
 
-- [[Prompting - Crear una app en 30 minutos]]
-- [[Claude y MCPs]]
+- [[M02·S02 - Prompting - Crear una app en 30 minutos]]
+- [[M03·S03 - Claude y MCPs]]

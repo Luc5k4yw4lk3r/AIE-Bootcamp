@@ -15,7 +15,7 @@ Curso de Google que estructura todo el **módulo 2** del bootcamp: usar Python p
 
 En vez de volver a ver 8 horas de vídeo, está el resumen que hizo la clase, vídeo por vídeo y con el código:
 
-→ **[[Resumen - Using Python to Interact with the Operating System]]**
+→ **[[M02·S04 - Using Python to Interact with the Operating System]]**
 
 Cubre: instalación de Python, compilado vs. interpretado, módulos propios, manejo de archivos, módulo `os`, expresiones regulares, `input()` y flujos de I/O, variables de entorno, `unittest`, `try`/`except`, comandos de Linux, redirección de salidas y scripting en Bash.
 

@@ -20,4 +20,4 @@ Ejercicios prácticos. Todos vienen con enunciado y solución, así que sirven i
 ## Relacionado
 
 - [[Clase]] — la sesión que corresponde a cada tanda de ejercicios.
-- [[Fundamentos de Programación]] — si un ejercicio se traba, acá están los cursos base.
+- [[M02·S01 - Fundamentos de Programación]] — si un ejercicio se traba, acá están los cursos base.

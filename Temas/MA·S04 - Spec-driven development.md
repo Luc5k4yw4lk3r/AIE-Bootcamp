@@ -1,8 +1,11 @@
 ---
 tipo: clase
-fecha: 2026-08-28
+fecha: 2026-08-27
 modulo: A
-tags: [proyectos, requisitos, agentes]
+tags:
+  - proyectos
+  - requisitos
+  - agentes
 ---
 
 # MA·S04 — Spec-driven development

@@ -5,7 +5,7 @@ tags: [proyectos]
 
 # Proyectos
 
-Proyectos de los compañeros del bootcamp. Se describen con los **5 bloques de construcción** de Andrew Ng —objetivo, entradas, salidas, diseño y características especiales—, el mismo esquema de [[Prompting - Crear una app en 30 minutos]].
+Proyectos de los compañeros del bootcamp. Se describen con los **5 bloques de construcción** de Andrew Ng —objetivo, entradas, salidas, diseño y características especiales—, el mismo esquema de [[M02·S02 - Prompting - Crear una app en 30 minutos]].
 
 | Proyecto | Persona | Estado |
 |---|---|---|

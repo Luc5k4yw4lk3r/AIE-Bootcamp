@@ -56,4 +56,4 @@ unittest.main()
 
 - [[2026-06-30 - Excepciones - raise y validación]]
 - [[Tarea - Excepciones, testing y APIs]] — ejercicios de repaso sobre esta sesión.
-- [[Python y Sistemas Operativos]]
+- [[M02·S03 - Python y Sistemas Operativos]]

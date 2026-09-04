@@ -32,8 +32,8 @@ Apuntes de cada sesión en vivo, en orden cronológico. Cada nota lleva un `## R
 | Fecha | Sesión | Temas |
 |---|---|---|
 | 07 jul | [[2026-07-07 - Python Requests - Consumo de APIs]] | `requests`, `GET`/`POST`, errores, timeouts, headers |
-| 03 ago | [[2026-08-03 - RAG en n8n]] | chunking, embeddings, retrieval + reranking, metadata |
-| 05 ago | [[2026-08-05 - Proyectos de n8n con Claude Code]] | n8n vía MCP, pack de skills, vibecoding |
+| 03 ago | [[M03·S02 - RAG en n8n]] | chunking, embeddings, retrieval + reranking, metadata |
+| 05 ago | [[M03·S04 - Proyectos de n8n con Claude Code]] | n8n vía MCP, pack de skills, vibecoding |
 
 ## Módulo A — Ingeniería de Software para AI Engineers
 
@@ -41,10 +41,10 @@ Módulo transversal de 7 sesiones, entre el 06 y el 07. Hilo conductor: el proye
 
 | Fecha | Sesión | Temas |
 |---|---|---|
-| 24 ago | [[2026-08-24 - Gestión de proyectos y ciclo de vida del software]] | ciclo de vida, charter, roles |
-| 27 ago | [[2026-08-27 - Product discovery ligero]] | stakeholders, journey map, oportunidades |
-| 28 ago | [[2026-08-28 - Análisis de requerimientos de la elicitación a la especificación]] | elicitación, requisitos, PRD |
-| 28 ago | [[2026-08-28 - MA·S04 - Spec-driven development]] | specs ejecutables, `CLAUDE.md`, agentes de código |
+| 24 ago | [[MA·S01 - Gestión de proyectos y ciclo de vida del software]] | ciclo de vida, charter, roles |
+| 27 ago | [[MA·S02 - Product discovery ligero]] | stakeholders, journey map, oportunidades |
+| 28 ago | [[MA·S03 - Análisis de requerimientos de la elicitación a la especificación]] | elicitación, requisitos, PRD |
+| 28 ago | [[MA·S04 - Spec-driven development]] | specs ejecutables, `CLAUDE.md`, agentes de código |
 | — | [[MA·S05 - Modelado - UML estructural y dinámico, C4 y ADRs]] | UML, C4, ADRs, Mermaid en el repo |
 | — | [[MA·S06 - Metodologías ágiles]] | Scrum, Kanban, gestión con alcance cambiante |
 | — | [[MA·S07 - Estimación, costeo y defensa del proyecto]] | estimación, costeo, defensa |
@@ -53,6 +53,6 @@ Entregables del caso VEGA: [[MA·S01 - Gestión de proyectos y ciclo de vida del
 
 ## Material de apoyo
 
-- [[Python y Sistemas Operativos]] — el curso que sigue el módulo 2.
-- [[Resumen - Using Python to Interact with the Operating System]] — resumen escrito de ese curso completo, hecho por la clase.
+- [[M02·S03 - Python y Sistemas Operativos]] — el curso que sigue el módulo 2.
+- [[M02·S04 - Using Python to Interact with the Operating System]] — resumen escrito de ese curso completo, hecho por la clase.
 - [[Tarea]] — los ejercicios que acompañan estas sesiones.

@@ -144,4 +144,4 @@ git push -u origin main
 
 ## Relacionado
 
-- [[Fundamentos de Programación]]
+- [[M02·S01 - Fundamentos de Programación]]

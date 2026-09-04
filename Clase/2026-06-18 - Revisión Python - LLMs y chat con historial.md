@@ -164,4 +164,4 @@ while pregunta != "salir":
 ## Relacionado
 
 - [[2026-07-07 - Python Requests - Consumo de APIs]]
-- [[Claude y MCPs]]
+- [[M03·S03 - Claude y MCPs]]

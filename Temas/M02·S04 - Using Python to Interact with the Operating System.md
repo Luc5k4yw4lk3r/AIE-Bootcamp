@@ -485,5 +485,5 @@ Esto te permite aprovechar lo mejor de cada lenguaje en el mismo flujo de trabaj
 
 ## Relacionado
 
-- [[Python y Sistemas Operativos]]
+- [[M02·S03 - Python y Sistemas Operativos]]
 - [[Clase]]

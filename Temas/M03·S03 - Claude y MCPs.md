@@ -33,5 +33,5 @@ Colecciones de skills ya hechas, para instalar en lugar de escribirlas desde cer
 
 ## Relacionado
 
-- [[n8n]] — la alternativa no-code para automatizar con agentes.
-- [[Prompting - Curso de Andrew Ng]] — cómo escribir las instrucciones que recibe el agente.
+- [[M03·S01 - n8n]] — la alternativa no-code para automatizar con agentes.
+- [[M02·S01 - Prompting - Curso de Andrew Ng]] — cómo escribir las instrucciones que recibe el agente.

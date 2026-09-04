@@ -54,7 +54,7 @@ Práctica: [[Tarea - Algoritmos]].
 ## Git
 
 - [How Git Works: Explained in 4 Minutes — ByteByteGo](https://www.youtube.com/watch?v=e9lnsKot_SQ) — el modelo mental en 4 minutos.
-- Para publicar tu código: [[Subir repositorios a GitHub]].
+- Para publicar tu código: [[M02·S05 - Subir repositorios a GitHub]].
 
 ## APIs
 

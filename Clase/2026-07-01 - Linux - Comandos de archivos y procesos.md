@@ -70,4 +70,4 @@ kill <id de proceso>
 ## Relacionado
 
 - [[2026-07-02 - Bash - Scripting inicial]]
-- [[Python y Sistemas Operativos]]
+- [[M02·S03 - Python y Sistemas Operativos]]
