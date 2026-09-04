@@ -1,7 +1,5 @@
 ---
-tipo: clase
-fecha: 2026-08-24
-modulo: A
+tipo: tema
 tags: [proyectos]
 ---
 

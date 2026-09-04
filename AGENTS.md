@@ -24,9 +24,9 @@ Verificado: los dos agentes descubren los comandos (`opencode debug config` list
 
 ## Qué es este repositorio
 
-Un **vault de Obsidian**, no un proyecto de software. No hay build, ni suite de tests, ni linter, ni dependencias. El contenido son apuntes de estudio en castellano del bootcamp de AI Engineering de Neoland (junio–julio 2026): apuntes de clase, ejercicios, temas de referencia y documentos de proyecto de compañeros.
+Un **vault de Obsidian**, no un proyecto de software. No hay build, ni suite de tests, ni linter, ni dependencias. El contenido son apuntes de estudio en castellano del bootcamp de AI Engineering de Neoland (junio–septiembre 2026): apuntes de clase, ejercicios, temas de referencia y documentos de proyecto de compañeros.
 
-Todo es Markdown más tres binarios (un PNG y un PDF en `Adjuntos/`, una imagen pegada en `Multimedia/`). Los cambios se hacen editando archivos `.md` directamente.
+Todo es Markdown más tres binarios: un PDF en `Adjuntos/` y dos PNG en `Multimedia/`. Los cambios se hacen editando archivos `.md` directamente.
 
 El vault se migró desde una exportación cruda de Notion. Esa migración está terminada — si aparece un sufijo hexadecimal de 32 caracteres en un nombre de archivo, un enlace Markdown con `%20` a un archivo local, o una URL desnuda sola en su línea, es una regresión, no el estado normal.
 
@@ -36,8 +36,8 @@ El vault se migró desde una exportación cruda de Notion. Esa migración está 
 
 Las tres que rompen en silencio si se ignoran:
 
-- Los apuntes de clase se llaman `AAAA-MM-DD - Tema.md`. Sin día de la semana, sin número de sesión — eran inconsistentes en el origen y se quitaron a propósito. Excepción viva: las sesiones del módulo A sin fecha confirmada se llaman `MA·SNN - Tema.md`, y una mezcla las dos formas (`2026-08-28 - MA·S04 - ...`). Es deuda de nombrado conocida, decidida por el dueño del vault; no la renombres sin que te lo pidan.
-- Los tags de tema van en la propiedad de frontmatter **`tags`**, nunca `temas`. Obsidian solo alimenta el panel de tags, el autocompletado y la búsqueda `tag:` desde `tags`. El vocabulario es cerrado (19 valores); agregar uno significa agregarlo antes a `CONVENCIONES.md`.
+- Conviven dos esquemas de nombre y cada uno vale en su carpeta: `Clase/` usa `AAAA-MM-DD - Tema.md` (sin día de la semana ni número de sesión, eran inconsistentes en el origen), y `Temas/` más los entregables de `Adjuntos/` usan `MMM·SNN - Tema.md`. La deuda de nombrado mixto de agosto (`2026-08-28 - MA·S04 - ...`) se saldó en `9250ac9`: si volvés a ver las dos formas en un mismo nombre, es una regresión.
+- Los tags de tema van en la propiedad de frontmatter **`tags`**, nunca `temas`. Obsidian solo alimenta el panel de tags, el autocompletado y la búsqueda `tag:` desde `tags`. El vocabulario es cerrado (24 valores); agregar uno significa agregarlo antes a `CONVENCIONES.md`, que es de donde el script lo lee.
 - Los enlaces entre notas son wikilinks (`[[Nota]]`), los adjuntos son embeds (`![[archivo.png]]`). Un enlace Markdown a un archivo local rompe los backlinks y el grafo.
 
 ## Verificación
@@ -48,16 +48,17 @@ No hay tests, pero sí un script que cubre los modos de fallo que este vault tie
 .scripts/verificar-vault.py
 ```
 
-Chequea residuo de Notion (en nombres y en contenido), enlaces Markdown a archivos locales, URLs desnudas, wikilinks rotos y notas sin frontmatter válido. Sale con código 1 si encuentra algo. Solo necesita Python 3; PyYAML es opcional y el propio script te dice en qué modo corrió.
+Chequea residuo de Notion (en nombres y en contenido), enlaces Markdown a archivos locales, URLs desnudas, wikilinks rotos, notas sin frontmatter válido y propiedades fuera de las convenciones. Sale con código 1 si encuentra algo. Solo necesita Python 3; PyYAML es opcional y el propio script te dice en qué modo corrió.
 
-Dos cosas que hay que entender antes de tocar los regex del script:
+Tres cosas que hay que entender antes de tocar los regex del script:
 
-- Hay que neutralizar bloques cerrados y code spans **en todos** los chequeos, no solo en el de wikilinks: `CONVENCIONES.md` documenta los antipatrones citándolos, así que sin eso se denuncia a sí misma. Aparte hay que descartar el patrón `[[00:00](url)]` — ese último es un artefacto de Notion presente en todo `Temas/Prompting - *` y `Temas/n8n.md`. Es un enlace Markdown normal envuelto en corchetes literales, no un wikilink; un regex ingenuo de `\[\[` reporta ~22 falsos positivos. Aparece además en forma múltiple: `[[03:29](url), [03:51](url)]`.
+- Hay que neutralizar bloques cerrados y code spans **en todos** los chequeos, no solo en el de wikilinks: `CONVENCIONES.md` documenta los antipatrones citándolos, así que sin eso se denuncia a sí misma. Aparte hay que descartar el patrón `[[00:00](url)]` — ese último es un artefacto de Notion presente en `Temas/M02·S01 - Prompting - *`, `Temas/M02·S02 - Prompting - *` y `Temas/M03·S01 - n8n.md`. Es un enlace Markdown normal envuelto en corchetes literales, no un wikilink; un regex ingenuo de `\[\[` reporta ~22 falsos positivos. Aparece además en forma múltiple: `[[03:29](url), [03:51](url)]`.
 - El hexadecimal de 32 caracteres y el `%20` también matchean **dentro de URLs externas** (nombres de PDFs de NeurIPS, de Fraunhofer, de Cockburn). Por eso el script excluye las líneas con `http`.
+- El chequeo 7 lee el vocabulario de tags **desde `CONVENCIONES.md`**, no de una copia en el script: duplicarlo es la deriva que el chequeo existe para cazar. Y tiene que leer las dos sintaxis de lista de YAML, `tags: [a, b]` y la lista en bloque con guiones, porque en el vault conviven las dos; un patrón que solo mire `^tags: \[` deja pasar la mitad de las notas.
 
 Línea base en el commit inicial `df59b95`: 37 notas, 118 wikilinks, 0 rotos, todo el frontmatter YAML válido. La cantidad de notas va cambiando; los invariantes que tienen que valer son **0 wikilinks rotos** y **0 notas sin frontmatter válido**.
 
-Estado al 2026-09-02: 54 notas, **6/6 chequeos sin hallazgos**. La deuda de agosto —8 URLs desnudas y 13 notas sin frontmatter— quedó saldada. Si el script te da rojo, es algo que se introdujo después: arreglalo, no lo documentes acá.
+Estado al 2026-09-04: 57 notas, **7/7 chequeos sin hallazgos**. La reestructuración de módulos (`9250ac9`) había dejado 2 wikilinks apuntando a una nota borrada y frontmatter copiado en los dos apuntes nuevos; ambas cosas quedaron saldadas junto con el chequeo 7, que es el que caza la segunda. Si el script te da rojo, es algo que se introdujo después: arreglalo, no lo documentes acá.
 
 ## Gotchas del vault
 
@@ -81,20 +82,22 @@ Valen en cualquier máquina:
 
 Las notas índice están en la raíz del repositorio, al lado de la carpeta que describen (`Clase.md` ↔ `Clase/`); esto refleja la estructura de páginas de Notion de la que viene el vault y es intencional. La excepción es `Proyectos/Proyectos.md`, que vive dentro de su carpeta: el wikilink `[[Proyectos]]` resuelve igual, pero rompe la simetría con el resto. `Home.md` es el punto de entrada. `Temas/` y `Recursos/` no tienen nota índice y se llegan desde `Home.md`.
 
-`Clases.base` es una vista de Obsidian Bases sobre `tipo: clase`. Su YAML parsea y Obsidian 1.12.7 soporta Bases, pero la vista **nunca se renderizó** — tratala como no verificada.
+`Clases.base` es una vista de Obsidian Bases sobre `tipo: clase`, así que muestra exactamente las notas de `Clase/`: las de `Temas/` llevan `tipo: tema` y quedan fuera a propósito. Su YAML parsea y Obsidian 1.12.7 soporta Bases, pero la vista **nunca se renderizó** — tratala como no verificada.
 
 ## Defectos conocidos sin arreglar
 
 Reportados y dejados sin arreglar a la espera de la decisión del dueño del vault. No asumas que fueron descuidos del material original; la mayoría se introdujeron durante la migración.
 
-1. `Espacio de alumnos/Resumen - Using Python to Interact with the Operating System.md` — bajar de nivel los H1 de Notion aplanó el esquema: las ocho secciones `📹 Vídeo N` y sus subsecciones quedaron todas en `##`, así que las subsecciones renderizan como hermanas del vídeo al que pertenecen. Se arregla bajando a `###` los `##` que no son de vídeo.
+1. `Temas/M02·S04 - Using Python to Interact with the Operating System.md` — bajar de nivel los H1 de Notion aplanó el esquema: las ocho secciones `📹 Vídeo N` y sus subsecciones quedaron todas en `##`, así que las subsecciones renderizan como hermanas del vídeo al que pertenecen. Se arregla bajando a `###` los `##` que no son de vídeo.
 2. `Tarea/Tarea - Programación inicial.md` — tres encabezados `##` vacíos (artefactos de Notion) más "Parte 2" en `###` mientras "Parte 1" está en `##`.
 3. `Tarea/Tarea - Python POO.md` — errata "Ejerc**ic**o 2".
 4. `Clase/2026-07-02 - Bash - Scripting inicial.md` — `[gather-information.sh](http://gather-information.sh/)` es un enlace muerto; Notion auto-enlazó un nombre de archivo. Debería ser código inline.
 5. `Tarea.md` — la columna "Estado" repite "ver propiedad `estado`" en cada fila y no aporta información.
 6. `Espacio de alumnos.md` — un embed de PDF dentro de una viñeta renderiza un visor completo dentro del ítem de lista.
 7. `Home.md` — una sección `## Marketing` (encabezado más el placeholder "Sugerencia") de la nota raíz original se perdió durante la reescritura y nunca se repuso.
-8. `Proyectos/Historias de usuario - Nash Equilibrium Lounge.md` — el H1 sigue diciendo "Historias de usuario de ejemplo" y no coincide con el nombre del archivo.
+8. `Proyectos/Proyectos.md` — "Tere" y "Teresa" son secciones separadas para la misma persona, y `### Jobs - Mar` y `### Generacion de contenido educativo` (un stub vacío, además sin tilde) no figuran en la tabla de arriba.
+9. `Adjuntos/MA·S01 - Gestión de proyectos y ciclo de vida del softwar - *.md` (dos archivos) — al prefijo le falta la "e" final de "software". Renombrarlos arrastra los wikilinks de `Clase.md`, así que hay que hacerlo con Obsidian cerrado y como cambio aparte.
+10. `Temas/M02·S04` y `Temas/M02·S05` llevan `tipo: recurso` viviendo en `Temas/`. Es defendible —son material externo resumido por la clase— pero conviene decidirlo explícitamente en vez de dejarlo como accidente de la migración.
 
 ## Idioma
 

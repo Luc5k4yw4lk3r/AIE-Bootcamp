@@ -24,7 +24,7 @@ Vault del bootcamp de AI Engineering de Neoland. Punto de entrada a todo: apunte
 
 ## Secciones
 
-- **[[Clase]]** — 13 sesiones, de junio a julio de 2026.
+- **[[Clase]]** — 15 sesiones, de junio a septiembre de 2026.
 - **[[Tarea]]** — ejercicios con enunciado y solución.
 - **[[Proyectos]]** — proyectos de los compañeros, en formato objetivo / entradas / salidas.
 - **[[Espacio de alumnos]]** — material que aporta la clase.
@@ -56,7 +56,7 @@ Las fases que seguimos, en orden:
 
 1. **Brainstorming** o iniciativa.
 2. **Misión del proyecto** — el objetivo, en una frase.
-3. **Historias de usuario** — ver [[Historias de usuario - Nash Equilibrium Lounge]] como ejemplo trabajado.
+3. **Historias de usuario** — una por necesidad concreta, en formato "como X quiero Y para Z".
 4. **Priorizar** — Pareto 80/20 para quedarse con lo que aporta, y recortar hasta el MVP.
 5. **Prototipo o maqueta** — pedirle a la IA que arme la maqueta a partir de las historias de usuario.
 

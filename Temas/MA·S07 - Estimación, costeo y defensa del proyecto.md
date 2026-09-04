@@ -1,7 +1,5 @@
 ---
-tipo: clase
-fecha:
-modulo: A
+tipo: tema
 tags: [proyectos, estimacion]
 ---
 

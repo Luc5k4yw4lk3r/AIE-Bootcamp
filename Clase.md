@@ -8,7 +8,7 @@ tags: [bootcamp]
 Apuntes de cada sesión en vivo, en orden cronológico. Cada nota lleva un `## Resumen` arriba con lo que se vio y el código tal como quedó en clase.
 
 > Los archivos se nombran `AAAA-MM-DD - Tema`. Ver [[CONVENCIONES]].
-> Las sesiones del módulo A que todavía no tienen fecha confirmada se nombran `MA·SNN - Tema`.
+> Los apuntes de referencia de cada sesión viven en `Temas/` con el esquema `MMM·SNN - Tema`; esta tabla los enlaza igual, con la fecha en que se dictaron.
 
 ## Módulo 2 — Python y Linux
 
@@ -37,7 +37,7 @@ Apuntes de cada sesión en vivo, en orden cronológico. Cada nota lleva un `## R
 
 ## Módulo A — Ingeniería de Software para AI Engineers
 
-Módulo transversal de 7 sesiones, entre el 06 y el 07. Hilo conductor: el proyecto VEGA de Nortia Energía. Las últimas tres todavía no tienen fecha confirmada.
+Módulo transversal de 7 sesiones, dictado entre los módulos 6 y 7. Hilo conductor: el proyecto VEGA de Nortia Energía. Las últimas tres todavía no tienen fecha confirmada.
 
 | Fecha | Sesión | Temas |
 |---|---|---|
@@ -50,6 +50,15 @@ Módulo transversal de 7 sesiones, entre el 06 y el 07. Hilo conductor: el proye
 | — | [[MA·S07 - Estimación, costeo y defensa del proyecto]] | estimación, costeo, defensa |
 
 Entregables del caso VEGA: [[MA·S01 - Gestión de proyectos y ciclo de vida del softwar - Solucion - Charter|Charter]] · [[MA·S02 - Oportunidades - Discovery de VEGA|Oportunidades]] · [[MA·S03 - Product Requirements Document (PRD)|PRD]] · [[MA·S04 - SPEC-001 · Respuesta cuando la consulta no está en la base de conocimiento|SPEC-001]]
+
+### Sesiones de análisis
+
+Prácticas sobre los entregables, fuera de la numeración `MA·SNN`.
+
+| Fecha | Sesión | Temas |
+|---|---|---|
+| 25 ago | [[2026-08-25 - Analisis de proyecto de ejemplo - Vega]] | recorrido por los entregables de VEGA como caso de referencia |
+| 01 sep | [[2026-09-01 - Analisis de proyecto de marketing]] | documentación del proyecto de Alberto, pack de tráfico y performance |
 
 ## Material de apoyo
 

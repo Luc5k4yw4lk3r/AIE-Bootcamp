@@ -35,6 +35,9 @@ URL_DESNUDA = re.compile(r"^https?://")
 # Un target con forma de timestamp no es un wikilink: es el artefacto de Notion
 # [[03:29](url), [03:51](url)], un enlace Markdown envuelto en corchetes.
 TIMESTAMP = re.compile(r"^\d{1,2}:\d{2}(:\d{2})?$")
+FECHA_EN_NOMBRE = re.compile(r"^(\d{4}-\d{2}-\d{2}) - ")
+
+TIPOS = {"clase", "tarea", "tema", "proyecto", "recurso", "indice"}
 
 
 def relativo(p):
@@ -153,6 +156,106 @@ def frontmatter_invalido():
     return malas
 
 
+def vocabulario_de_tags():
+    """Los tags válidos salen de CONVENCIONES.md, que es la spec autoritativa.
+    Copiarlos acá sería exactamente la deriva que este chequeo existe para cazar:
+    AGENTS.md llegó a decir 19 valores cuando la spec ya listaba 24."""
+    spec = RAIZ / "CONVENCIONES.md"
+    if not spec.exists():
+        return None
+    seccion = re.search(
+        r"^### Vocabulario cerrado de `tags`$(.*?)^## ",
+        spec.read_text(encoding="utf-8"),
+        re.M | re.S,
+    )
+    if not seccion:
+        return None
+    return set(re.findall(r"`([a-z0-9-]+)`", seccion.group(1))) or None
+
+
+VOCABULARIO_TAGS = vocabulario_de_tags()
+
+
+def bloque_frontmatter(texto):
+    """El YAML entre delimitadores, o None si no hay bloque bien formado.
+    Los casos None ya los reporta el chequeo 6; acá se saltan sin duplicar ruido."""
+    if not texto.startswith("---"):
+        return None
+    fin = texto.find("\n---", 3)
+    return None if fin == -1 else texto[3:fin]
+
+
+def campos(bloque):
+    """`tipo`, `fecha` y `tags` del frontmatter, o None si el YAML no se puede leer.
+
+    Sin PyYAML se leen por regex. Hay que soportar las **dos** sintaxis de lista
+    de YAML: `tags: [a, b]` en línea y la lista en bloque con guiones. En el vault
+    conviven las dos, y un patrón que solo mire `^tags: \[` deja pasar la mitad.
+    """
+    if yaml is not None:
+        try:
+            datos = yaml.safe_load(bloque)
+        except yaml.YAMLError:
+            return None
+        if not isinstance(datos, dict):
+            return None
+        crudos = datos.get("tags") or []
+        if isinstance(crudos, str):
+            crudos = [crudos]
+        return {
+            "tipo": datos.get("tipo"),
+            "fecha": str(datos["fecha"]) if datos.get("fecha") else None,
+            "tags": [str(t).strip() for t in crudos if str(t).strip()],
+        }
+
+    tipo = re.search(r"^tipo\s*:\s*(\S+)", bloque, re.M)
+    fecha = re.search(r"^fecha\s*:\s*(\S+)", bloque, re.M)
+    en_linea = re.search(r"^tags\s*:\s*\[([^\]]*)\]", bloque, re.M)
+    if en_linea:
+        crudos = en_linea.group(1).split(",")
+    else:
+        en_bloque = re.search(r"^tags\s*:\s*$\n((?:[ \t]*-[ \t]*\S.*\n?)+)", bloque, re.M)
+        crudos = re.findall(r"^[ \t]*-[ \t]*(.+?)[ \t]*$", en_bloque.group(1), re.M) if en_bloque else []
+    return {
+        "tipo": tipo.group(1) if tipo else None,
+        "fecha": fecha.group(1) if fecha else None,
+        "tags": [t.strip() for t in crudos if t.strip()],
+    }
+
+
+def propiedades_fuera_de_convenciones():
+    """`tipo` y `tags` contra el vocabulario cerrado, y la `fecha` de una clase
+    contra la del nombre del archivo.
+
+    El chequeo 6 solo mira que `tipo` exista. Eso dejó pasar dos apuntes con
+    `tags: [gestion, analisis]` —ninguno de los dos en el vocabulario— y una
+    `fecha` copiada del apunte anterior que no coincidía con el nombre.
+    """
+    malas = []
+    for p in NOTAS:
+        if p.name in NO_SON_NOTAS:
+            continue
+        bloque = bloque_frontmatter(p.read_text(encoding="utf-8"))
+        if bloque is None:
+            continue
+        datos = campos(bloque)
+        if datos is None:
+            continue
+
+        if datos["tipo"] and datos["tipo"] not in TIPOS:
+            malas.append(f'{relativo(p)}: tipo "{datos["tipo"]}" fuera del vocabulario')
+        if VOCABULARIO_TAGS is not None:
+            for t in datos["tags"]:
+                if t not in VOCABULARIO_TAGS:
+                    malas.append(f'{relativo(p)}: tag "{t}" fuera del vocabulario')
+        del_nombre = FECHA_EN_NOMBRE.match(p.name)
+        if del_nombre and datos["fecha"] and datos["fecha"] != del_nombre.group(1):
+            malas.append(
+                f'{relativo(p)}: fecha {datos["fecha"]} no coincide con el nombre ({del_nombre.group(1)})'
+            )
+    return malas
+
+
 CHEQUEOS = [
     ("Residuo de Notion en nombres de archivo", nombres_con_residuo_notion),
     ("Residuo de Notion en contenido", contenido_con_residuo_notion),
@@ -163,6 +266,11 @@ CHEQUEOS = [
         "Notas sin frontmatter válido"
         + (" (YAML parseado)" if yaml else " (modo estructural, sin PyYAML)"),
         frontmatter_invalido,
+    ),
+    (
+        "Propiedades fuera de las convenciones"
+        + ("" if VOCABULARIO_TAGS else " (sin vocabulario de tags: falta CONVENCIONES.md)"),
+        propiedades_fuera_de_convenciones,
     ),
 ]
 
@@ -189,10 +297,11 @@ def main():
         print("PyYAML no está instalado: el frontmatter se chequeó solo por estructura.")
         print("Para la validación YAML completa: pip install pyyaml")
     if not con_hallazgos:
-        print(f"{NEGRITA}Vault limpio: 6/6 chequeos sin hallazgos.{FIN_COLOR}")
+        total = len(CHEQUEOS)
+        print(f"{NEGRITA}Vault limpio: {total}/{total} chequeos sin hallazgos.{FIN_COLOR}")
         return 0
 
-    print(f"{NEGRITA}{len(con_hallazgos)} de 6 chequeos con hallazgos.{FIN_COLOR}")
+    print(f"{NEGRITA}{len(con_hallazgos)} de {len(CHEQUEOS)} chequeos con hallazgos.{FIN_COLOR}")
     if INVARIANTES & set(con_hallazgos):
         print("Hay invariantes rotos (wikilinks o frontmatter): arreglar antes de commitear.")
     return 1

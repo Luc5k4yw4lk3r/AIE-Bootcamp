@@ -15,8 +15,6 @@ Proyectos de los compañeros del bootcamp. Se describen con los **5 bloques de c
 | Clases didácticas de música | Tere | idea |
 | *(sin definir)* | Alberto | pendiente |
 
-Ejemplo trabajado en profundidad: [[Historias de usuario - Nash Equilibrium Lounge]].
-
 ---
 
 ## Mundial — Jorge

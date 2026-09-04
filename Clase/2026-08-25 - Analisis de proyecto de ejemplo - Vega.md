@@ -1,10 +1,8 @@
 ---
 tipo: clase
-fecha: 2026-07-07
-modulo: 4
-tags:
-  - gestion
-  - analisis
+fecha: 2026-08-25
+modulo: A
+tags: [proyectos, requisitos]
 ---
 
 

@@ -1,6 +1,6 @@
 # AIE-Bootcamp
 
-Vault de [Obsidian](https://obsidian.md) con los apuntes del bootcamp de AI Engineering de Neoland: notas de clase, ejercicios, temas de referencia y documentos de proyecto.
+Vault de [Obsidian](https://obsidian.md) con los apuntes del bootcamp de AI Engineering de Neoland: notas de clase en `Clase/`, ejercicios en `Tarea/`, referencia por módulo en `Temas/` y documentos de proyecto en `Proyectos/`. Los adjuntos se reparten entre `Adjuntos/` (PDFs y entregables) y `Multimedia/` (imágenes).
 
 **No es un proyecto de software.** No hay build, ni tests, ni dependencias que instalar. Todo es Markdown y se edita como Markdown.
 

@@ -1,7 +1,5 @@
 ---
-tipo: clase
-fecha: 2026-08-27
-modulo: A
+tipo: tema
 tags: [proyectos, requisitos]
 ---
 

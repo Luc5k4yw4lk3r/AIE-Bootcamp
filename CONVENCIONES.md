@@ -13,12 +13,13 @@ Reglas para que el vault no vuelva a degradarse. Si dudás, mirá una nota exist
 |---|---|---|
 | `Clase/` | Un apunte por sesión en vivo | [[Clase]] |
 | `Tarea/` | Ejercicios con enunciado y solución | [[Tarea]] |
-| `Temas/` | Referencia por tema, independiente de la fecha | — |
+| `Temas/` | Referencia por módulo y sesión, independiente de la fecha | — |
 | `Proyectos/` | Documentos de proyecto largos | [[Proyectos]] |
 | `Recursos/` | Enlaces y material externo sin elaborar | — |
 | `Espacio de alumnos/` | Material aportado por compañeros | [[Espacio de alumnos]] |
 | `Plantillas/` | Plantillas del plugin Templates | — |
-| `Adjuntos/` | Imágenes y PDFs | — |
+| `Adjuntos/` | PDFs y entregables de sesión en Markdown (`tipo: proyecto`) | — |
+| `Multimedia/` | Imágenes: las que pega Obsidian y las que se añaden a mano | — |
 
 La raíz solo tiene [[Home]], [[CONVENCIONES]] y las notas índice. Única excepción: el `README.md` y los archivos de configuración de agentes (`AGENTS.md`, `CLAUDE.md`, `opencode.json`), que tienen que estar en la raíz para que las herramientas los encuentren. No son notas del vault.
 
@@ -26,6 +27,8 @@ La raíz solo tiene [[Home]], [[CONVENCIONES]] y las notas índice. Única excep
 
 - **Clases:** `AAAA-MM-DD - Tema.md` → `2026-06-22 - Python y Linux - Expresiones regulares.md`
   La fecha ordena sola y evita el lío de numerar sesiones. **No** se pone el día de la semana ni el número de sesión en el nombre; van en las propiedades.
+- **Temas y entregables de sesión:** `MMM·SNN - Tema.md` → `MA·S03 - Análisis de requerimientos de la elicitación a la especificación.md`
+  `M` + el número de módulo (`02`, `03`…) o `A` para el transversal, `·S` + el número de sesión con dos dígitos, ` - ` y el tema. El separador es `·` (U+00B7), no un punto. Ordena por módulo y sesión sin depender de la fecha, que para la referencia no aporta. Aplica a `Temas/` y a los entregables de `Adjuntos/`.
 - **Todo lo demás:** título descriptivo en castellano, con tildes, sin fecha.
 - Nunca sufijos de ID ni códigos. Si aparece un hash de 32 caracteres al final de un archivo, viene de una exportación de Notion y hay que quitarlo.
 
@@ -77,7 +80,7 @@ Usá solo estos. Si hace falta uno nuevo, agregalo primero a esta lista.
 1. `Ctrl+N` dentro de `Clase/`.
 2. `Ctrl+P` → **Insert template** → `Plantilla - Clase`.
 3. Renombrar el archivo a `AAAA-MM-DD - Tema`.
-4. Rellenar `fecha`, `modulo` y `temas` en las propiedades, y el `## Resumen` con 2–4 viñetas al terminar la sesión.
+4. Rellenar `fecha`, `modulo` y `tags` en las propiedades, y el `## Resumen` con 2–4 viñetas al terminar la sesión.
 5. Añadir la fila en la tabla de [[Clase]].
 
 ## Marcas de trabajo pendiente

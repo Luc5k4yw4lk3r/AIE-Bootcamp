@@ -1,7 +1,5 @@
 ---
-tipo: clase
-fecha: 2026-08-03
-modulo: 3
+tipo: tema
 tags: [n8n, rag, llm]
 ---
 
