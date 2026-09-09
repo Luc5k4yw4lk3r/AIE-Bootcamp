@@ -90,10 +90,20 @@ Vías posibles para conseguir los datos, de más a menos deseable:
 ---
 
 ## Alberto
-
-> [!question] Pendiente
-> Sin proyecto definido todavía.
-
+### PACK 1 • Producto Hook / Entrada
+GEO & SEO Entity Audit & Optimization (Search & AI Citations)  
+Objetivo: Posicionar la marca en motores de respuesta conversacional (ChatGPT, Gemini, Perplexity) y Google AI Overviews mediante citabilidad y arquitectura de entidades.  
+### PACK 2 • Tráfico & Performance con IA  
+AI Creative Scaling & Performance Ads (Paid Media + IA)  
+Objetivo: Generación masiva y testing acelerado de creatividades multiformato para escalar campañas en Meta Ads, TikTok y Google PMax acelerando el ROAS.  
+### PACK 3 • Operaciones & Escala eCommerce
+AI Catalog Enrichment & Product Feed Automation  
+Objetivo: Optimización masiva y enriquecimiento semántico de catálogos e-Commerce mediante flujos automatizados de IA  
+### PACK 4 • Conversión & Automatización Agéntica
+Conversational AI Sales Agents & Automation Workflows  
+Objetivo: Despliegue de asistentes agénticos de venta en tiempo real y flujos automatizados de captación y cualificación. (edited)
 ## Teresa
 ### Generacion de contenido educativo
 
+## Rodrigo
+### Chatbot con RAG por Telegram o Whatsapp

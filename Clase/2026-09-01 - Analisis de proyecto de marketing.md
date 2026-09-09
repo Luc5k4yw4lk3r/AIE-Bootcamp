@@ -13,3 +13,8 @@ Objetivo: Generación masiva y testing acelerado de creatividades multiformato p
 
 # Charter
 [[MA·S01 - Gestión de proyectos y ciclo de vida del softwar - Charter - AI Creative Scaling & Performance Ads]]
+# Discovery
+[[MA·S02 - Oportunidades - Discovery - AI Creative Scaling & Performance Ads]]
+# PRD
+[[MA·S03 - Product Requirements Document (PRD) - AI Creative Scaling & Performance Ads]]
+

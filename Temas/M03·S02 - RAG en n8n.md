@@ -106,12 +106,12 @@ Otros prerequisitos que los videos también asumen y ninguno explica (todos gaps
 
 **Los modos que muestra el video 1 (25:47):**
 
-| Modo | Cómo corta | Cuándo usarlo |
-|---|---|---|
-| **Simple** (preset del Default Data Loader) | 1000 caracteres / 200 de overlap | Default rápido |
-| **Character Text Splitter** | Por un **separador explícito** (ej. el punto) | Documentos con estructura predecible y marcada: CSV-like, logs, transcripciones línea por línea |
-| **Token Splitter** | Por **tokens BPE** | Cuando querés controlar el costo/límite real del modelo, que se mide en tokens |
-| **Recursive Character Text Splitter** | Jerarquía de separadores: párrafo → oración → palabra, "manteniendo juntos" tanto como se pueda | **El recomendado por default** (`19:30`) |
+| Modo                                        | Cómo corta                                                                                      | Cuándo usarlo                                                                                   |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Simple** (preset del Default Data Loader) | 1000 caracteres / 200 de overlap                                                                | Default rápido                                                                                  |
+| **Character Text Splitter**                 | Por un **separador explícito** (ej. el punto)                                                   | Documentos con estructura predecible y marcada: CSV-like, logs, transcripciones línea por línea |
+| **Token Splitter**                          | Por **tokens BPE**                                                                              | Cuando querés controlar el costo/límite real del modelo, que se mide en tokens                  |
+| **Recursive Character Text Splitter**       | Jerarquía de separadores: párrafo → oración → palabra, "manteniendo juntos" tanto como se pueda | **El recomendado por default** (`19:30`)                                                        |
 
 > ⚠️ **Corrección al video (verificada en la doc oficial).** El video presenta "cuatro splitters", pero **el modo Simple no es un algoritmo distinto**: es el **Recursive Character Text Splitter con chunk size 1000 y overlap 200**. O sea: hay **tres nodos de splitter + un preset**. No pienses en el Simple como un algoritmo naïve inferior; es el algoritmo recomendado con valores por defecto.
 

@@ -8,7 +8,12 @@ tags: [proyectos]
 
 Sponsor:  Alberto Coronado
 Stakeholders identificados:
-- **Alberto Coronado** - Founder
+- **Alberto Coronado** - Founder · impulsor y decisor de producto
+- **Dueño-operador de pyme** - Usuario primario; publica él mismo, sin equipo de diseño
+- **Community manager / freelance de marketing** - Usuario secundario; gestiona varias marcas a la vez
+- **Diseñador freelance** - Afectado; parte de su trabajo es lo que la herramienta absorbe
+- **Plataformas de anuncios (Meta, TikTok, Google)** - Actor externo con poder de veto: sus políticas de contenido generado por IA condicionan el producto
+- **Proveedor de modelos de IA** - Dependencia de coste y de disponibilidad; fija el suelo del precio por creatividad
 
 Fecha: 02-09-2026 · 
 Versión: 1.0
@@ -17,7 +22,7 @@ Versión: 1.0
 Para las pequeñas empresas, el mayor problema en marketing no suele ser la falta de esfuerzo, sino la **falta de consistencia e identidad visual**. Muchas veces las marcas publican en redes sociales, actualizan su web o lanzan anuncios con estilos, tonos de voz y colores completamente diferentes, lo que genera una percepción fragmentada. Además, contratar estudios de fotografía o agencias para la creación diaria de contenido resulta muy costoso. Pomelli resuelve esta brecha al unificar la estética de la marca y reducir drásticamente los costos y tiempos de producción.
 
 ## 2. Objetivo
-El objetivo principal de es **democratizar la creación de contenido de marketing profesional**. Busca que emprendedores, pymes o profesionales sin un equipo de diseño dedicado puedan generar campañas, copys publicitarios, fotografías de producto de alta calidad y hasta sitios web, de manera rápida, gratuita y respetando siempre la identidad única de su negocio.
+El objetivo principal de es **democratizar la creación de contenido de marketing profesional**. Busca que emprendedores, pymes o profesionales sin un equipo de diseño dedicado puedan generar campañas, copys publicitarios, fotografías de producto de alta calidad ~~y hasta sitios web~~, de manera rápida, gratuita y respetando siempre la identidad única de su negocio.
 
 ## 3. Alcance — fuera
 ### Estrategia y toma de decisiones
@@ -42,26 +47,26 @@ Abarcar distintas áreas del flujo de trabajo de marketing digital a través de 
 
 ## 5. Criterios de éxito
 
-| Métrica                                           | Valor objetivo                                                                                                                                                                                                                                                    | Plazo          | Cómo se mide |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------ |
-| Reduccion de tiempos de produccion de entregables | Se generan entregables 30% mas rapido                                                                                                                                                                                                                             |                |              |
-| Índice de Fricción (Prompts per Export)           | El usuario necesite **menos de 3 iteraciones** para lograr un contenido final                                                                                                                                                                                     | Fin del piloto | Usuario      |
-| En usuarios incremento de las  redes sociales     | 25% mas de interacciones en redes                                                                                                                                                                                                                                 |                |              |
-| En usuarios Incrementar la reputacion online      | 25% mas de reputacion en redes                                                                                                                                                                                                                                    |                |              |
-| Retención Semanal (WAU - Weekly Active Users)     | Una retención de más del 20-30% en la segunda semana es un excelente indicador                                                                                                                                                                                    |                |              |
-| La prueba de sustitución                          | se realiza una encuesta a los usuarios activos y más del 40% afirma que, gracias a la herramienta, **dejaron de usar herramientas como Canva, cancelaron suscripciones a bancos de imágenes o dejaron de depender de un diseñador freelance** para tareas menores |                |              |
+> Los umbrales marcados como *(propuesto)* todavía no están negociados con el sponsor: son la propuesta del equipo y se cierran en la validación con Alberto. Cada uno lleva magnitud, unidad y población de medida.
 
-
+| Métrica | Valor objetivo | Plazo | Cómo se mide |
+| --- | --- | --- | --- |
+| Tiempo de producción de un entregable | El tiempo mediano desde que el usuario abre una campaña hasta el primer export aprobado es ≤ **12 min**, frente a la línea base de producción manual, medido sobre las campañas del piloto *(propuesto — línea base pendiente de medir)* | Fin del piloto (8 semanas) | Telemetría de la app: `timestamp` de creación de campaña → `timestamp` del primer export |
+| Índice de fricción (prompts por export) | El p75 de iteraciones de regeneración hasta el export aprobado es **< 3**, medido sobre los exports del piloto *(propuesto)* | Fin del piloto (8 semanas) | Contador de regeneraciones por creatividad exportada |
+| Interacciones en redes de los usuarios | **+25 %** de interacciones (likes, comentarios, guardados, comparticiones) en los 30 días posteriores al primer uso, frente a los 30 días previos, sobre las cuentas de los usuarios del piloto que conecten sus métricas *(propuesto)* | 30 días después del alta de cada usuario | Métricas nativas de la plataforma, aportadas por el usuario |
+| Percepción de marca de los usuarios | El **≥ 70 %** de los comentarios recibidos en las publicaciones generadas se clasifican como neutros o positivos, sobre las publicaciones del piloto *(propuesto)* | Fin del piloto (8 semanas) | Clasificación de sentimiento de los comentarios, con revisión humana de una muestra |
+| Retención semanal (WAU) | El **≥ 25 %** de los usuarios activos de la semana 1 vuelven a generar al menos una creatividad en la semana 2, sobre la cohorte de altas de cada semana *(propuesto)* | Cada cohorte semanal, durante el piloto | Cohortes semanales de usuarios activos |
+| Prueba de sustitución | El **≥ 40 %** de los usuarios activos declara haber dejado de usar otra herramienta (banco de imágenes, editor gráfico o diseñador externo) para tareas menores, sobre los usuarios que respondan la encuesta, con **≥ 30** respuestas para darla por válida *(propuesto)* | Fin del piloto (8 semanas) | Encuesta de una pregunta dentro de la app |
 
 ## 6. Riesgos top 5
 
-| Riesgo                                        | Probabilidad | Impacto   | Respuesta y mitigación                                                                  | Dueño      |
-| --------------------------------------------- | ------------ | --------- | --------------------------------------------------------------------------------------- | ---------- |
-| Competencia de grandes companias              | media/alta   | Alto      | Aceptacion. Mitigar con fidelizacion de clientes                                        | Alberto    |
-| Riesgo de alucinacion                         | alta         | alto      | Mitigar. Redireccionar a un agente. Hacer un menu. Notificar a los usuarios.            | PO         |
-| Suba de costos de tokens                      | media        | media     | Mitigar. Se traslada el costo a los usuarios.                                           |            |
-| Adopcion de usuarios                          | media        | media     | Rechazo al nuevo canal de comunicacion                                                  |            |
-
+| Riesgo                                                                                                                                    | Probabilidad | Impacto | Respuesta y mitigación                                                                                                                                                        | Dueño   |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| Competencia de grandes compañías                                                                                                          | media/alta   | alto    | Aceptar. Mitigar con fidelización de clientes y con el nicho de la consistencia de marca                                                                                      | Alberto |
+| Riesgo de alucinación: la creatividad afirma algo del producto que el usuario no aportó                                                   | alta         | alto    | Mitigar. Generar solo sobre atributos declarados por el usuario, marcar el texto no respaldado antes del export y medirlo con un eval continuo (NFR-04 del PRD)               | PO      |
+| Suba de costos de tokens y de generación de imagen                                                                                        | media        | media   | Mitigar. Cachear y limitar generaciones por plan; en el peor caso, trasladar el coste al usuario — ojo con el conflicto CONF-003                                              | Alberto |
+| Adopción de usuarios: la pyme prueba una vez y no vuelve                                                                                  | media        | media   | Mitigar. Plantillas por industria para bajar el coste del primer uso; medir la retención de la semana 2 desde el día uno                                                      | PO      |
+| Punto de partida pobre de la marca (*garbage in, garbage out*): el sitio o el logo del usuario no dan para extraer un ADN de marca usable | alta         | alto    | Mitigar. Camino alternativo por plantilla de industria y edición manual de los campos que la extracción no resuelva; declarar cobertura mínima de extracción (NFR-05 del PRD) | PO      |
 
 ## 7. Supuestos
 - **A las pymes les importa la consistencia de marca:** Asumimos que los dueños de negocios valoran mantener su paleta de colores y tono de voz. En la realidad, es posible que a muchos solo les interese publicar _cualquier cosa_ rápido, sin importar si respeta el "ADN de la marca".
@@ -72,7 +77,7 @@ Abarcar distintas áreas del flujo de trabajo de marketing digital a través de 
 
 ## 8. Qué no sabemos todavía
 - **Disposición a pagar (Pricing):** ¿Estarán dispuestos a pagar una suscripción mensual recurrente, o preferirán pagar por créditos (por cada imagen generada)? Además, ¿por qué pagarían por esto si ChatGPT o Canva ya ofrecen herramientas de IA a bajo costo?
-    
+
 - **Economía unitaria (Unit Economics):** Generar imágenes y procesar lenguaje natural con IA en la nube es costoso. No sabemos si el costo de los servidores (cálculo de GPU y tokens) será lo suficientemente bajo como para que la empresa sea rentable.
-    
+
 - **El problema del Copyright y la Legalidad:** Aún no sabemos cómo reaccionarán las pymes frente a la incertidumbre legal de usar imágenes generadas por IA que no tienen derechos de autor claros, o si plataformas como Instagram penalizarán el contenido 100% automatizado en el futuro.
