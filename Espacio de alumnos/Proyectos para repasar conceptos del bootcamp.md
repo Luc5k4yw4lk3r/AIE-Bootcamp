@@ -54,3 +54,15 @@ Por otro lado dejo aquí los proyectos que quiero realizar para repasar el Bootc
 **Para qué:** corregir de forma asíncrona a alumnos de canto entre clase y clase, y sostener tu escuela online.  
 **Cómo:** alineación audio-partitura con DTW y análisis con music21 y librosa que extraen los hechos objetivos; los agentes razonan sobre esos datos, nunca escuchan directamente. Agente de diagnóstico técnico, agente musicólogo con RAG sobre tratados en dominio público, y generador de ejercicios a medida en PDF y MIDI.  
 **Bootcamp:** los ocho módulos. Es el único de la lista que los toca todos con sentido.
+
+**10. El Répétiteur — maestro de música que escucha y lee**  
+**Para qué:** corregir de forma asíncrona a alumnos de canto entre clase y clase, y sostener tu escuela online.  
+**Cómo:** alineación audio-partitura con DTW y análisis con music21 y librosa que extraen los hechos objetivos; los agentes razonan sobre esos datos, nunca escuchan directamente. Agente de diagnóstico técnico, agente musicólogo con RAG sobre tratados en dominio público, y generador de ejercicios a medida en PDF y MIDI.  
+**Bootcamp:** los ocho módulos. Es el único de la lista que los toca todos con sentido.
+
+
+**10. El Répétiteur — maestro de música que escucha y lee**  
+**Para qué:** corregir de forma asíncrona a alumnos de canto entre clase y clase, y sostener tu escuela online.  
+**Cómo:** alineación audio-partitura con DTW y análisis con music21 y librosa que extraen los hechos objetivos; los agentes razonan sobre esos datos, nunca escuchan directamente. Agente de diagnóstico técnico, agente musicólogo con RAG sobre tratados en dominio público, y generador de ejercicios a medida en PDF y MIDI.  
+**Bootcamp:** los ocho módulos. Es el único de la lista que los toca todos con sentido.
+

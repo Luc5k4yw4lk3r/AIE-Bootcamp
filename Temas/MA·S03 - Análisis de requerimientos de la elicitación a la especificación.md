@@ -240,12 +240,12 @@ La versión reparada, en el caso VEGA:
 
 Estas cuatro palabras se usan como sinónimos en la conversación de oficina y no lo son. Separarlas es lo que te permite saber en qué estás fallando cuando algo sale mal.
 
-| Actividad | Qué hacés | Qué sale | Síntoma de que la salteaste |
-|---|---|---|---|
-| **Elicitación** | Extraés material crudo de personas, documentos y datos | Notas, frases textuales, ejemplos, quejas | El documento solo contiene lo que ya pensabas antes de empezar |
-| **Análisis** | Clasificás, detectás huecos, contradicciones y conflictos | FR, NFR, conflictos registrados, supuestos explicitados | Dos requisitos del mismo documento se contradicen y nadie lo notó |
-| **Especificación** | Escribís con estructura y vocabulario acordados | `02-requirements.md`, `03-prd.md` | El equipo pregunta lo mismo tres veces |
-| **Validación** | Comprobás con el stakeholder que eso es lo que necesitaba | Requisitos aprobados o corregidos | En la demo alguien dice "esto no era lo que pedí" |
+| Actividad          | Qué hacés                                                 | Qué sale                                                | Síntoma de que la salteaste                                       |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Elicitación**    | Extraés material crudo de personas, documentos y datos    | Notas, frases textuales, ejemplos, quejas               | El documento solo contiene lo que ya pensabas antes de empezar    |
+| **Análisis**       | Clasificás, detectás huecos, contradicciones y conflictos | FR, NFR, conflictos registrados, supuestos explicitados | Dos requisitos del mismo documento se contradicen y nadie lo notó |
+| **Especificación** | Escribís con estructura y vocabulario acordados           | `02-requirements.md`, `03-prd.md`                       | El equipo pregunta lo mismo tres veces                            |
+| **Validación**     | Comprobás con el stakeholder que eso es lo que necesitaba | Requisitos aprobados o corregidos                       | En la demo alguien dice "esto no era lo que pedí"                 |
 
 La distinción que más rinde: **verificar** es comprobar que construiste bien el sistema; **validar** es comprobar que construiste el sistema correcto. Podés pasar todos los tests y haber construido lo que nadie necesitaba.
 

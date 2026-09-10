@@ -72,8 +72,7 @@ Al terminar esta sesión vas a poder:
 Durante seis sesiones el expediente de VEGA respondió **qué** se va a construir: el charter
 (MA·S01), el discovery (MA·S02), los requisitos y el PRD (MA·S03), las specs ejecutables
 (MA·S04), los diagramas, el C4 y los ADR (MA·S05), y el backlog priorizado con el sprint 1
-planificado (MA·S06). Hoy respondés las dos preguntas que un comité de dirección hace primero y
-que ninguna de esas seis sesiones contesta: **¿cuánto cuesta?** y **¿por qué vale la pena?**.
+planificado (MA·S06). Hoy respondés las dos preguntas que un comité de dirección hace primero y que ninguna de esas seis sesiones contesta: **¿cuánto cuesta?** y **¿por qué vale la pena?**.
 
 El eje conceptual es que un proyecto de IA rompe la estimación clásica por dos lados. Por
 arriba, tiene fases de investigación cuya duración no se conoce hasta que terminan —el spike de
@@ -806,14 +805,14 @@ circulares nuevas"), tradujiste.
 Un guión que funciona, con presupuesto de tiempo. Los porcentajes son orientativos, pero el
 **orden no es negociable**: problema antes que solución, siempre.
 
-| # | Parte | Tiempo | Qué decís | Qué NO decís |
-|---|---|---|---|---|
-| 1 | **Problema** | 1:30 | El dolor en el lenguaje de ellos: 1.900 contactos/día, 11 min de resolución, 60 % del tiempo buscando en 4.100 documentos, 7 semanas de rampa | Nada de tecnología. Todavía no |
-| 2 | **Solución propuesta** | 1:00 | Qué hace VEGA en una frase que un no técnico repite sin errores | Cómo está construido |
-| 3 | **Alcance** | 1:00 | Qué entra y —sobre todo— **qué no entra**. El alcance excluido es lo que evita las expectativas rotas | "Ya veremos" |
-| 4 | **Arquitectura** | 1:30 | El C4 nivel 1, y como mucho el nivel 2. Una decisión con su alternativa descartada (un ADR contado en 20 segundos) | El diagrama de clases. El de secuencia. Nada de UML |
-| 5 | **Plan** | 1:30 | Fases, hitos, y **dónde está la incertidumbre**: el spike, el timebox, qué decisión lo cierra | Un Gantt de 40 barras |
-| 6 | **Coste y business case** | 1:30 | El rango, los supuestos que lo mueven, el punto de equilibrio y la sensibilidad a la adopción | Un número único sin supuestos |
+| #   | Parte                     | Tiempo | Qué decís                                                                                                                                     | Qué NO decís                                        |
+| --- | ------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| 1   | **Problema**              | 1:30   | El dolor en el lenguaje de ellos: 1.900 contactos/día, 11 min de resolución, 60 % del tiempo buscando en 4.100 documentos, 7 semanas de rampa | Nada de tecnología. Todavía no                      |
+| 2   | **Solución propuesta**    | 1:00   | Qué hace VEGA en una frase que un no técnico repite sin errores                                                                               | Cómo está construido                                |
+| 3   | **Alcance**               | 1:00   | Qué entra y —sobre todo— **qué no entra**. El alcance excluido es lo que evita las expectativas rotas                                         | "Ya veremos"                                        |
+| 4   | **Arquitectura**          | 1:30   | El C4 nivel 1, y como mucho el nivel 2. Una decisión con su alternativa descartada (un ADR contado en 20 segundos)                            | El diagrama de clases. El de secuencia. Nada de UML |
+| 5   | **Plan**                  | 1:30   | Fases, hitos, y **dónde está la incertidumbre**: el spike, el timebox, qué decisión lo cierra                                                 | Un Gantt de 40 barras                               |
+| 6   | **Coste y business case** | 1:30   | El rango, los supuestos que lo mueven, el punto de equilibrio y la sensibilidad a la adopción                                                 | Un número único sin supuestos                       |
 
 Reglas de escenario:
 
@@ -868,15 +867,15 @@ Se proyecta durante las defensas. Cinco criterios, peso igual, escala 1-4.
 
 El expediente completo, en el repositorio `vega-project`:
 
-| # | Artefacto | Sesión de origen |
-|---|---|---|
-| 1 | Project charter | MA·S01 |
-| 2 | Mapa de stakeholders, journey y oportunidades priorizadas | MA·S02 |
-| 3 | Requisitos, NFR, conflictos y PRD con criterios de aceptación | MA·S03 |
-| 4 | Specs ejecutables + `CLAUDE.md` | MA·S04 |
-| 5 | Diagramas estructurales y dinámicos, C4 nivel 1-2 y 3 ADRs | MA·S05 |
-| 6 | Backlog priorizado y sprint 1 planificado en tablero | MA·S06 |
-| 7 | Estimación, costeo y business case (`docs/08-estimacion.md`) | MA·S07 |
+| #   | Artefacto                                                     | Sesión de origen |
+| --- | ------------------------------------------------------------- | ---------------- |
+| 1   | Project charter                                               | MA·S01           |
+| 2   | Mapa de stakeholders, journey y oportunidades priorizadas     | MA·S02           |
+| 3   | Requisitos, NFR, conflictos y PRD con criterios de aceptación | MA·S03           |
+| 4   | Specs ejecutables + `CLAUDE.md`                               | MA·S04           |
+| 5   | Diagramas estructurales y dinámicos, C4 nivel 1-2 y 3 ADRs    | MA·S05           |
+| 6   | Backlog priorizado y sprint 1 planificado en tablero          | MA·S06           |
+| 7   | Estimación, costeo y business case (`docs/08-estimacion.md`)  | MA·S07           |
 
 ```mermaid
 flowchart TD
