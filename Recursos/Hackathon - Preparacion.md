@@ -48,6 +48,9 @@ https://academy.openai.com/public/courses/ai-for-educators-lc8j1
 # Preparación de entorno de trabajo
 ## Pasos para armar mi entorno de trabajo
 Creo mi carpeta del proyecto en workspace
+
+Arquitectura: https://drive.google.com/file/d/11X259pKdbqgirVebSEH_743PvkRXZ5-i/view?usp=sharing
+
 Inicializo con un prompt con claude
 
 ```
