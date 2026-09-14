@@ -1,0 +1,850 @@
+<title>Anatomía de un request</title>
+<meta name="description" content="Explicador interactivo del ciclo de vida de un request en FastAPI">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#eef2f1; --surface:#ffffff; --surface-2:#e7edeb; --surface-3:#f5f8f7;
+    --border:#d3ddda; --border-strong:#b9c7c3;
+    --ink:#0f1a1c; --ink-soft:#4b5b58; --ink-faint:#7d8d89;
+    --accent:#0d9488; --accent-ink:#0b6b62; --accent-soft:#c7f0ea; --accent-glow:rgba(13,148,136,.22);
+    --amber:#b45309; --amber-soft:#fbe6c9;
+    --danger:#c62828; --danger-soft:#f7d6d6; --danger-glow:rgba(198,40,40,.18);
+    --ok:#15803d; --ok-soft:#cdefd7;
+    --violet:#6d28d9; --violet-soft:#e6ddfb;
+    --shadow:0 1px 2px rgba(15,26,28,.06),0 10px 30px -12px rgba(15,26,28,.18);
+    --shadow-lift:0 2px 6px rgba(15,26,28,.08),0 18px 44px -16px rgba(15,26,28,.30);
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Hanken Grotesk',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b1214; --surface:#111b1e; --surface-2:#17252880; --surface-3:#152023;
+      --border:#22383b; --border-strong:#315055;
+      --ink:#e7f0ed; --ink-soft:#98aeaa; --ink-faint:#6a827e;
+      --accent:#2dd4bf; --accent-ink:#5eead4; --accent-soft:#0f3f3a; --accent-glow:rgba(45,212,191,.20);
+      --amber:#fbbf24; --amber-soft:#3a2c0d;
+      --danger:#f87171; --danger-soft:#3a1717; --danger-glow:rgba(248,113,113,.16);
+      --ok:#4ade80; --ok-soft:#123020;
+      --violet:#c4b5fd; --violet-soft:#241a3f;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px -14px rgba(0,0,0,.7);
+      --shadow-lift:0 2px 8px rgba(0,0,0,.5),0 22px 50px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b1214; --surface:#111b1e; --surface-2:#17252880; --surface-3:#152023;
+    --border:#22383b; --border-strong:#315055;
+    --ink:#e7f0ed; --ink-soft:#98aeaa; --ink-faint:#6a827e;
+    --accent:#2dd4bf; --accent-ink:#5eead4; --accent-soft:#0f3f3a; --accent-glow:rgba(45,212,191,.20);
+    --amber:#fbbf24; --amber-soft:#3a2c0d;
+    --danger:#f87171; --danger-soft:#3a1717; --danger-glow:rgba(248,113,113,.16);
+    --ok:#4ade80; --ok-soft:#123020;
+    --violet:#c4b5fd; --violet-soft:#241a3f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px -14px rgba(0,0,0,.7);
+    --shadow-lift:0 2px 8px rgba(0,0,0,.5),0 22px 50px -18px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--body);
+    margin:0; line-height:1.55; -webkit-font-smoothing:antialiased;
+    font-size:15px;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding-inline:20px; padding-block:0}
+  a{color:var(--accent-ink); text-decoration:none}
+  a:hover{text-decoration:underline}
+  h1,h2,h3{font-family:var(--disp); text-wrap:balance; margin:0; line-height:1.1}
+  ::selection{background:var(--accent-glow)}
+
+  /* ---------- header ---------- */
+  header.top{
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,var(--surface-3),transparent);
+  }
+  .top-in{display:flex; align-items:flex-start; justify-content:space-between; gap:20px; padding-block:26px 30px; flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent-ink); font-weight:600; display:flex; align-items:center; gap:9px}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-glow)}
+  h1{font-size:clamp(29px,5vw,46px); font-weight:800; letter-spacing:-.02em; margin-top:12px}
+  .lede{color:var(--ink-soft); max-width:60ch; margin-top:12px; font-size:16px}
+  .lede code{font-family:var(--mono); font-size:.86em; background:var(--surface-2); padding:1px 6px; border-radius:5px; color:var(--accent-ink)}
+  .theme-btn{
+    font-family:var(--mono); font-size:12px; font-weight:600; color:var(--ink-soft);
+    background:var(--surface); border:1px solid var(--border); border-radius:9px;
+    padding:9px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+    transition:border-color .15s, color .15s;
+  }
+  .theme-btn:hover{border-color:var(--border-strong); color:var(--ink)}
+
+  /* ---------- composer ---------- */
+  section{padding-block:34px}
+  .sec-head{display:flex; align-items:baseline; gap:12px; margin-bottom:18px; flex-wrap:wrap}
+  .sec-num{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent); letter-spacing:.05em}
+  .sec-head h2{font-size:clamp(19px,3vw,24px); font-weight:700; letter-spacing:-.01em}
+  .sec-head p{margin:0; color:var(--ink-faint); font-size:13.5px}
+
+  .composer{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .scen-tabs{display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid var(--border); background:var(--surface-3)}
+  .scen-tab{
+    flex:1 1 auto; min-width:150px; text-align:left; cursor:pointer;
+    background:transparent; border:none; border-right:1px solid var(--border);
+    padding:13px 16px; font-family:var(--body); color:var(--ink-soft);
+    display:flex; flex-direction:column; gap:3px; transition:background .15s,color .15s;
+    border-bottom:2px solid transparent;
+  }
+  .scen-tab:last-child{border-right:none}
+  .scen-tab:hover{background:var(--surface-2); color:var(--ink)}
+  .scen-tab .st-title{font-family:var(--mono); font-size:12.5px; font-weight:600; display:flex; align-items:center; gap:7px}
+  .scen-tab .st-desc{font-size:11.5px; color:var(--ink-faint)}
+  .scen-tab[aria-selected="true"]{background:var(--surface); color:var(--ink); border-bottom-color:var(--accent)}
+  .scen-tab[aria-selected="true"] .st-desc{color:var(--ink-soft)}
+  .mini-code{
+    font-family:var(--mono); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:5px;
+    letter-spacing:.02em;
+  }
+  .m-get{background:var(--accent-soft); color:var(--accent-ink)}
+  .m-post{background:var(--amber-soft); color:var(--amber)}
+  .st-badge{margin-left:auto; font-family:var(--mono); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:5px}
+  .b-ok{background:var(--ok-soft); color:var(--ok)}
+  .b-err{background:var(--danger-soft); color:var(--danger)}
+
+  .composer-body{padding:18px 18px 20px; display:grid; grid-template-columns:1fr auto; gap:16px; align-items:center}
+  .req-line{font-family:var(--mono); font-size:13.5px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; min-width:0}
+  .req-verb{font-weight:700; padding:3px 9px; border-radius:6px; font-size:12px}
+  .req-path{color:var(--ink); word-break:break-all}
+  .req-path .seg-bad{color:var(--danger); text-decoration:underline wavy var(--danger)}
+  .req-body{
+    grid-column:1/-1; font-family:var(--mono); font-size:12.5px; background:var(--surface-3);
+    border:1px solid var(--border); border-radius:10px; padding:11px 13px; color:var(--ink-soft);
+    white-space:pre; overflow-x:auto;
+  }
+  .req-body .k{color:var(--accent-ink)} .req-body .s{color:var(--amber)} .req-body .n{color:var(--violet)}
+  .req-body .bad{color:var(--danger); font-weight:600}
+  .send-wrap{display:flex; gap:9px; align-items:center}
+  .btn{
+    font-family:var(--mono); font-weight:600; font-size:13px; cursor:pointer; border-radius:10px;
+    padding:11px 20px; border:1px solid transparent; display:inline-flex; align-items:center; gap:9px;
+    transition:transform .08s, box-shadow .15s, background .15s, opacity .15s;
+  }
+  .btn-send{background:var(--accent); color:#04231f; box-shadow:0 1px 0 rgba(0,0,0,.05), 0 6px 18px -6px var(--accent-glow)}
+  :root[data-theme="dark"] .btn-send, :root:not([data-theme="light"]) .btn-send{color:#04231f}
+  .btn-send:hover{box-shadow:0 2px 0 rgba(0,0,0,.05), 0 10px 26px -8px var(--accent-glow)}
+  .btn-send:active{transform:translateY(1px)}
+  .btn-send:disabled{opacity:.5; cursor:progress}
+  .btn-ghost{background:transparent; border-color:var(--border); color:var(--ink-soft)}
+  .btn-ghost:hover{border-color:var(--border-strong); color:var(--ink)}
+  .btn svg{width:15px;height:15px}
+  .send-arrow{width:16px;height:16px}
+
+  /* ---------- stage / trace layout ---------- */
+  .trace-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; align-items:start}
+
+  .waterfall{position:relative; display:flex; flex-direction:column; gap:0}
+  .rail-label{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; display:flex; justify-content:space-between}
+  .rail-label b{color:var(--accent-ink); font-weight:600}
+
+  .stage{
+    position:relative; display:grid; grid-template-columns:34px 1fr; gap:14px; align-items:stretch;
+    cursor:pointer; padding:0; border:none; background:transparent; text-align:left; font-family:var(--body);
+    color:inherit; width:100%;
+  }
+  .stage-rail{position:relative; display:flex; flex-direction:column; align-items:center}
+  .node{
+    width:34px; height:34px; border-radius:10px; border:1.5px solid var(--border-strong);
+    background:var(--surface); display:flex; align-items:center; justify-content:center;
+    color:var(--ink-faint); flex:0 0 auto; z-index:2; transition:all .25s; margin-top:4px;
+  }
+  .node svg{width:17px;height:17px}
+  .connector{width:2px; flex:1 1 auto; background:var(--border); margin:2px 0; min-height:14px; transition:background .3s}
+  .stage:last-child .connector{display:none}
+
+  .stage-card{
+    border:1px solid var(--border); border-radius:12px; background:var(--surface);
+    padding:11px 14px; margin-bottom:12px; transition:all .25s; min-width:0;
+  }
+  .sc-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .sc-name{font-family:var(--disp); font-weight:700; font-size:15px; letter-spacing:-.01em}
+  .sc-owner{font-family:var(--mono); font-size:10px; font-weight:600; letter-spacing:.03em; padding:1.5px 7px; border-radius:20px; background:var(--surface-2); color:var(--ink-soft); text-transform:uppercase}
+  .sc-status{margin-top:5px; font-size:12.5px; color:var(--ink-faint); min-height:1.2em; font-family:var(--mono)}
+  .sc-status .tick{color:var(--ok); font-weight:700}
+
+  /* active / done / error states */
+  .stage.is-active .node{border-color:var(--accent); background:var(--accent); color:#04231f; box-shadow:0 0 0 5px var(--accent-glow); transform:scale(1.06)}
+  .stage.is-active .stage-card{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow-lift); transform:translateX(2px)}
+  .stage.is-done .node{border-color:var(--accent); color:var(--accent-ink); background:var(--accent-soft)}
+  .stage.is-done .connector, .stage.is-active .connector{background:var(--accent)}
+  .stage.is-done .sc-status{color:var(--ink-soft)}
+  .stage.is-error .node{border-color:var(--danger); background:var(--danger); color:#fff; box-shadow:0 0 0 5px var(--danger-glow)}
+  .stage.is-error .stage-card{border-color:var(--danger); box-shadow:0 0 0 1px var(--danger)}
+  .stage.is-error .sc-status{color:var(--danger); font-weight:600}
+  .stage.is-skipped{opacity:.42}
+  .stage.is-skipped .sc-status{color:var(--ink-faint)}
+  .stage.is-response .node{border-color:var(--violet); background:var(--violet-soft); color:var(--violet)}
+  .stage.is-response .stage-card{border-color:var(--violet)}
+  .stage:focus-visible{outline:none}
+  .stage:focus-visible .stage-card{outline:2px solid var(--accent); outline-offset:2px}
+  .stage.dimmed .stage-card{opacity:.85}
+  .stage.selected .stage-card{box-shadow:0 0 0 1px var(--accent-ink), var(--shadow)}
+
+  .yours{position:relative}
+  .yours::after{content:"tu código"; position:absolute; top:-8px; right:10px; font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--amber); background:var(--amber-soft); padding:2px 7px; border-radius:20px}
+
+  /* ---------- inspector ---------- */
+  .inspector{position:sticky; top:14px}
+  .insp-card{
+    border:1px solid var(--border); border-radius:16px; background:var(--surface);
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .insp-head{padding:15px 18px 13px; border-bottom:1px solid var(--border); background:var(--surface-3)}
+  .insp-kicker{font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); display:flex; align-items:center; gap:8px}
+  .insp-kicker .idx{color:var(--accent-ink); font-weight:700}
+  .insp-title{font-family:var(--disp); font-size:20px; font-weight:800; letter-spacing:-.01em; margin-top:6px; display:flex; align-items:center; gap:10px}
+  .insp-title .who{font-family:var(--mono); font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; background:var(--surface-2); color:var(--ink-soft)}
+  .insp-body{padding:16px 18px 18px}
+  .insp-desc{color:var(--ink-soft); font-size:14px; margin:0 0 14px}
+  .insp-desc strong{color:var(--ink); font-weight:600}
+  .code-label{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px; display:flex; align-items:center; gap:7px}
+  .code-label::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--accent)}
+  pre.code{
+    font-family:var(--mono); font-size:12.5px; line-height:1.6; background:var(--surface-3);
+    border:1px solid var(--border); border-radius:11px; padding:13px 15px; margin:0; overflow-x:auto;
+    color:var(--ink); tab-size:2;
+  }
+  pre.code .cm{color:var(--ink-faint); font-style:italic}
+  pre.code .kw{color:var(--violet); font-weight:600}
+  pre.code .fn{color:var(--accent-ink); font-weight:600}
+  pre.code .st{color:var(--amber)}
+  pre.code .nm{color:var(--danger)}
+  pre.code .dc{color:var(--accent-ink)}
+  .insp-hint{margin-top:13px; font-size:12.5px; color:var(--ink-faint); font-style:italic; display:flex; gap:8px; align-items:flex-start}
+  .insp-hint svg{width:15px;height:15px;flex:0 0 auto;margin-top:2px;color:var(--accent)}
+
+  .resp-box{margin-top:14px; border:1px dashed var(--border-strong); border-radius:12px; padding:0; overflow:hidden; opacity:0; transform:translateY(6px); transition:opacity .3s, transform .3s}
+  .resp-box.show{opacity:1; transform:none}
+  .resp-status{display:flex; align-items:center; gap:10px; padding:11px 15px; font-family:var(--mono); font-size:13px; font-weight:700; border-bottom:1px solid var(--border)}
+  .resp-status.ok{background:var(--ok-soft); color:var(--ok)}
+  .resp-status.err{background:var(--danger-soft); color:var(--danger)}
+  .resp-status .lat{margin-left:auto; font-weight:500; opacity:.8; font-size:11.5px}
+  .resp-json{font-family:var(--mono); font-size:12.5px; padding:13px 15px; white-space:pre; overflow-x:auto; margin:0; color:var(--ink); line-height:1.55; background:var(--surface)}
+  .resp-json .k{color:var(--accent-ink)} .resp-json .s{color:var(--amber)} .resp-json .n{color:var(--violet)} .resp-json .b{color:var(--danger)}
+
+  /* ---------- app.py reference ---------- */
+  .appref{background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--shadow)}
+  .appref-bar{display:flex; align-items:center; gap:8px; padding:10px 15px; border-bottom:1px solid var(--border); background:var(--surface-3); font-family:var(--mono); font-size:12px; color:var(--ink-soft)}
+  .appref-bar .fdot{width:10px;height:10px;border-radius:50%}
+  .appref pre{margin:0; padding:16px 18px; font-family:var(--mono); font-size:13px; line-height:1.7; overflow-x:auto; color:var(--ink)}
+
+  /* ---------- event loop demo ---------- */
+  .loop-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .loop-panel{border:1px solid var(--border); border-radius:14px; background:var(--surface); padding:16px 16px 18px; box-shadow:var(--shadow)}
+  .loop-panel h3{font-size:15px; font-weight:700; display:flex; align-items:center; gap:9px; margin-bottom:3px}
+  .loop-panel .lp-sub{font-size:12.5px; color:var(--ink-faint); font-family:var(--mono); margin-bottom:14px}
+  .tag{font-family:var(--mono); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em}
+  .tag-async{background:var(--accent-soft); color:var(--accent-ink)}
+  .tag-sync{background:var(--surface-2); color:var(--ink-soft)}
+  .gantt{display:flex; flex-direction:column; gap:9px}
+  .grow{display:grid; grid-template-columns:74px 1fr; gap:10px; align-items:center}
+  .grow .glabel{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft)}
+  .gtrack{position:relative; height:22px; background:var(--surface-3); border:1px solid var(--border); border-radius:6px; overflow:hidden}
+  .gbar{position:absolute; top:0; bottom:0; border-radius:5px; width:0; transition:width .12s linear; display:flex; align-items:center}
+  .gbar.cpu{background:var(--accent); opacity:.92}
+  .gbar.io{background:repeating-linear-gradient(45deg,var(--violet-soft),var(--violet-soft) 5px,transparent 5px,transparent 10px); border:1px solid var(--violet)}
+  .gbar.done{background:var(--ok); opacity:.9}
+  .gbar-wrap{position:absolute; inset:0}
+  .loop-foot{margin-top:14px; font-size:12.5px; color:var(--ink-soft); display:flex; align-items:center; gap:8px; min-height:2.4em}
+  .loop-foot .num{font-family:var(--mono); font-weight:700; color:var(--ink); font-variant-numeric:tabular-nums}
+  .loop-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; font-family:var(--mono); font-size:11.5px; color:var(--ink-soft)}
+  .loop-legend span{display:inline-flex; align-items:center; gap:6px}
+  .swatch{width:13px;height:13px;border-radius:3px;display:inline-block}
+  .sw-cpu{background:var(--accent)} .sw-io{background:repeating-linear-gradient(45deg,var(--violet-soft),var(--violet-soft) 3px,transparent 3px,transparent 6px);border:1px solid var(--violet)} .sw-done{background:var(--ok)}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--border); margin-top:20px}
+  .foot-in{padding-block:26px 40px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:center; color:var(--ink-faint); font-size:13px}
+  .foot-in .mono{font-family:var(--mono); font-size:12px}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    .trace-grid{grid-template-columns:1fr}
+    .loop-grid{grid-template-columns:1fr}
+    .inspector{position:static}
+    .composer-body{grid-template-columns:1fr}
+    .send-wrap{justify-content:stretch}
+    .btn-send{flex:1}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important; animation:none !important}
+  }
+</style>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div>
+      <div class="eyebrow"><span class="dot"></span>FastAPI · ASGI · Pydantic</div>
+      <h1>Anatomía de un request</h1>
+      <p class="lede">Mandá un request y seguílo capa por capa, desde el browser hasta tu <code>async def</code> y de vuelta. Probá qué pasa cuando los datos son válidos… y cuando <strong>Pydantic los rechaza</strong>.</p>
+    </div>
+    <button class="theme-btn" id="theme" aria-label="Cambiar tema">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <span id="theme-label">Tema</span>
+    </button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- COMPOSER -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>Armá el request</h2>
+      <p>Elegí un escenario y presioná enviar</p>
+    </div>
+    <div class="composer">
+      <div class="scen-tabs" role="tablist" aria-label="Escenarios">
+        <button class="scen-tab" role="tab" data-scen="0" aria-selected="true">
+          <span class="st-title"><span class="mini-code m-get">GET</span> /items/42<span class="st-badge b-ok">200</span></span>
+          <span class="st-desc">Camino feliz: el id es un entero válido</span>
+        </button>
+        <button class="scen-tab" role="tab" data-scen="1" aria-selected="false">
+          <span class="st-title"><span class="mini-code m-get">GET</span> /items/abc<span class="st-badge b-err">422</span></span>
+          <span class="st-desc">El path param no es <code>int</code> → falla</span>
+        </button>
+        <button class="scen-tab" role="tab" data-scen="2" aria-selected="false">
+          <span class="st-title"><span class="mini-code m-post">POST</span> /items<span class="st-badge b-ok">201</span></span>
+          <span class="st-desc">Body JSON válido contra el modelo</span>
+        </button>
+        <button class="scen-tab" role="tab" data-scen="3" aria-selected="false">
+          <span class="st-title"><span class="mini-code m-post">POST</span> /items<span class="st-badge b-err">422</span></span>
+          <span class="st-desc">Falta un campo requerido en el body</span>
+        </button>
+      </div>
+      <div class="composer-body">
+        <div class="req-line">
+          <span class="req-verb" id="req-verb">GET</span>
+          <span class="req-path" id="req-path">/items/42</span>
+        </div>
+        <div class="send-wrap">
+          <button class="btn btn-send" id="send">
+            <span>Enviar</span>
+            <svg class="send-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="reset" title="Reiniciar">Reset</button>
+        </div>
+        <div class="req-body" id="req-body" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRACE + INSPECTOR -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>El viaje del request</h2>
+      <p>Cada fila es una capa · tocá cualquiera para ver el detalle</p>
+    </div>
+    <div class="trace-grid">
+      <div>
+        <div class="rail-label"><span>Waterfall</span><b id="phase-label">en espera</b></div>
+        <div class="waterfall" id="waterfall"><!-- stages injected --></div>
+      </div>
+      <div class="inspector">
+        <div class="insp-card">
+          <div class="insp-head">
+            <div class="insp-kicker"><span class="idx" id="i-idx">—</span><span id="i-kick">Inspector de capa</span></div>
+            <div class="insp-title"><span id="i-title">Elegí una capa</span><span class="who" id="i-who" hidden></span></div>
+          </div>
+          <div class="insp-body">
+            <p class="insp-desc" id="i-desc">Presioná <strong>Enviar</strong> para ver el request atravesar cada capa, o tocá una fila del waterfall para leer qué hace.</p>
+            <div id="i-code-wrap" hidden>
+              <div class="code-label" id="i-code-label">Datos en este punto</div>
+              <pre class="code" id="i-code"></pre>
+            </div>
+            <div class="insp-hint" id="i-hint" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              <span id="i-hint-text"></span>
+            </div>
+            <div class="resp-box" id="resp">
+              <div class="resp-status" id="resp-status"></div>
+              <pre class="resp-json" id="resp-json"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP.PY -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>El código que corre detrás</h2>
+      <p>Los 4 escenarios golpean estas dos rutas</p>
+    </div>
+    <div class="appref">
+      <div class="appref-bar"><span class="fdot" style="background:#ec6a5e"></span><span class="fdot" style="background:#f4bf4f"></span><span class="fdot" style="background:#61c454"></span><span style="margin-left:6px">main.py</span></div>
+      <pre id="appref-code"></pre>
+    </div>
+  </section>
+
+  <!-- EVENT LOOP -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>¿Por qué aguanta tanto? El event loop</h2>
+      <p>3 requests que esperan a la base de datos, con y sin <code>async</code></p>
+    </div>
+    <div style="margin-bottom:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+      <button class="btn btn-send" id="loop-play"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg><span>Reproducir</span></button>
+      <span style="font-size:13px;color:var(--ink-faint)">Mientras una corrutina hace <code style="font-family:var(--mono);color:var(--accent-ink)">await db.query()</code>, el loop atiende a las demás.</span>
+    </div>
+    <div class="loop-grid">
+      <div class="loop-panel">
+        <h3><span class="tag tag-async">async def</span> Un solo worker, event loop</h3>
+        <div class="lp-sub">las esperas de I/O se solapan</div>
+        <div class="gantt" id="gantt-async"></div>
+        <div class="loop-foot" id="foot-async">&nbsp;</div>
+      </div>
+      <div class="loop-panel">
+        <h3><span class="tag tag-sync">def</span> Bloqueante, en serie</h3>
+        <div class="lp-sub">cada request espera a que termine la anterior</div>
+        <div class="gantt" id="gantt-sync"></div>
+        <div class="loop-foot" id="foot-sync">&nbsp;</div>
+      </div>
+    </div>
+    <div class="loop-legend">
+      <span><i class="swatch sw-cpu"></i> CPU (tu código corriendo)</span>
+      <span><i class="swatch sw-io"></i> await I/O (esperando la DB)</span>
+      <span><i class="swatch sw-done"></i> respuesta enviada</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>Modelo simplificado del stack <b style="color:var(--ink-soft)">Uvicorn → Starlette → FastAPI → Pydantic</b>. La realidad tiene más matices, pero el orden es este.</span>
+    <span class="mono"><a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener">fastapi.tiangolo.com ↗</a></span>
+  </div>
+</footer>
+
+<script>
+/* ============ THEME ============ */
+(function(){
+  var root=document.documentElement, btn=document.getElementById('theme'), lbl=document.getElementById('theme-label');
+  function sysDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;}
+  function cur(){var t=root.getAttribute('data-theme'); if(t) return t; return sysDark()?'dark':'light';}
+  function paint(){lbl.textContent = cur()==='dark'?'Oscuro':'Claro';}
+  btn.addEventListener('click',function(){root.setAttribute('data-theme', cur()==='dark'?'light':'dark'); paint();});
+  paint();
+})();
+
+/* ============ NODES ============ */
+var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+var ICON = {
+  client:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  server:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>',
+  mw:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  router:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v6a3 3 0 0 0 3 3h9M18 8l3-3-3-3M18 21v-6a3 3 0 0 0-3-3H6M6 16l-3 3 3 3"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  deps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M6 8.5v3a2 2 0 0 0 2 2h1M18 8.5v3a2 2 0 0 1-2 2h-1"/></svg>',
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/></svg>',
+  json:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4c-2 0-3 1-3 3v1c0 1.5-1 2-2 2 1 0 2 .5 2 2v1c0 2 1 3 3 3M16 4c2 0 3 1 3 3v1c0 1.5 1 2 2 2-1 0-2 .5-2 2v1c0 2-1 3-3 3"/></svg>'
+};
+
+/* fixed layer definitions */
+var NODES = [
+  {id:'client', name:'Cliente', owner:'browser / curl', icon:'client', yours:false},
+  {id:'uvicorn', name:'Uvicorn', owner:'servidor ASGI', icon:'server', yours:false},
+  {id:'middleware', name:'Middleware', owner:'starlette', icon:'mw', yours:false},
+  {id:'router', name:'Router', owner:'fastapi', icon:'router', yours:false},
+  {id:'validation', name:'Validación', owner:'pydantic', icon:'shield', yours:false},
+  {id:'deps', name:'Dependencias', owner:'Depends()', icon:'deps', yours:false},
+  {id:'handler', name:'Tu función', owner:'async def', icon:'code', yours:true},
+  {id:'serialize', name:'Serialización', owner:'response_model', icon:'json', yours:false}
+];
+
+/* static per-layer info (shown when clicking, scenario-agnostic) */
+var LAYER_INFO = {
+  client:{desc:'Alguien —un browser, <code>curl</code>, tu frontend— abre una conexión TCP y manda texto plano HTTP: una línea con método y ruta, headers, y opcionalmente un body.', code:'GET /items/42 HTTP/1.1\nHost: api.midominio.com\nAccept: application/json', label:'Request HTTP crudo', hint:'FastAPI todavía no vio nada. Esto son bytes en un socket.'},
+  uvicorn:{desc:'<strong>Uvicorn</strong> es el servidor ASGI. Parsea esos bytes HTTP y arma un <code>scope</code> (un dict con método, path, headers…) más dos funciones: <code>receive</code> para leer el body y <code>send</code> para responder. Eso es todo lo que FastAPI recibe.', code:'scope = {\n  "type": "http",\n  "method": "GET",\n  "path": "/items/42",\n  "headers": [(b"accept", b"application/json")],\n}', label:'ASGI scope', hint:'FastAPI nunca toca el socket: habla ASGI, no HTTP.'},
+  middleware:{desc:'Antes de llegar a tu ruta, el request pasa por los <strong>middlewares</strong> (CORS, GZip, tu auth global…). Cada uno puede mirar o modificar el request y, a la vuelta, la response. Son las capas de una cebolla.', code:'app.add_middleware(\n    CORSMiddleware,\n    allow_origins=["*"],\n)', label:'Cadena de middlewares', hint:'La response vuelve a atravesar esta cebolla en orden inverso.'},
+  router:{desc:'El <strong>router</strong> busca qué <em>path operation</em> matchea el método y la ruta. <code>/items/42</code> matchea <code>@app.get("/items/{item_id}")</code> y extrae <code>item_id="42"</code> (todavía como string).', code:'@app.get("/items/{item_id}")\nasync def read_item(item_id: int):\n    ...\n# match ✓  item_id = "42"  (str, sin validar)', label:'Ruta matcheada', hint:'Si ninguna ruta matchea, acá mismo sale un 404.'},
+  validation:{desc:'<strong>Pydantic</strong> toma los datos crudos (path, query, body) y los valida contra los type hints. Convierte tipos (<code>"42"</code> → <code>42</code>) y si algo no encaja, corta acá con un <strong>422</strong>. Tu función nunca llega a ejecutarse con datos inválidos.', code:'item_id: int = 42   # "42" → 42  ✓\n# type hints = contrato de validación', label:'Datos validados y tipados', hint:'Esta es la razón por la que tu función recibe objetos ya limpios.'},
+  deps:{desc:'FastAPI resuelve el árbol de <strong>dependencias</strong> (<code>Depends()</code>): sesión de DB, usuario autenticado, config… Se ejecutan antes de tu función y sus resultados se inyectan como parámetros.', code:'async def read_item(\n    item_id: int,\n    db = Depends(get_db),   # ← inyectada\n):', label:'Dependencias resueltas', hint:'Cada dependencia también valida sus propios parámetros.'},
+  handler:{desc:'Recién ahora corre <strong>tu código</strong>: la <em>path operation</em>. Recibe parámetros ya validados y tipados. Si es <code>async def</code>, cada <code>await</code> (a la DB, a otra API) le devuelve el control al event loop.', code:'async def read_item(item_id: int):\n    item = await db.get(item_id)  # await I/O\n    return {"item_id": item_id,\n            "name": "Café"}', label:'Tu path operation', hint:'Todo lo anterior existió para que esta función sea simple.'},
+  serialize:{desc:'Lo que devolvés (un dict, un objeto, un modelo) se filtra por el <code>response_model</code> y se serializa a JSON con <code>jsonable_encoder</code>. Se descartan campos de más, se convierten fechas, Decimals, etc.', code:'return item\n# → jsonable_encoder(item)\n# → b\'{"item_id":42,"name":"Café"}\'', label:'Response serializada', hint:'El response_model también documenta el schema en /docs.'}
+};
+
+/* ============ SCENARIOS ============ */
+/* each step: {node, kind, status, resp?} — the "run" sequence */
+var SCEN = [
+  { /* 0: GET /items/42 -> 200 */
+    verb:'GET', path:'/items/42', body:null, badPath:false,
+    steps:[
+      {node:'client', st:'abre conexión y manda GET /items/42'},
+      {node:'uvicorn', st:'parsea HTTP → arma el scope ASGI'},
+      {node:'middleware', st:'CORS ok → sigue'},
+      {node:'router', st:'match: read_item · item_id="42"'},
+      {node:'validation', st:'"42" → 42 (int) ✓', tick:true},
+      {node:'deps', st:'get_db() → sesión inyectada'},
+      {node:'handler', st:'await db.get(42) → devuelve el item', code:'{"item_id": 42, "name": "Café"}', lbl:'return de tu función'},
+      {node:'serialize', st:'dict → JSON'}
+    ],
+    resp:{ok:true, status:'200 OK', lat:'~7 ms', json:'{\n  <span class="k">"item_id"</span>: <span class="n">42</span>,\n  <span class="k">"name"</span>: <span class="s">"Café"</span>\n}'}
+  },
+  { /* 1: GET /items/abc -> 422 */
+    verb:'GET', path:'/items/abc', body:null, badPath:true,
+    steps:[
+      {node:'client', st:'manda GET /items/abc'},
+      {node:'uvicorn', st:'parsea HTTP → scope ASGI'},
+      {node:'middleware', st:'CORS ok → sigue'},
+      {node:'router', st:'match: read_item · item_id="abc"'},
+      {node:'validation', st:'"abc" no es int → 422', error:true, code:'item_id: int  ✗\n"abc" → int  →  ValidationError', lbl:'Pydantic rechaza'},
+      {node:'deps', st:'no se ejecuta', skip:true},
+      {node:'handler', st:'nunca corre', skip:true},
+      {node:'serialize', st:'—', skip:true}
+    ],
+    resp:{ok:false, status:'422 Unprocessable Entity', lat:'~2 ms', json:'{\n  <span class="k">"detail"</span>: [{\n    <span class="k">"loc"</span>: [<span class="s">"path"</span>, <span class="s">"item_id"</span>],\n    <span class="k">"msg"</span>: <span class="b">"Input should be a valid integer"</span>,\n    <span class="k">"type"</span>: <span class="s">"int_parsing"</span>\n  }]\n}'}
+  },
+  { /* 2: POST /items valid -> 201 */
+    verb:'POST', path:'/items', badPath:false,
+    body:'{\n  <span class="k">"name"</span>: <span class="s">"Yerba"</span>,\n  <span class="k">"price"</span>: <span class="n">4500</span>\n}',
+    steps:[
+      {node:'client', st:'POST /items con body JSON'},
+      {node:'uvicorn', st:'lee el body vía receive()'},
+      {node:'middleware', st:'CORS ok → sigue'},
+      {node:'router', st:'match: create_item'},
+      {node:'validation', st:'JSON → Item(name, price) ✓', tick:true, code:'Item(name="Yerba", price=4500.0)\n# str ✓   float ✓', lbl:'Body → modelo Pydantic'},
+      {node:'deps', st:'sin dependencias extra'},
+      {node:'handler', st:'guarda y devuelve el item', code:'return item  # Item(...)', lbl:'return de tu función'},
+      {node:'serialize', st:'Item → JSON'}
+    ],
+    resp:{ok:true, status:'201 Created', lat:'~11 ms', json:'{\n  <span class="k">"name"</span>: <span class="s">"Yerba"</span>,\n  <span class="k">"price"</span>: <span class="n">4500.0</span>\n}'}
+  },
+  { /* 3: POST /items invalid -> 422 */
+    verb:'POST', path:'/items', badPath:false,
+    body:'{\n  <span class="k">"name"</span>: <span class="s">"Yerba"</span><span class="bad">   ← falta "price"</span>\n}',
+    steps:[
+      {node:'client', st:'POST /items con body incompleto'},
+      {node:'uvicorn', st:'lee el body vía receive()'},
+      {node:'middleware', st:'CORS ok → sigue'},
+      {node:'router', st:'match: create_item'},
+      {node:'validation', st:'falta "price" (required) → 422', error:true, code:'class Item(BaseModel):\n    name: str\n    price: float   # ← requerido, no vino', lbl:'Campo requerido ausente'},
+      {node:'deps', st:'no se ejecuta', skip:true},
+      {node:'handler', st:'nunca corre', skip:true},
+      {node:'serialize', st:'—', skip:true}
+    ],
+    resp:{ok:false, status:'422 Unprocessable Entity', lat:'~3 ms', json:'{\n  <span class="k">"detail"</span>: [{\n    <span class="k">"loc"</span>: [<span class="s">"body"</span>, <span class="s">"price"</span>],\n    <span class="k">"msg"</span>: <span class="b">"Field required"</span>,\n    <span class="k">"type"</span>: <span class="s">"missing"</span>\n  }]\n}'}
+  }
+];
+
+/* ============ RENDER STAGES ============ */
+var wf = document.getElementById('waterfall');
+var stageEls = {};
+NODES.forEach(function(n, i){
+  var b = document.createElement('button');
+  b.className = 'stage' + (n.yours?' ':'');
+  b.setAttribute('data-node', n.id);
+  b.setAttribute('type','button');
+  b.innerHTML =
+    '<div class="stage-rail"><div class="node">'+ICON[n.icon]+'</div><div class="connector"></div></div>'+
+    '<div class="stage-card'+(n.yours?' yours':'')+'">'+
+      '<div class="sc-top"><span class="sc-name">'+n.name+'</span><span class="sc-owner">'+n.owner+'</span></div>'+
+      '<div class="sc-status" data-status>toca para ver</div>'+
+    '</div>';
+  wf.appendChild(b);
+  stageEls[n.id] = b;
+  b.addEventListener('click', function(){
+    if(running) return;
+    showLayer(n.id, i);
+    selectStage(n.id);
+  });
+});
+
+/* ============ INSPECTOR ============ */
+var I = {
+  idx:document.getElementById('i-idx'), kick:document.getElementById('i-kick'),
+  title:document.getElementById('i-title'), who:document.getElementById('i-who'),
+  desc:document.getElementById('i-desc'), codeWrap:document.getElementById('i-code-wrap'),
+  code:document.getElementById('i-code'), codeLabel:document.getElementById('i-code-label'),
+  hint:document.getElementById('i-hint'), hintText:document.getElementById('i-hint-text')
+};
+
+function nodeMeta(id){ for(var k=0;k<NODES.length;k++) if(NODES[k].id===id) return {n:NODES[k], i:k}; }
+
+function showLayer(id, idx){
+  var meta = nodeMeta(id), info = LAYER_INFO[id];
+  I.idx.textContent = String(idx+1).padStart(2,'0');
+  I.kick.textContent = 'Capa · '+meta.n.owner;
+  I.title.childNodes[0].textContent = meta.n.name;
+  I.who.hidden=false; I.who.textContent = meta.n.owner;
+  I.desc.innerHTML = info.desc;
+  I.codeWrap.hidden=false; I.codeLabel.textContent = info.label;
+  I.code.innerHTML = hl(info.code);
+  I.hint.hidden=false; I.hintText.textContent = info.hint;
+}
+
+function selectStage(id){
+  Object.keys(stageEls).forEach(function(k){ stageEls[k].classList.toggle('selected', k===id); });
+}
+
+/* naive python-ish highlighter for inspector code */
+function hl(s){
+  s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var strs=[], cmts=[];
+  s = s.replace(/"[^"]*"/g, function(m){ strs.push('<span class="st">'+m+'</span>'); return '~S'+(strs.length-1)+'S~'; });
+  s = s.replace(/#[^\n]*/g, function(m){ cmts.push('<span class="cm">'+m+'</span>'); return '~C'+(cmts.length-1)+'C~'; });
+  s = s.replace(/\b(async|def|return|class|await|import|from)\b/g,'<span class="kw">$1</span>');
+  s = s.replace(/\b(ValidationError)\b/g,'<span class="nm">$1</span>');
+  s = s.replace(/(@app\.\w+)/g,'<span class="dc">$1</span>');
+  s = s.replace(/~C(\d+)C~/g, function(_,i){ return cmts[+i]; });
+  s = s.replace(/~S(\d+)S~/g, function(_,i){ return strs[+i]; });
+  return s;
+}
+
+/* ============ RUN ANIMATION ============ */
+var running=false, curScen=0, timers=[];
+var sendBtn=document.getElementById('send'), resetBtn=document.getElementById('reset');
+var phaseLabel=document.getElementById('phase-label');
+var resp=document.getElementById('resp'), respStatus=document.getElementById('resp-status'), respJson=document.getElementById('resp-json');
+
+function clearRun(){
+  timers.forEach(clearTimeout); timers=[];
+  Object.keys(stageEls).forEach(function(k){
+    var e=stageEls[k];
+    e.className='stage'+(nodeMeta(k).n.yours?'':'');
+    e.querySelector('[data-status]').innerHTML='toca para ver';
+  });
+  resp.classList.remove('show');
+  phaseLabel.textContent='en espera';
+}
+
+function resetAll(){
+  clearRun(); running=false; sendBtn.disabled=false;
+  I.idx.textContent='—'; I.kick.textContent='Inspector de capa';
+  I.title.childNodes[0].textContent='Elegí una capa'; I.who.hidden=true;
+  I.desc.innerHTML='Presioná <strong>Enviar</strong> para ver el request atravesar cada capa, o tocá una fila del waterfall para leer qué hace.';
+  I.codeWrap.hidden=true; I.hint.hidden=true;
+  selectStage(null);
+}
+
+function setStatus(id, html){ stageEls[id].querySelector('[data-status]').innerHTML=html; }
+
+function run(){
+  if(running) return;
+  clearRun();
+  running=true; sendBtn.disabled=true;
+  var sc=SCEN[curScen];
+  phaseLabel.textContent='→ request bajando';
+  var step = reduce ? 60 : 620;
+
+  sc.steps.forEach(function(s, k){
+    timers.push(setTimeout(function(){
+      var el=stageEls[s.node], idx=nodeMeta(s.node).i;
+      // clear previous active
+      Object.keys(stageEls).forEach(function(kk){ stageEls[kk].classList.remove('is-active'); });
+
+      if(s.skip){
+        el.classList.add('is-skipped');
+        setStatus(s.node, '<span style="opacity:.7">'+s.st+'</span>');
+      } else if(s.error){
+        el.classList.add('is-error');
+        setStatus(s.node, '✗ '+s.st);
+        phaseLabel.textContent='✗ cortó en validación';
+      } else {
+        el.classList.add('is-active');
+        var prev = sc.steps[k-1];
+        setStatus(s.node, (s.tick?'<span class="tick">✓ </span>':'')+s.st);
+      }
+      // mark earlier non-skip/non-error as done
+      for(var j=0;j<k;j++){
+        var pj=sc.steps[j];
+        if(!pj.skip && !pj.error){ stageEls[pj.node].classList.remove('is-active'); stageEls[pj.node].classList.add('is-done'); }
+      }
+      // update inspector to this layer
+      showLayer(s.node, idx); selectStage(s.node);
+      // override inspector code if step provides one (scenario-specific)
+      if(s.code){ I.codeLabel.textContent=s.lbl||'Datos en este punto'; I.code.innerHTML=hl(s.code); }
+
+      // last step -> show response
+      if(k===sc.steps.length-1){
+        timers.push(setTimeout(function(){
+          stageEls[s.node].classList.remove('is-active');
+          if(!s.skip && !s.error) stageEls[s.node].classList.add('is-done');
+          showResponse(sc);
+          running=false; sendBtn.disabled=false;
+        }, reduce?40:520));
+      }
+    }, step*k));
+  });
+}
+
+function showResponse(sc){
+  var r=sc.resp;
+  phaseLabel.textContent = r.ok ? '← response 2xx' : '← response 422';
+  respStatus.className='resp-status '+(r.ok?'ok':'err');
+  respStatus.innerHTML=(r.ok?'&#10003; ':'&#10007; ')+r.status+'<span class="lat">'+r.lat+'</span>';
+  respJson.innerHTML=r.json;
+  resp.classList.add('show');
+  // light up return path
+  if(r.ok){ stageEls['uvicorn'].classList.add('is-response'); stageEls['client'].classList.add('is-response'); }
+}
+
+/* ============ SCENARIO SWITCH ============ */
+var tabs=document.querySelectorAll('.scen-tab');
+var reqVerb=document.getElementById('req-verb'), reqPath=document.getElementById('req-path'), reqBody=document.getElementById('req-body');
+
+function loadScen(i){
+  curScen=i;
+  tabs.forEach(function(t){ t.setAttribute('aria-selected', t.dataset.scen==String(i)?'true':'false'); });
+  var sc=SCEN[i];
+  reqVerb.textContent=sc.verb;
+  reqVerb.style.background = sc.verb==='GET'?'var(--accent-soft)':'var(--amber-soft)';
+  reqVerb.style.color = sc.verb==='GET'?'var(--accent-ink)':'var(--amber)';
+  if(sc.badPath){
+    var parts=sc.path.split('/'); var last=parts.pop();
+    reqPath.innerHTML=parts.join('/')+'/<span class="seg-bad">'+last+'</span>';
+  } else { reqPath.textContent=sc.path; }
+  if(sc.body){ reqBody.hidden=false; reqBody.innerHTML=sc.body; } else { reqBody.hidden=true; }
+  resetAll();
+}
+tabs.forEach(function(t){ t.addEventListener('click', function(){ loadScen(parseInt(t.dataset.scen,10)); }); });
+
+sendBtn.addEventListener('click', run);
+resetBtn.addEventListener('click', resetAll);
+loadScen(0);
+
+/* ============ APP.PY ============ */
+document.getElementById('appref-code').innerHTML = hl(
+'from fastapi import FastAPI\n'+
+'from pydantic import BaseModel\n'+
+'\n'+
+'app = FastAPI()\n'+
+'\n'+
+'class Item(BaseModel):        # el contrato de datos\n'+
+'    name: str\n'+
+'    price: float\n'+
+'\n'+
+'@app.get("/items/{item_id}")\n'+
+'async def read_item(item_id: int):        # item_id validado como int\n'+
+'    item = await db.get(item_id)          # await = le suelta el loop\n'+
+'    return {"item_id": item_id, "name": item.name}\n'+
+'\n'+
+'@app.post("/items", status_code=201)\n'+
+'async def create_item(item: Item):        # body validado contra Item\n'+
+'    return item'
+);
+
+/* ============ EVENT LOOP DEMO ============ */
+(function(){
+  // 3 requests. Each: cpu(1) -> io(3, awaitable) -> cpu(1) -> done
+  // async: io overlaps. sync: fully serial.
+  var UNIT=6; // px per time-unit visual handled by %; we use % of total
+  var reqs=['req A','req B','req C'];
+  var COL={cpu:'cpu', io:'io'};
+
+  function buildTracks(container){
+    container.innerHTML='';
+    var rows=[];
+    reqs.forEach(function(r){
+      var row=document.createElement('div'); row.className='grow';
+      row.innerHTML='<span class="glabel">'+r+'</span><div class="gtrack"><div class="gbar-wrap"></div></div>';
+      container.appendChild(row);
+      rows.push(row.querySelector('.gbar-wrap'));
+    });
+    return rows;
+  }
+
+  // schedule model: returns per-request list of segments {type,start,end} in time units, plus total
+  function schedule(async){
+    // durations: cpu1=1, io=3, cpu2=1  (total work per req = 5)
+    var segs=[[],[],[]], total;
+    if(async){
+      // single worker, but io overlaps. Simplified cooperative timeline:
+      // t0: A cpu1 (0-1)
+      // t1: A hits await io (1-4), worker free -> B cpu1 (1-2)
+      // t2: B await io (2-5) -> C cpu1 (2-3)
+      // t3: C await io (3-6) -> worker idle waiting
+      // t4: A io done -> A cpu2 (4-5)
+      // t5: B io done -> B cpu2 (5-6) ; A done@5
+      // t6: C io done -> C cpu2 (6-7) ; B done@6
+      // t7: C done@7
+      segs[0]=[{t:'cpu',s:0,e:1},{t:'io',s:1,e:4},{t:'cpu',s:4,e:5}];
+      segs[1]=[{t:'cpu',s:1,e:2},{t:'io',s:2,e:5},{t:'cpu',s:5,e:6}];
+      segs[2]=[{t:'cpu',s:2,e:3},{t:'io',s:3,e:6},{t:'cpu',s:6,e:7}];
+      total=7;
+    } else {
+      // serial: each req fully finishes (5 units incl. its blocking io) before next
+      segs[0]=[{t:'cpu',s:0,e:1},{t:'io',s:1,e:4},{t:'cpu',s:4,e:5}];
+      segs[1]=[{t:'cpu',s:5,e:6},{t:'io',s:6,e:9},{t:'cpu',s:9,e:10}];
+      segs[2]=[{t:'cpu',s:10,e:11},{t:'io',s:11,e:14},{t:'cpu',s:14,e:15}];
+      total=15;
+    }
+    return {segs:segs, total:total, done:segs.map(function(s){return s[s.length-1].e;})};
+  }
+
+  var asyncWraps=buildTracks(document.getElementById('gantt-async'));
+  var syncWraps=buildTracks(document.getElementById('gantt-sync'));
+  var footA=document.getElementById('foot-async'), footS=document.getElementById('foot-sync');
+  var playBtn=document.getElementById('loop-play');
+  var raf=null;
+
+  function render(wraps, model, elapsed){
+    var T=model.total;
+    model.segs.forEach(function(row, ri){
+      var wrap=wraps[ri]; wrap.innerHTML='';
+      row.forEach(function(seg){
+        if(elapsed<=seg.s) return;
+        var bar=document.createElement('div');
+        var vis=Math.min(elapsed, seg.e);
+        bar.className='gbar '+(seg.t==='io'?'io':'cpu');
+        bar.style.left=(seg.s/T*100)+'%';
+        bar.style.width=((vis-seg.s)/T*100)+'%';
+        wrap.appendChild(bar);
+      });
+      // done marker
+      if(elapsed>=model.done[ri]){
+        var d=document.createElement('div');
+        d.className='gbar done';
+        d.style.left=(model.done[ri]/T*100 - 1.5)+'%';
+        d.style.width='1.5%';
+        wrap.appendChild(d);
+      }
+    });
+  }
+
+  function play(){
+    if(raf) cancelAnimationFrame(raf);
+    var A=schedule(true), S=schedule(false);
+    var maxT=S.total; // common clock, real time proportional
+    var dur = reduce?200:2600;
+    var t0=null;
+    playBtn.disabled=true;
+    function frame(ts){
+      if(!t0) t0=ts;
+      var p=Math.min(1,(ts-t0)/dur);
+      var elapsed=p*maxT;
+      render(asyncWraps, A, elapsed);
+      render(syncWraps, S, elapsed);
+      // footers
+      var aDone = A.done.filter(function(d){return elapsed>=d;}).length;
+      var sDone = S.done.filter(function(d){return elapsed>=d;}).length;
+      footA.innerHTML='<span class="num">'+aDone+'/3</span> listas · las 3 terminan en <span class="num">7</span> ticks';
+      footS.innerHTML='<span class="num">'+sDone+'/3</span> listas · recién a los <span class="num">15</span> ticks';
+      if(p<1){ raf=requestAnimationFrame(frame); } else { playBtn.disabled=false; }
+    }
+    raf=requestAnimationFrame(frame);
+  }
+  playBtn.addEventListener('click', play);
+  // initial resting state: show fully rendered final frame so page isn't empty
+  render(asyncWraps, schedule(true), 7);
+  render(syncWraps, schedule(false), 15);
+  footA.innerHTML='<span class="num">3/3</span> listas · las 3 terminan en <span class="num">7</span> ticks';
+  footS.innerHTML='<span class="num">3/3</span> listas · recién a los <span class="num">15</span> ticks';
+})();
+</script>

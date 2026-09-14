@@ -1,0 +1,703 @@
+<title>FastAPI por dentro</title>
+<meta name="description" content="Tres vistas interactivas de FastAPI: arquitectura de deployment, árbol de dependencias y estados de una corrutina">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#eef2f1; --surface:#ffffff; --surface-2:#e7edeb; --surface-3:#f5f8f7;
+    --border:#d3ddda; --border-strong:#b9c7c3;
+    --ink:#0f1a1c; --ink-soft:#4b5b58; --ink-faint:#7d8d89;
+    --accent:#0d9488; --accent-ink:#0b6b62; --accent-soft:#c7f0ea; --accent-glow:rgba(13,148,136,.22);
+    --amber:#b45309; --amber-soft:#fbe6c9; --amber-ink:#8a3f07;
+    --danger:#c62828; --danger-soft:#f7d6d6; --danger-glow:rgba(198,40,40,.18);
+    --ok:#15803d; --ok-soft:#cdefd7;
+    --violet:#6d28d9; --violet-soft:#e6ddfb; --violet-ink:#5b21b6;
+    --blue:#1d4ed8; --blue-soft:#d6e2fb;
+    --shadow:0 1px 2px rgba(15,26,28,.06),0 10px 30px -12px rgba(15,26,28,.18);
+    --shadow-lift:0 2px 6px rgba(15,26,28,.08),0 18px 44px -16px rgba(15,26,28,.30);
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Hanken Grotesk',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b1214; --surface:#111b1e; --surface-2:#1a282c; --surface-3:#152023;
+      --border:#22383b; --border-strong:#315055;
+      --ink:#e7f0ed; --ink-soft:#98aeaa; --ink-faint:#6a827e;
+      --accent:#2dd4bf; --accent-ink:#5eead4; --accent-soft:#0f3f3a; --accent-glow:rgba(45,212,191,.20);
+      --amber:#fbbf24; --amber-soft:#3a2c0d; --amber-ink:#fcd34d;
+      --danger:#f87171; --danger-soft:#3a1717; --danger-glow:rgba(248,113,113,.16);
+      --ok:#4ade80; --ok-soft:#123020;
+      --violet:#c4b5fd; --violet-soft:#241a3f; --violet-ink:#ddd6fe;
+      --blue:#93c5fd; --blue-soft:#182744;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px -14px rgba(0,0,0,.7);
+      --shadow-lift:0 2px 8px rgba(0,0,0,.5),0 22px 50px -18px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b1214; --surface:#111b1e; --surface-2:#1a282c; --surface-3:#152023;
+    --border:#22383b; --border-strong:#315055;
+    --ink:#e7f0ed; --ink-soft:#98aeaa; --ink-faint:#6a827e;
+    --accent:#2dd4bf; --accent-ink:#5eead4; --accent-soft:#0f3f3a; --accent-glow:rgba(45,212,191,.20);
+    --amber:#fbbf24; --amber-soft:#3a2c0d; --amber-ink:#fcd34d;
+    --danger:#f87171; --danger-soft:#3a1717; --danger-glow:rgba(248,113,113,.16);
+    --ok:#4ade80; --ok-soft:#123020;
+    --violet:#c4b5fd; --violet-soft:#241a3f; --violet-ink:#ddd6fe;
+    --blue:#93c5fd; --blue-soft:#182744;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px -14px rgba(0,0,0,.7);
+    --shadow-lift:0 2px 8px rgba(0,0,0,.5),0 22px 50px -18px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--ink); font-family:var(--body); margin:0; line-height:1.55; -webkit-font-smoothing:antialiased; font-size:15px}
+  .wrap{max-width:1180px; margin:0 auto; padding-inline:20px}
+  a{color:var(--accent-ink); text-decoration:none} a:hover{text-decoration:underline}
+  h1,h2,h3{font-family:var(--disp); text-wrap:balance; margin:0; line-height:1.12}
+  ::selection{background:var(--accent-glow)}
+  code{font-family:var(--mono)}
+
+  /* header */
+  header.top{border-bottom:1px solid var(--border); background:linear-gradient(180deg,var(--surface-3),transparent)}
+  .top-in{display:flex; align-items:flex-start; justify-content:space-between; gap:20px; padding-block:26px 20px; flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent-ink); font-weight:600; display:flex; align-items:center; gap:9px}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-glow)}
+  h1{font-size:clamp(28px,5vw,44px); font-weight:800; letter-spacing:-.02em; margin-top:12px}
+  .lede{color:var(--ink-soft); max-width:62ch; margin-top:11px; font-size:15.5px}
+  .lede code{font-size:.87em; background:var(--surface-2); padding:1px 6px; border-radius:5px; color:var(--accent-ink)}
+  .theme-btn{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:9px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; transition:border-color .15s,color .15s}
+  .theme-btn:hover{border-color:var(--border-strong); color:var(--ink)}
+
+  /* view tabs */
+  .vtabs{display:flex; gap:8px; border-bottom:1px solid var(--border); flex-wrap:wrap; padding-bottom:0}
+  .vtab{position:relative; font-family:var(--body); background:transparent; border:none; cursor:pointer; padding:13px 6px 15px; margin-bottom:-1px; color:var(--ink-faint); display:flex; align-items:center; gap:10px; border-bottom:2px solid transparent; transition:color .15s}
+  .vtab:hover{color:var(--ink)}
+  .vtab .vn{font-family:var(--mono); font-size:11px; font-weight:700; width:22px; height:22px; border-radius:6px; background:var(--surface-2); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; flex:0 0 auto}
+  .vtab .vt{font-family:var(--disp); font-weight:700; font-size:15px; letter-spacing:-.01em}
+  .vtab .vsub{font-size:11.5px; color:var(--ink-faint); font-family:var(--mono)}
+  .vtab-txt{display:flex; flex-direction:column; align-items:flex-start; line-height:1.2}
+  .vtab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent)}
+  .vtab[aria-selected="true"] .vn{background:var(--accent); color:#04231f}
+
+  /* view container */
+  .view{padding-block:30px 44px}
+  .view[hidden]{display:none !important}
+  .view-head{margin-bottom:22px}
+  .view-head h2{font-size:clamp(20px,3.2vw,26px); font-weight:800; letter-spacing:-.015em}
+  .view-head p{margin:8px 0 0; color:var(--ink-soft); max-width:64ch; font-size:14.5px}
+  .view-head p code{font-family:var(--mono); font-size:.86em; color:var(--accent-ink); background:var(--surface-2); padding:1px 5px; border-radius:4px}
+
+  .split{display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:22px; align-items:start}
+
+  /* generic controls */
+  .ctrls{display:flex; gap:9px; align-items:center; flex-wrap:wrap; margin-bottom:16px}
+  .btn{font-family:var(--mono); font-weight:600; font-size:13px; cursor:pointer; border-radius:10px; padding:10px 17px; border:1px solid transparent; display:inline-flex; align-items:center; gap:8px; transition:transform .08s,box-shadow .15s,background .15s,opacity .15s}
+  .btn svg{width:15px;height:15px}
+  .btn-primary{background:var(--accent); color:#04231f; box-shadow:0 6px 18px -8px var(--accent-glow)}
+  .btn-primary:hover{box-shadow:0 10px 24px -8px var(--accent-glow)}
+  .btn-primary:active{transform:translateY(1px)}
+  .btn-primary:disabled{opacity:.45; cursor:not-allowed}
+  .btn-ghost{background:transparent; border-color:var(--border); color:var(--ink-soft)}
+  .btn-ghost:hover{border-color:var(--border-strong); color:var(--ink)}
+  .hint-inline{font-size:12.5px; color:var(--ink-faint)}
+
+  /* inspector (shared) */
+  .insp{position:sticky; top:14px; border:1px solid var(--border); border-radius:16px; background:var(--surface); box-shadow:var(--shadow); overflow:hidden}
+  .insp-head{padding:14px 17px 12px; border-bottom:1px solid var(--border); background:var(--surface-3)}
+  .insp-kick{font-family:var(--mono); font-size:10.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-faint); display:flex; align-items:center; gap:8px}
+  .insp-kick b{color:var(--accent-ink); font-weight:700}
+  .insp-title{font-family:var(--disp); font-size:19px; font-weight:800; letter-spacing:-.01em; margin-top:6px; display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .chip{font-family:var(--mono); font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; background:var(--surface-2); color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em}
+  .insp-body{padding:15px 17px 17px}
+  .insp-desc{color:var(--ink-soft); font-size:14px; margin:0 0 13px}
+  .insp-desc strong{color:var(--ink); font-weight:600}
+  .code-label{font-family:var(--mono); font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px; display:flex; align-items:center; gap:7px}
+  .code-label::before{content:""; width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  pre.code{font-family:var(--mono); font-size:12.5px; line-height:1.6; background:var(--surface-3); border:1px solid var(--border); border-radius:11px; padding:12px 14px; margin:0; overflow-x:auto; color:var(--ink); tab-size:2}
+  pre.code .cm{color:var(--ink-faint); font-style:italic}
+  pre.code .kw{color:var(--violet-ink); font-weight:600}
+  pre.code .st{color:var(--amber-ink)}
+  pre.code .nm{color:var(--danger)}
+  pre.code .dc{color:var(--accent-ink); font-weight:600}
+  .note{margin-top:12px; font-size:12.5px; color:var(--ink-faint); display:flex; gap:8px; align-items:flex-start}
+  .note svg{width:15px;height:15px;flex:0 0 auto;margin-top:2px;color:var(--accent)}
+
+  /* ===== VIEW 1: ARCHITECTURE ===== */
+  .arch{border:1px solid var(--border); border-radius:16px; background:var(--surface-3); box-shadow:var(--shadow); padding:18px 16px; display:flex; flex-direction:column; gap:0}
+  .tier{display:flex; flex-direction:column; align-items:center; gap:0}
+  .tier-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; width:100%}
+  .connv{width:2px; height:20px; background:var(--border-strong); margin:3px 0}
+  .connv.fan{position:relative}
+  .comp{
+    position:relative; border:1.5px solid var(--border-strong); background:var(--surface); border-radius:12px;
+    padding:11px 15px; cursor:pointer; min-width:150px; text-align:left; font-family:var(--body); color:inherit;
+    transition:all .2s; display:flex; align-items:center; gap:11px;
+  }
+  .comp:hover{border-color:var(--accent); transform:translateY(-1px); box-shadow:var(--shadow)}
+  .comp .cicon{width:30px;height:30px;border-radius:8px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; color:#fff}
+  .comp .cicon svg{width:17px;height:17px}
+  .comp .cname{display:block; font-family:var(--disp); font-weight:700; font-size:14.5px; letter-spacing:-.01em; line-height:1.15}
+  .comp .crole{display:block; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px}
+  .comp.wide{min-width:210px}
+  .comp.selected{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), var(--shadow)}
+  .comp.on-path{border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-glow)}
+  .comp.dim{opacity:.4}
+  .tier-label{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); align-self:flex-start; margin:2px 0 7px 2px}
+  /* icon backgrounds */
+  .bg-client{background:var(--blue)} .bg-proxy{background:var(--violet)} .bg-gunicorn{background:#0f766e}
+  .bg-worker{background:var(--accent)} .bg-app{background:var(--amber)} .bg-db{background:#0369a1}
+  .bg-redis{background:#b91c1c} .bg-celery{background:#65a30d}
+  :root[data-theme="dark"] .comp .cicon, :root:not([data-theme="light"]) .comp .cicon{color:#0b1214}
+
+  /* ===== VIEW 2: DEPENDENCIES ===== */
+  .deptree{border:1px solid var(--border); border-radius:16px; background:var(--surface); box-shadow:var(--shadow); padding:16px 16px}
+  .depnode{
+    position:relative; border:1.5px solid var(--border-strong); background:var(--surface); border-radius:11px;
+    padding:9px 13px; cursor:pointer; font-family:var(--body); color:inherit; text-align:left; width:100%;
+    display:flex; align-items:center; gap:10px; transition:all .2s; margin-bottom:8px;
+  }
+  .depnode:hover{border-color:var(--accent)}
+  .depnode .dn-badge{font-family:var(--mono); font-size:9.5px; font-weight:700; width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex:0 0 auto; background:var(--surface-2); color:var(--ink-faint)}
+  .depnode .dn-name{font-family:var(--mono); font-size:13px; font-weight:600}
+  .depnode .dn-name .p{color:var(--violet-ink)}
+  .depnode .dn-tag{margin-left:auto; font-family:var(--mono); font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:20px; letter-spacing:.02em}
+  .dn-endpoint{background:var(--amber-soft); color:var(--amber-ink)}
+  .dn-cache{background:var(--accent-soft); color:var(--accent-ink)}
+  .dn-yield{background:var(--violet-soft); color:var(--violet-ink)}
+  .depnode.lvl1{margin-left:26px; width:calc(100% - 26px)}
+  .depnode.lvl2{margin-left:52px; width:calc(100% - 52px)}
+  .depnode.active{border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-glow)}
+  .depnode.selected{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent)}
+  .depnode.done .dn-badge{background:var(--accent); color:#04231f}
+  .depguide{position:absolute; left:12px; top:0; bottom:0; width:2px; background:var(--border)}
+
+  .exec{border:1px solid var(--border); border-radius:16px; background:var(--surface); box-shadow:var(--shadow); overflow:hidden}
+  .exec-head{padding:13px 16px; border-bottom:1px solid var(--border); background:var(--surface-3); font-family:var(--disp); font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:space-between}
+  .exec-head .ph{font-family:var(--mono); font-size:11px; font-weight:600; color:var(--accent-ink)}
+  .exec-list{list-style:none; margin:0; padding:8px; counter-reset:step; min-height:120px}
+  .exec-item{display:grid; grid-template-columns:26px 1fr; gap:11px; padding:9px 8px; border-radius:9px; opacity:0; transform:translateX(-6px); transition:opacity .25s,transform .25s; align-items:start}
+  .exec-item.show{opacity:1; transform:none}
+  .exec-item .en{font-family:var(--mono); font-weight:700; font-size:12px; width:24px; height:24px; border-radius:7px; display:flex; align-items:center; justify-content:center; background:var(--accent-soft); color:var(--accent-ink)}
+  .exec-item.teardown .en{background:var(--violet-soft); color:var(--violet-ink)}
+  .exec-item .etxt{font-size:13px}
+  .exec-item .etxt code{font-family:var(--mono); font-size:12px; color:var(--ink)}
+  .exec-item .esub{display:block; color:var(--ink-faint); font-size:11.5px; font-family:var(--mono); margin-top:2px}
+
+  /* ===== VIEW 3: STATE MACHINE ===== */
+  .sm-wrap{border:1px solid var(--border); border-radius:16px; background:var(--surface); box-shadow:var(--shadow); padding:14px 12px 6px; overflow:hidden}
+  .sm-svg{width:100%; height:auto; display:block}
+  .sm-node rect{transition:fill .25s, stroke .25s}
+  .sm-node text{font-family:var(--mono); font-weight:600; fill:var(--ink)}
+  .sm-node .nsub{font-size:9px; fill:var(--ink-faint); font-weight:500}
+  .sm-edge{stroke:var(--border-strong); stroke-width:2; fill:none; transition:stroke .25s, stroke-width .25s}
+  .sm-edge.hot{stroke:var(--accent); stroke-width:3}
+  .sm-elabel{font-family:var(--mono); font-size:10px; fill:var(--ink-faint)}
+  .sm-elabel.hot{fill:var(--accent-ink); font-weight:700}
+  .loopbox{margin-top:12px; border:1px dashed var(--border-strong); border-radius:12px; padding:12px 14px; background:var(--surface-3)}
+  .loopbox .lb-h{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px}
+  .loopbox .lb-t{font-size:13.5px; color:var(--ink)}
+  .sm-log{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:5px}
+  .sm-log li{font-family:var(--mono); font-size:12px; color:var(--ink-faint); padding-left:16px; position:relative}
+  .sm-log li::before{content:"›"; position:absolute; left:2px; color:var(--accent)}
+  .sm-log li.cur{color:var(--ink); font-weight:600}
+  .steppill{font-family:var(--mono); font-size:12px; color:var(--ink-soft); background:var(--surface-2); border-radius:8px; padding:8px 12px; font-variant-numeric:tabular-nums}
+
+  /* footer */
+  footer{border-top:1px solid var(--border); margin-top:6px}
+  .foot-in{padding-block:24px 40px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:center; color:var(--ink-faint); font-size:13px}
+  .foot-in .mono{font-family:var(--mono); font-size:12px}
+
+  @media (max-width:840px){
+    .split{grid-template-columns:1fr}
+    .insp{position:static}
+    .vtab .vsub{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
+</style>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div>
+      <div class="eyebrow"><span class="dot"></span>FastAPI · tres escalas</div>
+      <h1>FastAPI por dentro</h1>
+      <p class="lede">La misma app vista en tres escalas: el <strong>sistema</strong> que la sirve en producción, el <strong>grafo de dependencias</strong> que arma cada handler, y la <strong>corrutina</strong> que corre dentro del event loop.</p>
+    </div>
+    <button class="theme-btn" id="theme" aria-label="Cambiar tema">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <span id="theme-label">Tema</span>
+    </button>
+  </div>
+  <div class="wrap">
+    <div class="vtabs" role="tablist" aria-label="Vistas">
+      <button class="vtab" role="tab" data-view="0" aria-selected="true"><span class="vn">01</span><span class="vtab-txt"><span class="vt">Arquitectura</span><span class="vsub">componentes en producción</span></span></button>
+      <button class="vtab" role="tab" data-view="1" aria-selected="false"><span class="vn">02</span><span class="vtab-txt"><span class="vt">Dependencias</span><span class="vsub">el grafo de Depends()</span></span></button>
+      <button class="vtab" role="tab" data-view="2" aria-selected="false"><span class="vn">03</span><span class="vtab-txt"><span class="vt">Estados async</span><span class="vsub">la corrutina en el loop</span></span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ VIEW 1: ARCHITECTURE ============ -->
+  <section class="view" id="view-0">
+    <div class="view-head">
+      <h2>Diagrama de componentes</h2>
+      <p>Lo que hay entre el browser y tu <code>async def</code> cuando la app está en producción. Tocá cada pieza para ver su rol, o seguí un request atravesando el stack.</p>
+    </div>
+    <div class="ctrls">
+      <button class="btn btn-primary" id="arch-trace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>Trazar un request</span></button>
+      <button class="btn btn-ghost" id="arch-reset">Reset</button>
+      <span class="hint-inline">o hacé clic en cualquier componente</span>
+    </div>
+    <div class="split">
+      <div class="arch" id="arch"><!-- injected --></div>
+      <div class="insp" id="insp1">
+        <div class="insp-head">
+          <div class="insp-kick"><b id="i1-kick">Componente</b></div>
+          <div class="insp-title"><span id="i1-title">Elegí una pieza</span></div>
+        </div>
+        <div class="insp-body">
+          <p class="insp-desc" id="i1-desc">Cada capa resuelve un problema distinto. Tocá un componente para ver <strong>qué hace</strong>, <strong>por qué está</strong> y <strong>qué pasa si lo sacás</strong>.</p>
+          <div id="i1-why-wrap" hidden>
+            <div class="code-label" id="i1-why-label">Por qué está</div>
+            <pre class="code" id="i1-why"></pre>
+          </div>
+          <div class="note" id="i1-note" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span id="i1-note-text"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: DEPENDENCIES ============ -->
+  <section class="view" id="view-1" hidden>
+    <div class="view-head">
+      <h2>Árbol de dependencias</h2>
+      <p>Antes de correr tu endpoint, FastAPI resuelve todo su árbol de <code>Depends()</code> — de las hojas hacia la raíz. Presioná <em>Resolver</em> y mirá el orden: las dependencias con <code>yield</code> hacen setup a la ida y teardown a la vuelta, y las repetidas se resuelven <strong>una sola vez por request</strong>.</p>
+    </div>
+    <div class="ctrls">
+      <button class="btn btn-primary" id="dep-run"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg><span>Resolver dependencias</span></button>
+      <button class="btn btn-ghost" id="dep-reset">Reset</button>
+    </div>
+    <div class="split">
+      <div>
+        <div class="deptree" id="deptree"><!-- injected --></div>
+        <div class="insp" id="insp2" style="margin-top:18px; position:static">
+          <div class="insp-head">
+            <div class="insp-kick"><b id="i2-kick">Dependencia</b></div>
+            <div class="insp-title"><span id="i2-title">Tocá un nodo</span><span class="chip" id="i2-chip" hidden></span></div>
+          </div>
+          <div class="insp-body">
+            <p class="insp-desc" id="i2-desc">El endpoint declara qué necesita; FastAPI averigua el orden y le inyecta cada pieza ya resuelta.</p>
+            <div id="i2-code-wrap" hidden>
+              <div class="code-label">Firma</div>
+              <pre class="code" id="i2-code"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="exec">
+        <div class="exec-head"><span>Orden de ejecución</span><span class="ph" id="dep-phase">en espera</span></div>
+        <ol class="exec-list" id="exec-list"><!-- injected --></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: STATE MACHINE ============ -->
+  <section class="view" id="view-2" hidden>
+    <div class="view-head">
+      <h2>Estados de una corrutina</h2>
+      <p>Una <code>async def</code> no es un hilo: es una corrutina que el event loop <em>pausa y reanuda</em>. Avanzá paso a paso y mirá cómo pasa de <code>running</code> a <code>suspended</code> en cada <code>await</code>, liberando al loop para atender a las demás.</p>
+    </div>
+    <div class="ctrls">
+      <button class="btn btn-primary" id="sm-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6"/></svg><span>Siguiente paso</span></button>
+      <button class="btn btn-ghost" id="sm-auto">Auto</button>
+      <button class="btn btn-ghost" id="sm-reset">Reset</button>
+      <span class="steppill" id="sm-step">paso 0 / 6</span>
+    </div>
+    <div class="split">
+      <div class="sm-wrap">
+        <svg class="sm-svg" viewBox="0 0 760 340" id="sm-svg" role="img" aria-label="Máquina de estados de una corrutina">
+          <defs>
+            <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0L10 5L0 10z" fill="var(--border-strong)"/>
+            </marker>
+            <marker id="arw-hot" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0L10 5L0 10z" fill="var(--accent)"/>
+            </marker>
+          </defs>
+          <!-- edges -->
+          <path class="sm-edge" id="e_create" d="M150 170 H232" marker-end="url(#arw)"/>
+          <path class="sm-edge" id="e_run" d="M368 158 L452 108" marker-end="url(#arw)"/>
+          <path class="sm-edge" id="e_susp" d="M540 132 L452 232" marker-end="url(#arw)"/>
+          <path class="sm-edge" id="e_wake" d="M470 250 Q300 300 270 206" marker-end="url(#arw)"/>
+          <path class="sm-edge" id="e_done" d="M620 108 Q690 140 660 168" marker-end="url(#arw)"/>
+          <text class="sm-elabel" id="l_create" x="158" y="160">agendar</text>
+          <text class="sm-elabel" id="l_run" x="372" y="128">ejecutar</text>
+          <text class="sm-elabel" id="l_susp" x="512" y="190">await I/O</text>
+          <text class="sm-elabel" id="l_wake" x="300" y="292">I/O listo</text>
+          <text class="sm-elabel" id="l_done" x="628" y="110">return</text>
+          <!-- nodes -->
+          <g class="sm-node" id="n_created" data-state="created">
+            <rect x="42" y="146" width="108" height="48" rx="11" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.5"/>
+            <text x="96" y="168" text-anchor="middle" font-size="13">Creada</text>
+            <text class="nsub" x="96" y="182" text-anchor="middle">coroutine()</text>
+          </g>
+          <g class="sm-node" id="n_ready" data-state="ready">
+            <rect x="222" y="146" width="108" height="48" rx="11" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.5"/>
+            <text x="276" y="168" text-anchor="middle" font-size="13">Lista</text>
+            <text class="nsub" x="276" y="182" text-anchor="middle">en la cola</text>
+          </g>
+          <g class="sm-node" id="n_running" data-state="running">
+            <rect x="454" y="82" width="120" height="50" rx="11" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.5"/>
+            <text x="514" y="104" text-anchor="middle" font-size="13">Ejecutando</text>
+            <text class="nsub" x="514" y="119" text-anchor="middle">tiene la CPU</text>
+          </g>
+          <g class="sm-node" id="n_suspended" data-state="suspended">
+            <rect x="454" y="210" width="120" height="50" rx="11" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.5"/>
+            <text x="514" y="232" text-anchor="middle" font-size="13">Suspendida</text>
+            <text class="nsub" x="514" y="247" text-anchor="middle">esperando I/O</text>
+          </g>
+          <g class="sm-node" id="n_done" data-state="done">
+            <rect x="636" y="146" width="104" height="48" rx="11" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="1.5"/>
+            <text x="688" y="168" text-anchor="middle" font-size="13">Terminada</text>
+            <text class="nsub" x="688" y="182" text-anchor="middle">resultado listo</text>
+          </g>
+        </svg>
+        <div class="loopbox">
+          <div class="lb-h">Mientras tanto, el event loop</div>
+          <div class="lb-t" id="sm-loop">El loop está inactivo, esperando que agendes tareas.</div>
+        </div>
+      </div>
+      <div class="insp" id="insp3">
+        <div class="insp-head">
+          <div class="insp-kick"><b>Paso</b> <span id="i3-idx">—</span></div>
+          <div class="insp-title"><span id="i3-title">La corrutina, paso a paso</span></div>
+        </div>
+        <div class="insp-body">
+          <p class="insp-desc" id="i3-desc">Presioná <strong>Siguiente paso</strong> para recorrer el ciclo de vida de una corrutina que hace <code>await db.fetch()</code>.</p>
+          <div class="code-label">En el código</div>
+          <pre class="code" id="i3-code">async def handle(req):
+    item = await db.fetch(req.id)
+    return render(item)</pre>
+          <ul class="sm-log" id="sm-log"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>Modelos simplificados con fines didácticos. Serie: <a href="#" id="link-tracer">Anatomía de un request</a> · FastAPI por dentro.</span>
+    <span class="mono"><a href="https://fastapi.tiangolo.com/" target="_blank" rel="noopener">fastapi.tiangolo.com ↗</a></span>
+  </div>
+</footer>
+
+<script>
+/* ========= THEME ========= */
+(function(){
+  var root=document.documentElement, btn=document.getElementById('theme'), lbl=document.getElementById('theme-label');
+  function sysDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;}
+  function cur(){var t=root.getAttribute('data-theme'); return t?t:(sysDark()?'dark':'light');}
+  function paint(){lbl.textContent=cur()==='dark'?'Oscuro':'Claro';}
+  btn.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark'); paint();});
+  paint();
+})();
+var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* ========= VIEW TABS ========= */
+var vtabs=document.querySelectorAll('.vtab'), views=[document.getElementById('view-0'),document.getElementById('view-1'),document.getElementById('view-2')];
+function showView(i){
+  vtabs.forEach(function(t){t.setAttribute('aria-selected', t.dataset.view==String(i)?'true':'false');});
+  views.forEach(function(v,k){v.hidden = k!==i;});
+}
+vtabs.forEach(function(t){t.addEventListener('click',function(){showView(parseInt(t.dataset.view,10));});});
+
+/* ========= syntax highlighter ========= */
+function hl(s){
+  s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var strs=[], cmts=[];
+  s = s.replace(/"[^"]*"/g, function(m){ strs.push('<span class="st">'+m+'</span>'); return '~S'+(strs.length-1)+'S~'; });
+  s = s.replace(/#[^\n]*/g, function(m){ cmts.push('<span class="cm">'+m+'</span>'); return '~C'+(cmts.length-1)+'C~'; });
+  s = s.replace(/\b(async|def|return|class|await|import|from|yield|with|for|in)\b/g,'<span class="kw">$1</span>');
+  s = s.replace(/(@app\.\w+|@router\.\w+)/g,'<span class="dc">$1</span>');
+  s = s.replace(/(Depends|HTTPException)/g,'<span class="dc">$1</span>');
+  s = s.replace(/~C(\d+)C~/g, function(_,i){ return cmts[+i]; });
+  s = s.replace(/~S(\d+)S~/g, function(_,i){ return strs[+i]; });
+  return s;
+}
+
+/* ================= VIEW 1: ARCHITECTURE ================= */
+var IC = {
+  client:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+  proxy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/><circle cx="12" cy="12" r="9"/></svg>',
+  gun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="16" height="6" rx="1.5"/><path d="M8 14v6M12 14v6M16 14v6M4 12h16"/></svg>',
+  worker:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>',
+  app:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/></svg>',
+  db:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>',
+  redis:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M13 2L4 13h7l-1 9 9-11h-7z"/></svg>',
+  celery:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 7h16M4 12h16M4 17h10"/><path d="M18 15l2 2 3-3.5"/></svg>'
+};
+var COMPS = {
+  client:{name:'Cliente', role:'browser · app · curl', icon:'client', bg:'bg-client', path:true,
+    desc:'Cualquier cosa que hable HTTP: un browser, tu frontend, una app mobile, otro servicio. Abre una conexión y manda el request.',
+    why:'GET /items/42 HTTP/1.1\nAuthorization: Bearer …', note:'Nunca confíes en lo que manda: por eso existen validación y auth del otro lado.'},
+  nginx:{name:'Nginx', role:'reverse proxy', icon:'proxy', bg:'bg-proxy', path:true,
+    desc:'El <strong>reverse proxy</strong>. Termina TLS (HTTPS), sirve archivos estáticos, comprime, limita rate y reparte la carga entre varios procesos de la app.',
+    why:'# nginx delega lo dinámico a la app\nlocation / {\n    proxy_pass http://127.0.0.1:8000;\n}', note:'Sin él, tu proceso Python tendría que hacer TLS y servir estáticos: lento y frágil.'},
+  gunicorn:{name:'Gunicorn', role:'process manager', icon:'gun', bg:'bg-gunicorn', path:false,
+    desc:'El <strong>proceso master</strong>. No atiende requests: arranca, vigila y reinicia N procesos worker. Es lo que te da paralelismo real en varios cores.',
+    why:'gunicorn main:app \\\n  -k uvicorn.workers.UvicornWorker \\\n  --workers 4', note:'En dev usás uvicorn directo; en prod, un master que supervise workers.'},
+  worker:{name:'Uvicorn worker', role:'servidor ASGI · event loop', icon:'worker', bg:'bg-worker', path:true,
+    desc:'Cada worker es un <strong>proceso independiente</strong> con su propio <strong>event loop</strong>. Parsea HTTP, arma el <code>scope</code> ASGI y corre tu app. Dentro de un worker, el async maneja miles de conexiones concurrentes.',
+    why:'# 1 proceso, 1 event loop,\n# miles de conexiones concurrentes\nasync def app(scope, receive, send): ...', note:'Escalás sumando workers (procesos) y, dentro de cada uno, con async.'},
+  app:{name:'FastAPI app', role:'tu código', icon:'app', bg:'bg-app', path:true,
+    desc:'Tu aplicación: rutas, dependencias, modelos Pydantic y los <code>async def</code> que escribís. Corre <em>dentro</em> de cada worker (el mismo código en todos).',
+    why:'app = FastAPI()\n\n@app.get("/items/{id}")\nasync def read(id: int): ...', note:'Es stateless: no guardes estado en variables globales, guardalo en la DB o el cache.'},
+  postgres:{name:'PostgreSQL', role:'base de datos', icon:'db', bg:'bg-db', path:true,
+    desc:'El estado que persiste. Tu handler le habla con <code>await</code> (driver async como asyncpg) para no bloquear el event loop mientras la query viaja.',
+    why:'item = await db.fetch_one(\n    "SELECT * FROM items WHERE id=$1", id\n)', note:'Un driver sync bloquea todo el worker: usá el async, o corré la query en un threadpool.'},
+  redis:{name:'Redis', role:'cache · sesiones', icon:'redis', bg:'bg-redis', path:false,
+    desc:'Cache en memoria: respuestas calculadas, sesiones, rate-limit, locks. Evita ir a Postgres para lo que se repite.',
+    why:'cached = await redis.get(key)\nif cached: return cached', note:'Opcional, pero es lo primero que sumás cuando la DB empieza a sufrir.'},
+  celery:{name:'Celery / worker', role:'tareas en background', icon:'celery', bg:'bg-celery', path:false,
+    desc:'Para trabajo pesado o lento (mandar mails, procesar un video, generar un PDF) que no debe bloquear el request. La app encola la tarea y responde ya.',
+    why:'send_email.delay(user.id)  # encola\nreturn {"status": "encolado"}', note:'Si algo tarda segundos y el usuario no necesita el resultado ya, va acá.'}
+};
+/* tiers layout: rows */
+var TIERS = [
+  {label:'Cliente', items:['client']},
+  {label:'Borde', items:['nginx']},
+  {label:'Procesos', items:['gunicorn']},
+  {label:'Workers (procesos)', items:['worker','worker','worker'], repeat:'worker'},
+  {label:'Aplicación', items:['app']},
+  {label:'Datos y tareas', items:['postgres','redis','celery']}
+];
+var archEl=document.getElementById('arch');
+var compEls={}; /* key -> array of els */
+TIERS.forEach(function(tier, ti){
+  if(ti>0){ var cv=document.createElement('div'); cv.className='connv'; archEl.appendChild(cv); }
+  var t=document.createElement('div'); t.className='tier';
+  var row=document.createElement('div'); row.className='tier-row';
+  tier.items.forEach(function(key, idx){
+    var c=COMPS[key];
+    var b=document.createElement('button'); b.type='button';
+    b.className='comp'+(tier.items.length===1?' wide':'');
+    b.setAttribute('data-comp', key);
+    b.innerHTML='<span class="cicon '+c.bg+'">'+IC[c.icon]+'</span><span><span class="cname">'+c.name+(tier.repeat?' '+(idx+1):'')+'</span><span class="crole">'+c.role+'</span></span>';
+    row.appendChild(b);
+    (compEls[key]=compEls[key]||[]).push(b);
+    b.addEventListener('click', function(){ if(tracing) return; selectComp(key, b); });
+  });
+  t.appendChild(row); archEl.appendChild(t);
+});
+var I1={kick:document.getElementById('i1-kick'),title:document.getElementById('i1-title'),desc:document.getElementById('i1-desc'),whyWrap:document.getElementById('i1-why-wrap'),why:document.getElementById('i1-why'),whyLabel:document.getElementById('i1-why-label'),note:document.getElementById('i1-note'),noteText:document.getElementById('i1-note-text')};
+function clearCompSel(){document.querySelectorAll('.comp').forEach(function(e){e.classList.remove('selected');});}
+function selectComp(key, el){
+  clearCompSel();
+  if(el) el.classList.add('selected'); else if(compEls[key]) compEls[key][0].classList.add('selected');
+  var c=COMPS[key];
+  I1.kick.textContent=c.role;
+  I1.title.textContent=c.name;
+  I1.desc.innerHTML=c.desc;
+  I1.whyWrap.hidden=false; I1.why.innerHTML=hl(c.why);
+  I1.note.hidden=false; I1.noteText.textContent=c.note;
+}
+var tracing=false, traceTimers=[];
+var TRACE=['client','nginx','worker','app','postgres']; /* worker index 1 (middle) */
+function archReset(){
+  traceTimers.forEach(clearTimeout); traceTimers=[]; tracing=false;
+  document.querySelectorAll('.comp').forEach(function(e){e.classList.remove('on-path','dim','selected');});
+  document.getElementById('arch-trace').disabled=false;
+}
+document.getElementById('arch-reset').addEventListener('click', archReset);
+document.getElementById('arch-trace').addEventListener('click', function(){
+  if(tracing) return; archReset(); tracing=true; this.disabled=true;
+  document.querySelectorAll('.comp').forEach(function(e){e.classList.add('dim');});
+  var step=reduce?90:560;
+  TRACE.forEach(function(key, i){
+    traceTimers.push(setTimeout(function(){
+      var el = key==='worker'? compEls.worker[1] : compEls[key][0];
+      el.classList.remove('dim'); el.classList.add('on-path');
+      selectCompQuiet(key, el);
+      if(i===TRACE.length-1){
+        traceTimers.push(setTimeout(function(){ tracing=false; document.getElementById('arch-trace').disabled=false; }, step));
+      }
+    }, step*i));
+  });
+});
+function selectCompQuiet(key, el){
+  var c=COMPS[key];
+  I1.kick.textContent=c.role; I1.title.textContent=c.name; I1.desc.innerHTML=c.desc;
+  I1.whyWrap.hidden=false; I1.why.innerHTML=hl(c.why);
+  I1.note.hidden=false; I1.noteText.textContent=c.note;
+}
+selectComp('worker', compEls.worker[1]); /* rest state: highlight the worker */
+document.querySelectorAll('.comp').forEach(function(e){e.classList.remove('selected');});
+
+/* ================= VIEW 2: DEPENDENCIES ================= */
+var DEPNODES = {
+  endpoint:{name:'read_items', sig:'@app.get("/items")\nasync def read_items(\n    user = Depends(get_current_user),\n    db = Depends(get_db),\n): ...', chip:'endpoint', chipCls:'dn-endpoint',
+    desc:'Tu <strong>path operation</strong>. Declara qué necesita con <code>Depends()</code>; para cuando corre, <code>user</code> y <code>db</code> ya están resueltos e inyectados.'},
+  user:{name:'get_current_user', sig:'async def get_current_user(\n    token = Depends(oauth2_scheme),\n    db = Depends(get_db),\n) -> User: ...', chip:'depende de 2', chipCls:'',
+    desc:'Una dependencia que <em>a su vez</em> depende de otras: necesita el <code>token</code> y la sesión de <code>db</code> para buscar y devolver el usuario. Si el token es inválido, lanza <code>HTTPException(401)</code> acá.'},
+  oauth:{name:'oauth2_scheme', sig:'oauth2_scheme = OAuth2PasswordBearer(\n    tokenUrl="token"\n)', chip:'hoja', chipCls:'',
+    desc:'Una hoja del árbol: no depende de nadie. Extrae el token del header <code>Authorization: Bearer …</code>. Al no tener dependencias, es de las primeras en resolverse.'},
+  db:{name:'get_db', sig:'async def get_db():\n    session = Session()\n    try:\n        yield session      # ← setup\n    finally:\n        await session.close()  # ← teardown', chip:'yield · cache', chipCls:'dn-yield',
+    desc:'Dependencia con <code>yield</code>: lo de <strong>antes</strong> del yield es setup (abre la sesión), lo de <strong>después</strong> es teardown (la cierra), y corre a la vuelta. La piden dos ramas distintas, pero FastAPI la <strong>cachea por request</strong>: se ejecuta una sola vez y todos comparten la misma sesión.'}
+};
+/* tree render: rows with levels */
+var TREE = [
+  {key:'endpoint', lvl:0, tag:'endpoint', tagCls:'dn-endpoint'},
+  {key:'user', lvl:1, tag:null},
+  {key:'oauth', lvl:2, tag:null},
+  {key:'db', lvl:2, tag:'yield · 1×', tagCls:'dn-yield'},
+  {key:'db', lvl:1, tag:'⚡ cacheada', tagCls:'dn-cache', ref:true}
+];
+var depTreeEl=document.getElementById('deptree');
+var depRowEls={}; /* key -> els (may be multiple for db) */
+TREE.forEach(function(row, i){
+  var d=DEPNODES[row.key];
+  var b=document.createElement('button'); b.type='button';
+  b.className='depnode lvl'+row.lvl;
+  b.setAttribute('data-dep', row.key);
+  var nameHtml = row.lvl===0 ? '<span class="p">read_items()</span>' : '<span class="p">Depends</span>('+d.name+')';
+  var tag = row.tag? '<span class="dn-tag '+(row.tagCls||'')+'">'+row.tag+'</span>' : '';
+  b.innerHTML='<span class="dn-badge">'+(row.lvl===0?'▸':'└')+'</span><span class="dn-name">'+nameHtml+'</span>'+tag;
+  depTreeEl.appendChild(b);
+  (depRowEls[row.key]=depRowEls[row.key]||[]).push(b);
+  b.addEventListener('click', function(){ if(depRunning) return; selectDep(row.key, b); });
+});
+var I2={kick:document.getElementById('i2-kick'),title:document.getElementById('i2-title'),chip:document.getElementById('i2-chip'),desc:document.getElementById('i2-desc'),codeWrap:document.getElementById('i2-code-wrap'),code:document.getElementById('i2-code')};
+function selectDep(key, el){
+  document.querySelectorAll('.depnode').forEach(function(e){e.classList.remove('selected');});
+  if(el) el.classList.add('selected');
+  var d=DEPNODES[key];
+  I2.kick.textContent = key==='endpoint'?'path operation':'dependencia';
+  I2.title.textContent=d.name;
+  I2.chip.hidden=!d.chip; I2.chip.textContent=d.chip||''; I2.chip.className='chip '+(d.chipCls||'');
+  I2.desc.innerHTML=d.desc;
+  I2.codeWrap.hidden=false; I2.code.innerHTML=hl(d.sig);
+}
+/* resolution order (post-order + cache + teardown) */
+var EXEC = [
+  {key:'oauth', n:'1', txt:'<code>oauth2_scheme</code> extrae el token', sub:'no tiene dependencias → primero'},
+  {key:'db', n:'2', txt:'<code>get_db</code> → abre la sesión', sub:'setup del yield · se cachea para el resto del request'},
+  {key:'user', n:'3', txt:'<code>get_current_user(token, db)</code> → busca el user', sub:'usa el token y la sesión ya resueltos'},
+  {key:'endpoint', n:'4', txt:'<code>read_items(user, db)</code> corre', sub:'recibe todo inyectado · la MISMA sesión de db'},
+  {key:'db', n:'✓', txt:'<code>get_db</code> → cierra la sesión', sub:'teardown del yield · a la vuelta, en orden inverso', teardown:true}
+];
+var execListEl=document.getElementById('exec-list'), depPhase=document.getElementById('dep-phase');
+var depRunning=false, depTimers=[];
+function depReset(){
+  depTimers.forEach(clearTimeout); depTimers=[]; depRunning=false;
+  execListEl.innerHTML='';
+  document.querySelectorAll('.depnode').forEach(function(e){e.classList.remove('active','done','selected');});
+  depPhase.textContent='en espera';
+  document.getElementById('dep-run').disabled=false;
+  EXEC.forEach(function(){ var li=document.createElement('li'); li.className='exec-item'; li.innerHTML='&nbsp;'; li.style.visibility='hidden'; execListEl.appendChild(li); });
+  execListEl.innerHTML='';
+}
+document.getElementById('dep-reset').addEventListener('click', depReset);
+document.getElementById('dep-run').addEventListener('click', function(){
+  if(depRunning) return; depReset(); depRunning=true; this.disabled=true;
+  var step=reduce?120:820;
+  EXEC.forEach(function(ex, i){
+    depTimers.push(setTimeout(function(){
+      depPhase.textContent = ex.teardown ? '← teardown' : '→ resolviendo';
+      // node highlight
+      document.querySelectorAll('.depnode').forEach(function(e){e.classList.remove('active');});
+      (depRowEls[ex.key]||[]).forEach(function(e){ e.classList.add('active'); if(!ex.teardown) e.classList.add('done'); });
+      selectDep(ex.key, (depRowEls[ex.key]||[])[0]);
+      // exec item
+      var li=document.createElement('li'); li.className='exec-item'+(ex.teardown?' teardown':'');
+      li.innerHTML='<span class="en">'+ex.n+'</span><span class="etxt">'+ex.txt+'<span class="esub">'+ex.sub+'</span></span>';
+      execListEl.appendChild(li);
+      requestAnimationFrame(function(){ li.classList.add('show'); });
+      if(i===EXEC.length-1){
+        depTimers.push(setTimeout(function(){
+          document.querySelectorAll('.depnode').forEach(function(e){e.classList.remove('active');});
+          depPhase.textContent='listo · 200 OK'; depRunning=false; document.getElementById('dep-run').disabled=false;
+        }, step));
+      }
+    }, step*i));
+  });
+});
+selectDep('endpoint', depRowEls.endpoint[0]);
+document.querySelectorAll('.depnode').forEach(function(e){e.classList.remove('selected');});
+
+/* ================= VIEW 3: STATE MACHINE ================= */
+var SM_STEPS = [
+  {state:'created', edge:null, idx:'0', title:'Creada',
+   desc:'Llamar a una <code>async def</code> <strong>no la ejecuta</strong>: devuelve un objeto corrutina, en pausa. Todavía no corrió ni una línea.',
+   log:'coro = handle(req)  → objeto creado', loop:'El loop todavía no la conoce.'},
+  {state:'ready', edge:'e_create', idx:'1', title:'Lista (en la cola)',
+   desc:'El event loop la <strong>agenda</strong> como una <em>task</em> y la pone en su cola de tareas listas para correr. Espera su turno.',
+   log:'loop.create_task(coro)  → encolada', loop:'La suma a su cola de listas; sigue con lo que estaba.'},
+  {state:'running', edge:'e_run', idx:'2', title:'Ejecutando',
+   desc:'El loop la elige y la corre. Tiene la CPU y ejecuta tu código línea por línea… <strong>hasta el primer <code>await</code></strong>.',
+   log:'ejecuta hasta  await db.fetch(req.id)', loop:'Le cede la CPU a esta task, en un solo hilo.'},
+  {state:'suspended', edge:'e_susp', idx:'3', title:'Suspendida (await)',
+   desc:'El <code>await</code> toca algo que <strong>todavía no está listo</strong> (la respuesta de la DB). La corrutina <strong>se pausa y devuelve el control al loop</strong>, guardando dónde quedó.',
+   log:'await → I/O pendiente → cede el control', loop:'¡Queda libre! Atiende OTRAS tasks mientras la DB responde.'},
+  {state:'ready', edge:'e_wake', idx:'4', title:'Lista otra vez',
+   desc:'La DB respondió. Un callback marca la I/O como completa y <strong>reencola</strong> la corrutina: vuelve a estar lista para reanudar.',
+   log:'I/O completa → callback la reencola', loop:'Recibe el aviso de que la I/O terminó y la vuelve a la cola.'},
+  {state:'running', edge:'e_run', idx:'5', title:'Reanudando',
+   desc:'El loop la vuelve a correr, pero <strong>retoma justo después del <code>await</code></strong>, con el resultado de la DB ya disponible en <code>item</code>.',
+   log:'reanuda con  item = <resultado>', loop:'La reanuda desde donde había quedado, no desde el principio.'},
+  {state:'done', edge:'e_done', idx:'6', title:'Terminada',
+   desc:'La corrutina llega al <code>return</code>. Su resultado queda listo para quien la esperaba, y el loop la descarta.',
+   log:'return render(item)  → resultado listo', loop:'Marca la task como completada y sigue.'}
+];
+var EDGE_LABELS={e_create:'l_create',e_run:'l_run',e_susp:'l_susp',e_wake:'l_wake',e_done:'l_done'};
+var smIdx=0, smAuto=null;
+var I3={idx:document.getElementById('i3-idx'),title:document.getElementById('i3-title'),desc:document.getElementById('i3-desc')};
+var smLoop=document.getElementById('sm-loop'), smLog=document.getElementById('sm-log'), smStep=document.getElementById('sm-step');
+var STATE_NODES={created:'n_created',ready:'n_ready',running:'n_running',suspended:'n_suspended',done:'n_done'};
+
+function smRender(){
+  var s=SM_STEPS[smIdx];
+  // nodes
+  Object.keys(STATE_NODES).forEach(function(st){
+    var g=document.getElementById(STATE_NODES[st]); var rect=g.querySelector('rect');
+    var on = st===s.state;
+    rect.setAttribute('fill', on?'var(--accent)':'var(--surface)');
+    rect.setAttribute('stroke', on?'var(--accent)':'var(--border-strong)');
+    rect.setAttribute('stroke-width', on?'2.5':'1.5');
+    g.querySelectorAll('text').forEach(function(t){ t.setAttribute('fill', on?'#04231f':(t.classList.contains('nsub')?'var(--ink-faint)':'var(--ink)')); });
+  });
+  // edges
+  document.querySelectorAll('.sm-edge').forEach(function(e){ e.classList.remove('hot'); e.setAttribute('marker-end','url(#arw)'); });
+  document.querySelectorAll('.sm-elabel').forEach(function(e){ e.classList.remove('hot'); });
+  if(s.edge){ var ed=document.getElementById(s.edge); ed.classList.add('hot'); ed.setAttribute('marker-end','url(#arw-hot)'); var lb=document.getElementById(EDGE_LABELS[s.edge]); if(lb) lb.classList.add('hot'); }
+  // inspector
+  I3.idx.textContent=s.idx; I3.title.textContent=s.title; I3.desc.innerHTML=s.desc;
+  smLoop.textContent=s.loop;
+  smStep.textContent='paso '+smIdx+' / 6';
+  // log
+  smLog.innerHTML='';
+  for(var k=0;k<=smIdx;k++){ var li=document.createElement('li'); if(k===smIdx) li.className='cur'; li.textContent=SM_STEPS[k].log; smLog.appendChild(li); }
+  document.getElementById('sm-next').disabled = smIdx>=SM_STEPS.length-1;
+}
+function smNext(){ if(smIdx<SM_STEPS.length-1){ smIdx++; smRender(); } }
+function smResetFn(){ if(smAuto){clearInterval(smAuto); smAuto=null; document.getElementById('sm-auto').textContent='Auto';} smIdx=0; smRender(); }
+document.getElementById('sm-next').addEventListener('click', smNext);
+document.getElementById('sm-reset').addEventListener('click', smResetFn);
+document.getElementById('sm-auto').addEventListener('click', function(){
+  if(smAuto){ clearInterval(smAuto); smAuto=null; this.textContent='Auto'; return; }
+  if(smIdx>=SM_STEPS.length-1) smIdx=0;
+  this.textContent='Pausar';
+  var self=this;
+  smAuto=setInterval(function(){ if(smIdx>=SM_STEPS.length-1){ clearInterval(smAuto); smAuto=null; self.textContent='Auto'; return; } smNext(); }, reduce?400:1500);
+});
+smRender();
+
+/* footer link -> first view (placeholder, same series) */
+document.getElementById('link-tracer').addEventListener('click', function(e){ e.preventDefault(); showView(0); window.scrollTo({top:0,behavior:reduce?'auto':'smooth'}); });
+
+showView(0);
+</script>
