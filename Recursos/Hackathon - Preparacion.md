@@ -51,42 +51,8 @@ Creo mi carpeta del proyecto en workspace
 
 Arquitectura: https://drive.google.com/file/d/11X259pKdbqgirVebSEH_743PvkRXZ5-i/view?usp=sharing
 
-Inicializo con un prompt con claude
-
-```
-Quiero armar un template para inicializar mi entorno de trabajo:
-
-SPEC DRIVEN DEVELOPMENT
-Voy a usar spec. Tomar como referencia como se implemento aca:
-https://github.com/mouredev/hello-sdd/tree/main/habits-cli/specs
-
-OPEN KNOWLEDGE FORMAT - OKF
-Quiero usar este formato para las specs
-https://github.com/GoogleCloudPlatform/open-knowledge-format
-
-N8N
-Quiero instalar MCP a n8n y las skills
-https://docs.n8n.io/connect/connect-to-n8n-mcp-server
-
-claude mcp add --transport http n8n-mcp http://localhost:5678/mcp-server/http \ --header "Authorization: Bearer <TU_TOKEN_N8N_MCP>"
-
-skills n8n
-https://github.com/czlonkowski/n8n-skills
-
-VARIABLES DE ENTORNO
-Guardar todas las variables de entorno en un .env
-
-BASE DE DATOS
-Voy a usar la base de datos neon
-npx neon@latest init
-psql 'postgresql://USER:TU-PASS@URL/neondb?sslmode=require&channel_binding=require'
-
-GIT
-Generar .gitignore
-No comitear nada por el momento
-Quitar a Claude como colaborador del repo
-
-```
+## Inicializo con un prompt con claude
+[[Template de inicialización de entorno — Spec-Driven Development + OKF (v2)]]
 
 ## Que pasa si me piden trabajar con una tecnologia que no conozco
 - Buscar la documentación de la librería o el software a usar.  Ejemplo:
