@@ -60,6 +60,10 @@ SPEC DRIVEN DEVELOPMENT
 Voy a usar spec. Tomar como referencia como se implemento aca:
 https://github.com/mouredev/hello-sdd/tree/main/habits-cli/specs
 
+OPEN KNOWLEDGE FORMAT - OKF
+Quiero usar este formato para las specs
+https://github.com/GoogleCloudPlatform/open-knowledge-format
+
 N8N
 Quiero instalar MCP a n8n y las skills
 https://docs.n8n.io/connect/connect-to-n8n-mcp-server
@@ -68,7 +72,6 @@ claude mcp add --transport http n8n-mcp http://localhost:5678/mcp-server/http \ 
 
 skills n8n
 https://github.com/czlonkowski/n8n-skills
-
 
 VARIABLES DE ENTORNO
 Guardar todas las variables de entorno en un .env
@@ -104,7 +107,7 @@ Como evitarlo y entender nuestro valor.
 **Roles y Organización con el equipo**
 - Si nuestro compañero es fuerte en backend nosotros tomamos roles de front con v0
 - Si nuestro compañero es fuerte en front nosotros podemos hacer cosas de backend con n8n
-- Si es un equipo fuerte técnicamente tomar el rol de comunicacion o investigacion. Preguntar y entender bien el problema.
+- Si es un equipo fuerte técnicamente tomar el rol de comunicación o investigación. Preguntar y entender bien el problema.
 
 # Notas
 - **Desactivar Claude Code como  como colaborador**
