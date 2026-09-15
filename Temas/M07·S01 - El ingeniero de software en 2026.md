@@ -9,6 +9,8 @@
 | **Duración de la clase** | 3 h |
 | **Tiempo de estudio estimado** | **~7 h 30 min**: lectura de este documento (~60 min) + recursos imprescindibles (~95 min) + recomendados (~60 min) + ejercicios (~4 h). Los opcionales suman ~35 min más |
 
+**Artefacto:** el apunte completo como página navegable. https://gemini.google.com/share/cfb34817b560?skid=ae84fa45-05c6-4b21-a516-e41fb17ae7de
+
 ---
 
 ## 1. Objetivos de aprendizaje

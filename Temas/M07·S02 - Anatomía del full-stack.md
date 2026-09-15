@@ -8,6 +8,7 @@
 | **Tema** | Cliente, servidor y base de datos; la frontera frontend/backend; el recorrido de una petición (DNS → TCP → TLS → HTTP → HTML o JSON); UI components y page rendering; qué es realmente el estado; la arquitectura de single server y dónde entra la llamada a la LLM API. Taller: dibujarla |
 | **Duración de la clase** | 3 h |
 | **Tiempo de estudio estimado** | **~8 h 40 min**: lectura de este documento (~70 min) + recursos imprescindibles (~150 min) + ejercicios (~5 h). Los recomendados suman ~2 h más y los opcionales ~65 min |
+**Artefacto:** el apunte completo como página navegable. https://gemini.google.com/share/f6d38ba7dfce?skid=de01ea12-3254-4eb3-9113-a3bc1e744d2f
 
 ---
 
