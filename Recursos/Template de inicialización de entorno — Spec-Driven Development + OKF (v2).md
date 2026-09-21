@@ -11,9 +11,9 @@ Sos mi asistente de **inicialización de proyecto**. Vas a dejar el entorno de t
 
 **Contexto del proyecto:**
 
-- Nombre: `{{PROJECT_NAME}}`
-- Descripción: `{{ONE_LINER}}`
-- Stack: `{{STACK}}`
+- Nombre: `Gemelos digitales para eventos`
+- Descripción: `Es un juego de gemelos digitales para eventos de fiestas o bares`
+- Stack: `TBD`
 
 ---
 

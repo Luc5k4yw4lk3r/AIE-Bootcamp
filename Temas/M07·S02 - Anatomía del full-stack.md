@@ -143,26 +143,28 @@ Andrew Ng incluye exactamente estos temas (UI components, page rendering, state 
 
 ### Bloque E — Arquitectura y taller
 
-| Término | Definición | Analogía |
-|---|---|---|
-| **Single server** | Arquitectura en la que la aplicación entera (HTTP server, application server, BD y, si hay, caché) corre en una sola máquina. | Un food truck: cocina, caja y despensa en un mismo vehículo. |
-| **SPOF (single point of failure)** | Componente cuya caída tira abajo el sistema entero. En un single server, la máquina completa. Se ataca en S12–S13. | El único puente para cruzar el río. |
-| **Model API de terceros vs self-hosted** | El modelo puede consumirse como API de un proveedor (OpenAI, Google, Anthropic) o correr en infraestructura propia. En el primer caso, tu servidor no contiene el modelo. | Pedir delivery vs. tener tu propio horno. |
-| **LLM API** | La API HTTP de un proveedor de modelos. Vista en M02, junto con tokens, costos y latencia. | La cocina de otro restaurante a la que le encargás un plato. |
-| **API key** | Credencial secreta que identifica y autoriza a tu aplicación frente a una API. Viaja en un header del request. | La llave de tu cuenta corriente. |
-| **Endpoint** | Combinación de método y URL que expone una operación de una API (`POST /v1/messages`). | Una ventanilla específica de un organismo. |
-| **Rate limit** | Límite de uso que impone una API, por ejemplo en requests por minuto (RPM) y tokens por minuto (TPM). Visto en M02. | El cupo diario de extracciones del cajero. |
-| **Container (C4)** | En C4, "an application or a data store": una web app, una SPA, una app móvil, una BD. No es un container de Docker. Visto en MA·S05. | Cada local dentro de un shopping. |
-| **Deployment node (C4)** | La infraestructura donde se despliegan uno o más containers: una máquina, una VM, un cluster. El diagrama formal se hace en S16. | El edificio del shopping. |
-| **Excalidraw** | Pizarra virtual open source, de estilo a mano alzada, que corre en el browser. Vista en MA·S02. | Una servilleta infinita. |
-| **Mermaid `flowchart`** | Sintaxis de texto para diagramas de flujo, versionable junto al código. Vista en MA·S05. | Un plano escrito en lugar de dibujado. |
-| **Trade-off journal** | Tu bitácora de decisiones del bloque: alternativas, elección, por qué y qué aceptás perder. Arrancó en M07·S01. | El cuaderno de bitácora del piloto. |
+| Término                                  | Definición                                                                                                                                                                | Analogía                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **Single server**                        | Arquitectura en la que la aplicación entera (HTTP server, application server, BD y, si hay, caché) corre en una sola máquina.                                             | Un food truck: cocina, caja y despensa en un mismo vehículo. |
+| **SPOF (single point of failure)**       | Componente cuya caída tira abajo el sistema entero. En un single server, la máquina completa. Se ataca en S12–S13.                                                        | El único puente para cruzar el río.                          |
+| **Model API de terceros vs self-hosted** | El modelo puede consumirse como API de un proveedor (OpenAI, Google, Anthropic) o correr en infraestructura propia. En el primer caso, tu servidor no contiene el modelo. | Pedir delivery vs. tener tu propio horno.                    |
+| **LLM API**                              | La API HTTP de un proveedor de modelos. Vista en M02, junto con tokens, costos y latencia.                                                                                | La cocina de otro restaurante a la que le encargás un plato. |
+| **API key**                              | Credencial secreta que identifica y autoriza a tu aplicación frente a una API. Viaja en un header del request.                                                            | La llave de tu cuenta corriente.                             |
+| **Endpoint**                             | Combinación de método y URL que expone una operación de una API (`POST /v1/messages`).                                                                                    | Una ventanilla específica de un organismo.                   |
+| **Rate limit**                           | Límite de uso que impone una API, por ejemplo en requests por minuto (RPM) y tokens por minuto (TPM). Visto en M02.                                                       | El cupo diario de extracciones del cajero.                   |
+| **Container (C4)**                       | En C4, "an application or a data store": una web app, una SPA, una app móvil, una BD. No es un container de Docker. Visto en MA·S05.                                      | Cada local dentro de un shopping.                            |
+| **Deployment node (C4)**                 | La infraestructura donde se despliegan uno o más containers: una máquina, una VM, un cluster. El diagrama formal se hace en S16.                                          | El edificio del shopping.                                    |
+| **Excalidraw**                           | Pizarra virtual open source, de estilo a mano alzada, que corre en el browser. Vista en MA·S02.                                                                           | Una servilleta infinita.                                     |
+| **Mermaid `flowchart`**                  | Sintaxis de texto para diagramas de flujo, versionable junto al código. Vista en MA·S05.                                                                                  | Un plano escrito en lugar de dibujado.                       |
+| **Trade-off journal**                    | Tu bitácora de decisiones del bloque: alternativas, elección, por qué y qué aceptás perder. Arrancó en M07·S01.                                                           | El cuaderno de bitácora del piloto.                          |
 
 ---
 
 ## 4. Notas de estudio por subtema
 
 ### 4.0 El recorrido que atraviesa toda la sesión
+
+Como funciona la internet: https://www.youtube.com/watch?v=rw41W8crZ_Y
 
 Todo lo que ves hoy cabe en un solo recorrido: alguien abre tu app, el cliente averigua dónde está el servidor, abre una conexión segura, pide algo y recibe una respuesta. Si la funcionalidad usa IA, en el medio tu backend repite el mismo recorrido, ahora como cliente, hacia la LLM API. Tené este diagrama a mano mientras leés el resto de la sección.
 
@@ -211,12 +213,12 @@ Toda aplicación web o móvil, desde un blog hasta ChatGPT, se descompone en tre
 
 MDN distingue dos tipos de web server que conviene tener claros desde hoy:
 
-| | Static web server | Dynamic web server |
-|---|---|---|
-| **Qué tiene** | Máquina + HTTP server | Máquina + HTTP server + application server + BD |
-| **Qué hace** | Devuelve los archivos tal cual están guardados | Arma o actualiza el contenido antes de enviarlo |
-| **Ejemplo** | Una landing page, la documentación de un proyecto | Una app de chat con cuentas y conversaciones |
-| **En este bloque** | Donde se sirve un frontend ya compilado | El esqueleto del single server: en S03, Uvicorn y FastAPI ocupan esos lugares |
+|                    | Static web server                                 | Dynamic web server                                                            |
+| ------------------ | ------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Qué tiene**      | Máquina + HTTP server                             | Máquina + HTTP server + application server + BD                               |
+| **Qué hace**       | Devuelve los archivos tal cual están guardados    | Arma o actualiza el contenido antes de enviarlo                               |
+| **Ejemplo**        | Una landing page, la documentación de un proyecto | Una app de chat con cuentas y conversaciones                                  |
+| **En este bloque** | Donde se sirve un frontend ya compilado           | El esqueleto del single server: en S03, Uvicorn y FastAPI ocupan esos lugares |
 
 El dynamic web server **ya es** la arquitectura de single server que dibujás al final de la sesión: las tres cajas en una misma máquina.
 
@@ -228,15 +230,15 @@ Que el servidor "elija el contenido" es la clave. El cliente **pide**; el servid
 
 #### La frontera como decisión de diseño
 
-Ng incluye la frontera entre frontend y backend entre las decisiones de diseño de sistema que dependen del contexto, junto con la descomposición y dónde vive el estado de la aplicación (*AI Engineering Skills Map*, The Batch, 2026). No hay una única respuesta correcta para todo, pero sí un piso que no se negocia:
+Andrew Ng incluye la frontera entre frontend y backend entre las decisiones de diseño de sistema que dependen del contexto, junto con la descomposición y dónde vive el estado de la aplicación (*AI Engineering Skills Map*, The Batch, 2026). No hay una única respuesta correcta para todo, pero sí un piso que no se negocia:
 
-| Va **sí o sí** en el backend | **Puede** ir en el cliente |
-|---|---|
-| Secretos: API keys, credenciales de BD, tokens de servicios | Presentación, layout, animaciones |
-| Validación **con autoridad** (la que decide si algo se guarda) | Validación **de conveniencia**, para dar feedback rápido al usuario |
-| Acceso a la base de datos | Estado de UI: qué panel está abierto, el borrador de un mensaje |
-| Reglas de negocio y autorización (quién puede ver o hacer qué) | Preferencias no sensibles (tema claro u oscuro) |
-| **La llamada a la LLM API** y los límites de uso y costo por usuario | Caché de lectura de datos no sensibles |
+| Va **sí o sí** en el backend                                         | **Puede** ir en el cliente                                          |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Secretos: API keys, credenciales de BD, tokens de servicios          | Presentación, layout, animaciones                                   |
+| Validación **con autoridad** (la que decide si algo se guarda)       | Validación **de conveniencia**, para dar feedback rápido al usuario |
+| Acceso a la base de datos                                            | Estado de UI: qué panel está abierto, el borrador de un mensaje     |
+| Reglas de negocio y autorización (quién puede ver o hacer qué)       | Preferencias no sensibles (tema claro u oscuro)                     |
+| **La llamada a la LLM API** y los límites de uso y costo por usuario | Caché de lectura de datos no sensibles                              |
 
 La regla que ordena la tabla: **todo lo que llega al cliente, el usuario lo puede ver y modificar.** Un secreto que llega al browser deja de ser secreto: cualquiera lo ve en DevTools. Una validación que solo existe en el cliente no valida nada, porque se puede mandar el request directo con `curl`.
 
