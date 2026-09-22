@@ -21,7 +21,7 @@ tags: [n8n, apis]
 - [Pin and mock data — documentación de n8n](https://docs.n8n.io/build/work-with-data/pin-and-mock-data/) — fijar la salida de un nodo para probar el resto sin volver a llamar a la API. Muy útil en la semana 3.
 - [Edit Fields (Set) — documentación de n8n](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set/) — qué campos deja pasar y cuáles no.
 - [If — documentación de n8n](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.if/) — para las guardas de la semana 3.
-- El bloque 4 de [[Tarea - Python esencial - namespaces, archivos y algoritmos]]: es el mismo ejercicio mental, pero en Python. Si te cuesta la semana 1, hacé ese bloque antes.
+- El bloque 4 de [[Tarea - Repaso 01 - Python esencial - namespaces, archivos y algoritmos]]: es el mismo ejercicio mental, pero en Python. Si te cuesta la semana 1, hacé ese bloque antes.
 - [[M03·S04 - Proyectos de n8n con Claude Code]], sección "Documentar el proyecto con OKF": el formato para la semana 4.
 
 ## Parte 1: Las consignas
@@ -172,7 +172,7 @@ Señales de que el contrato todavía está flojo: filas que dicen "los datos de 
 1. **Falta `salary`:** la expresión `{{ $json.salary.min }}` intenta leer `min` de algo que no existe. Según la versión, `Aplanar` falla con un error sobre esa expresión, o deja el campo vacío. Cualquiera de los dos es un problema: en el primer caso se corta todo por una sola oferta, y en el segundo esa oferta pasa el filtro con un salario inventado o desaparece sin avisar. Guardas posibles:
    - un **If** antes de `Aplanar` con la condición *`salary` exists*, que manda las ofertas sin salario por otra rama (para registrarlas o avisar);
    - o un valor por defecto en la expresión: `{{ $json.salary?.min ?? 0 }}`. Si tu versión no acepta `?.`, usá el If.
-2. **`results: []`:** `Separar ofertas` devuelve 0 items y el resto del flujo no corre. No hay error y no hay aviso. Es el mismo caso que la semana 4 de [[Tarea - Depuración de flujos en n8n]]: la guarda es devolver siempre un item con `total` y decidir con un If.
+2. **`results: []`:** `Separar ofertas` devuelve 0 items y el resto del flujo no corre. No hay error y no hay aviso. Es el mismo caso que la semana 4 de [[Tarea - Repaso 05 - Depuración de flujos en n8n]]: la guarda es devolver siempre un item con `total` y decidir con un If.
 3. **`min: '32.000'`:** el campo es de tipo *Number*, así que `Aplanar` intenta convertir `'32.000'`. Según la configuración, falla o lo interpreta mal: `32.000` puede quedar como **32**, porque el punto se lee como separador decimal. Una oferta de 32 no pasa el filtro de 30000 y desaparece sin avisar. La guarda es limpiar el texto antes de convertirlo, por ejemplo `{{ Number(String($json.salary.min).replaceAll('.', '')) }}`, y **verificar la vista previa**.
 
 La lección de las tres es la misma: los fallos más caros de un flujo **no dan error**. Dan un resultado plausible y equivocado.
@@ -193,6 +193,6 @@ Si alguna casilla queda sin marcar, esa es la próxima ventana sin copiloto.
 ## Relacionado
 
 - [[Tarea]]
-- [[Tarea - Depuración de flujos en n8n]] — la misma habilidad, pero partiendo del error.
-- [[Tarea - Python esencial - namespaces, archivos y algoritmos]] — el bloque 4 es este mismo ejercicio en Python.
+- [[Tarea - Repaso 05 - Depuración de flujos en n8n]] — la misma habilidad, pero partiendo del error.
+- [[Tarea - Repaso 01 - Python esencial - namespaces, archivos y algoritmos]] — el bloque 4 es este mismo ejercicio en Python.
 - [[M03·S01 - n8n]] · [[M03·S04 - Proyectos de n8n con Claude Code]]

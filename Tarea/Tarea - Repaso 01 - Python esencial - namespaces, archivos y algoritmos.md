@@ -851,6 +851,6 @@ if __name__ == "__main__":
 
 - [[Tarea]]
 - [[Tarea - Algoritmos]] — más práctica de contadores, acumuladores y ordenamiento.
-- [[Tarea - Excepciones, testing y APIs]] — el paso siguiente: validar, testear y consumir APIs.
-- [[Tarea - Depuración de flujos en n8n]] y [[Tarea - El recorrido del dato en n8n]] — el bloque 4, pero dentro de n8n.
+- [[Tarea - Repaso 02 - Excepciones, testing y APIs]] — el paso siguiente: validar, testear y consumir APIs.
+- [[Tarea - Repaso 05 - Depuración de flujos en n8n]] y [[Tarea - Repaso 04 - El recorrido del dato en n8n]] — el bloque 4, pero dentro de n8n.
 - [[M02·S01 - Fundamentos de Programación]] — cursos base si un bloque entero cuesta.

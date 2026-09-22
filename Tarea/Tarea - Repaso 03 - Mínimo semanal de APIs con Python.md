@@ -55,7 +55,7 @@ Si falla, anotá el error exacto y traelo a la próxima tutoría: un error de en
 
 ### Semana 2 — Algo que sale
 
-Es el Ejercicio 9 de [[Tarea - Excepciones, testing y APIs]], con una vuelta más. Si ya lo hiciste, arrancá directo por la variante.
+Es el Ejercicio 9 de [[Tarea - Repaso 02 - Excepciones, testing y APIs]], con una vuelta más. Si ya lo hiciste, arrancá directo por la variante.
 
 - Hacé un `GET` a `https://pokeapi.co/api/v2/pokemon/ditto` e imprimí el nombre y el peso.
 - **Variante:** pedile al usuario un nombre con `input()` y mostrá **nombre, altura, peso y tipos**. Los tipos vienen dentro de una lista de diccionarios anidados: imprimí primero `datos["types"]` para ver qué forma tienen antes de sacar el nombre.
@@ -179,11 +179,11 @@ with open("pokemons.csv", "w", encoding="utf-8", newline="") as archivo:
 print(f"Guardados: {len(guardados)} · Fallidos: {len(fallidos)} ({', '.join(fallidos) or 'ninguno'})")
 ```
 
-El `try` va **dentro** del `for`, no alrededor. Si envolviera todo el bucle, el primer fallo cortaría a todos los que vienen después. Es la misma idea del Ejercicio 4 de [[Tarea - Excepciones, testing y APIs]].
+El `try` va **dentro** del `for`, no alrededor. Si envolviera todo el bucle, el primer fallo cortaría a todos los que vienen después. Es la misma idea del Ejercicio 4 de [[Tarea - Repaso 02 - Excepciones, testing y APIs]].
 
 ## Relacionado
 
 - [[Tarea]]
-- [[Tarea - Excepciones, testing y APIs]] — la versión completa de estos temas, con tests.
-- [[Tarea - RAG con Telegram en n8n]] — el paso siguiente, una vez hechas estas cuatro semanas.
+- [[Tarea - Repaso 02 - Excepciones, testing y APIs]] — la versión completa de estos temas, con tests.
+- [[Tarea - Repaso 06 - RAG con Telegram en n8n]] — el paso siguiente, una vez hechas estas cuatro semanas.
 - [[2026-07-07 - Python Requests - Consumo de APIs]] · [[M02·S01 - Fundamentos de Programación]]

@@ -395,6 +395,6 @@ Cuando lo veas, no toques el flujo: revisá la credencial. Fijate si la clave es
 ## Relacionado
 
 - [[Tarea]]
-- [[Tarea - El recorrido del dato en n8n]] — la otra mitad: entender qué forma tiene el dato en cada paso.
-- [[Tarea - Python esencial - namespaces, archivos y algoritmos]] — los bloques 4 y 5 son lo mismo, pero en Python.
+- [[Tarea - Repaso 04 - El recorrido del dato en n8n]] — la otra mitad: entender qué forma tiene el dato en cada paso.
+- [[Tarea - Repaso 01 - Python esencial - namespaces, archivos y algoritmos]] — los bloques 4 y 5 son lo mismo, pero en Python.
 - [[M03·S01 - n8n]] · [[M03·S04 - Proyectos de n8n con Claude Code]]

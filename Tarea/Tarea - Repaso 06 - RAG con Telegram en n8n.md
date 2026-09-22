@@ -133,7 +133,7 @@ Elegí uno o más:
 
 ## Parte 2: Errores típicos y cómo resolverlos
 
-Antes de mirar esta tabla, pasá por el protocolo de cuatro preguntas de [[Tarea - Depuración de flujos en n8n]]: ¿se ejecutó?, ¿dónde hay datos por última vez?, ¿qué esperaba?, ¿cuál es el cambio más chico?
+Antes de mirar esta tabla, pasá por el protocolo de cuatro preguntas de [[Tarea - Repaso 05 - Depuración de flujos en n8n]]: ¿se ejecutó?, ¿dónde hay datos por última vez?, ¿qué esperaba?, ¿cuál es el cambio más chico?
 
 | Síntoma | Causa | Arreglo |
 |---|---|---|
@@ -158,6 +158,6 @@ Antes de mirar esta tabla, pasá por el protocolo de cuatro preguntas de [[Tarea
 
 - [[Tarea]]
 - [[M03·S02 - RAG en n8n]] — la clase que repasa esta tarea.
-- [[Tarea - Mínimo semanal de APIs con Python]] — la tarea anterior de este mismo recorrido.
-- [[Tarea - Depuración de flujos en n8n]] — el protocolo para cuando algo no dispara.
+- [[Tarea - Repaso 03 - Mínimo semanal de APIs con Python]] — la tarea anterior de este mismo recorrido.
+- [[Tarea - Repaso 05 - Depuración de flujos en n8n]] — el protocolo para cuando algo no dispara.
 - [[Proyectos]] — la idea "Chatbot con RAG por Telegram o Whatsapp" parte exactamente de acá.

@@ -85,5 +85,5 @@ print(response.json())
 ## Relacionado
 
 - [[2026-06-18 - Revisión Python - LLMs y chat con historial]]
-- [[Tarea - Excepciones, testing y APIs]] — ejercicios de repaso sobre esta sesión.
+- [[Tarea - Repaso 02 - Excepciones, testing y APIs]] — ejercicios de repaso sobre esta sesión.
 - [[M02·S01 - Fundamentos de Programación]]
