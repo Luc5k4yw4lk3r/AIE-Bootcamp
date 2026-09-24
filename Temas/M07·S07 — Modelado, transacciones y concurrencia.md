@@ -1,12 +1,6 @@
 # M07·S07 — Modelado, transacciones y concurrencia + FastAPI ↔ PostgreSQL
 
-**Módulo:** 07 — Fundamentos de Software + System Design para AI Engineers · Semana 2 (Gestión de datos y diseño de APIs)
-**Sesión:** M07·S07
-**Fecha:** [Completar por el profesor: fecha]
-**Tema:** TaskFlow deja SQLite y pasa a PostgreSQL con su modelo entidad-relación completo: restricciones en la base, SQLAlchemy 2.0, migraciones con Alembic revisadas a mano, un `SqlAlchemyTaskRepository` que cumple el mismo `Protocol` de S05 y, como eje, **qué pasa cuando dos personas mueven la misma tarea a la vez**.
-**Duración estimada de estudio:** ~10 h en total — 3 h de sesión (lab en equipo) + ~3,5 h de lectura imprescindible + ~3,5 h de ejercicios.
-
-> 📝 **Nota para el profesor:** el reparto propuesto de los 180 min es el estándar de la semana 2: 40 min de concepto (modelado + concurrencia) / 60 min de taller guiado (modelos + Alembic + repository, pasos 1–8 de la guía) / 45 min de práctica autónoma (lost update y las dos terminales `psql`, pasos 9–11) / 20 min de puesta en común (ER entre equipos y TJ-006) / 15 min de cierre y entrega. Es mucho para 3 h: si hay que recortar, lo primero que sale es el deadlock (paso 10c) y el stretch de `If-Match`.
+**Módulo:** 07 — Fundamentos de Software + System Design para AI Engineers **Fecha:** [Completar por el profesor: fecha] **Duración estimada de estudio:** ~7 horas en total: lectura de recursos (~3,5 h) y ejercicios (~3,5 h). La guía práctica se hace en el lab en equipo, dentro de las 3 horas de la sesión en clase.
 
 ---
 
@@ -14,11 +8,11 @@
 
 Al terminar esta sesión vas a poder:
 
-1. **Modelar** el dominio completo de TaskFlow como diagrama entidad-relación —cardinalidades, tablas intermedias N:M y la membresía con rol como *association object*— y **mapearlo** a modelos SQLAlchemy 2.0.
+1. **Modelar** el dominio completo de TaskFlow como diagrama entidad-relación —cardinalidades, tablas intermedias N:M y la membresía con rol como _association object_— y **mapearlo** a modelos SQLAlchemy 2.0.
 2. **Proteger** la consistencia de los datos desde la base con `NOT NULL`, `UNIQUE`, `CHECK`, PK, FK y una política `ON DELETE` decidida relación por relación, y **explicar** qué garantiza la base y qué queda en el service.
 3. **Conectar** el webserver a PostgreSQL desde la capa repository con un `SqlAlchemyTaskRepository` que cumple el `Protocol` de S05, **sin tocar** ni el service ni el router (salvo un `except`).
 4. **Migrar** el esquema y los datos de SQLite a PostgreSQL con Alembic, dirigiendo al agente y **revisando** la migración autogenerada con un checklist antes de aplicarla.
-5. **Reproducir** un *lost update* entre dos sesiones, **arreglarlo** con bloqueo optimista (`version_id_col` → 409) y **contrastarlo** con el pesimista (`SELECT … FOR UPDATE`) y con los niveles de aislamiento de PostgreSQL.
+5. **Reproducir** un _lost update_ entre dos sesiones, **arreglarlo** con bloqueo optimista (`version_id_col` → 409) y **contrastarlo** con el pesimista (`SELECT … FOR UPDATE`) y con los niveles de aislamiento de PostgreSQL.
 6. **Decidir** el ciclo de vida del dato en TaskFlow —frescura con `updated_at` y caché, soft vs hard delete, qué pasa al borrar un usuario— y **registrar** TJ-005 (ORM) y TJ-006 (concurrencia) en el trade-off journal.
 
 ---
@@ -29,40 +23,51 @@ En **M07·S05** levantaste el prototipo de TaskFlow con una sola entidad, la `Ta
 
 Primero **modelás el dominio entero**: usuarios, equipos, proyectos, tareas, comentarios, etiquetas, la membresía con rol y la relación tarea↔etiqueta. Después lo **protegés en la base**, porque la base es la última línea de defensa: un `CHECK` sobre el estado de la tarea vale aunque mañana alguien escriba un script que se saltee la API. Lo mapeás con SQLAlchemy 2.0, versionás el esquema con Alembic y escribís un repository nuevo que enchufás en `dependencies.py`, igual que en S05.
 
+No es tu primer Postgres ni tu primer SQLAlchemy: en **M07·S04** levantaste Postgres con Docker Compose, le hablaste con SQLAlchemy Core (`Table`, `engine`, `engine.begin()`) y viste que `create_all` no modifica tablas que ya existen. Lo nuevo de hoy es el **ORM declarativo**, las **migraciones** con Alembic y la **concurrencia**.
+
 El eje conceptual es la **concurrencia**. Ana y Beto tienen el tablero abierto y mueven la misma tarjeta casi al mismo tiempo. Sin control, uno pisa al otro y la regla de transiciones de S05 se viola sin que nadie se entere. Lo vas a reproducir, lo vas a arreglar con una columna `version` y vas a ver la alternativa pesimista en dos terminales.
 
-¿Por qué importa en tu rol? Como dice Andrew Ng en su *AI Engineering Skills Map*, los datos son relativamente difíciles de cambiar, **aun cuando los agentes ayuden con las migraciones**. El agente te va a generar la migración en segundos; revisarla es trabajo tuyo, porque un error de datos es de los más caros de revertir.
+¿Por qué importa en tu rol? Como dice Andrew Ng en su _AI Engineering Skills Map_, los datos son relativamente difíciles de cambiar, **aun cuando los agentes ayuden con las migraciones**. El agente te va a generar la migración en segundos; revisarla es trabajo tuyo, porque un error de datos es de los más caros de revertir.
 
 ---
 
-## 3. Conceptos clave
+## 3. Conceptos clave / glosario
 
 Solo los términos **nuevos** de hoy.
 
-| Término | Definición | Analogía |
-|---|---|---|
-| **Cardinalidad** | Cuántas instancias de una entidad se relacionan con cuántas de otra, con mínimo y máximo: una tarea pertenece a **exactamente un** proyecto; un proyecto tiene **cero o más** tareas. | Cuántas llaves abren cuántas puertas. |
-| **Tabla intermedia (N:M)** | Tabla con dos FK que representa una relación muchos-a-muchos: `task_labels` une tareas con etiquetas. | El registro de inscripciones entre alumnos y materias. |
-| **Association object** | Una tabla intermedia que además lleva datos propios (el `role` de `project_members`) y por eso se mapea como una clase del ORM. | La inscripción que además guarda la nota. |
-| **Normalización** | Organizar las tablas para que cada dato viva en un solo lugar y dependa solo de la clave de su tabla. Evita que actualizar un dato obligue a tocarlo en diez filas. | Tener un único contacto por persona en la agenda, no una copia por cada grupo de WhatsApp. |
-| **`ON DELETE`** | Qué hace la base con las filas que referencian a otra que se borra: impedirlo (`RESTRICT`/`NO ACTION`), borrarlas también (`CASCADE`) o dejar la referencia en `NULL` (`SET NULL`). | Qué pasa con los inquilinos cuando se demuele el edificio. |
-| **ORM** | Capa que mapea filas a objetos de Python y traduce operaciones sobre objetos a SQL. SQLAlchemy es el ORM de hoy. | Un traductor simultáneo entre Python y SQL. |
-| **Session (SQLAlchemy)** | El objeto con el que el ORM habla con la base: lleva la transacción en curso, recuerda qué objetos cargaste (*identity map*) y qué cambiaste (*unit of work*), y lo manda todo junto en el flush/commit. | El carrito de compras: vas agregando y recién al pagar se confirma todo. |
-| **Identity map** | Dentro de una sesión, cada fila se representa con **un solo objeto**: si pedís dos veces la tarea 1, recibís la misma instancia (mientras tu código la siga referenciando: ver el gotcha de 4.6). | Un único expediente por caso en la oficina. |
-| **Migración (Alembic)** | Script versionado que lleva el esquema de una revisión a la siguiente (`upgrade`) y de vuelta (`downgrade`). Las revisiones se encadenan como commits. | Git, pero para la estructura de la base. |
-| **Autogenerate** | Alembic compara tus modelos con la base y **propone** una migración candidata. Es un borrador, no una verdad. | El autocorrector: acierta mucho y a veces cambia "Lucía" por "Lucha". |
-| **Lost update** | Dos transacciones leen el mismo dato, cada una escribe en base a lo que leyó, y la segunda pisa a la primera sin saberlo. | Dos personas editando la misma planilla offline y subiendo su copia. |
-| **Bloqueo optimista** | No bloquea nada: cada fila lleva una `version` y el `UPDATE` solo aplica si la versión sigue siendo la que leíste. Si no, falla y el cliente recarga. | Reservar asiento: si cuando pagás ya no está, te avisan y elegís otro. |
-| **Bloqueo pesimista** | Bloquea la fila al leerla (`SELECT … FOR UPDATE`) y los demás esperan hasta que termine tu transacción. | Llevarte la llave del baño. |
-| **Nivel de aislamiento** | Cuánto ve una transacción de lo que hacen las otras mientras corre. En PostgreSQL: Read Committed (el default), Repeatable Read, Serializable. | Qué tan gruesa es la pared entre dos oficinas. |
-| **MVCC** | *Multi-Version Concurrency Control*: la base guarda varias versiones de cada fila para que cada sentencia vea una foto (*snapshot*) consistente. Por eso leer no bloquea escribir. | Mirar una foto del tablero mientras otro mueve las tarjetas reales. |
-| **Deadlock** | Dos transacciones esperan cada una un lock que tiene la otra. PostgreSQL lo detecta y aborta una. | Dos autos en un puente de una mano, ninguno retrocede. |
-| **Savepoint** | Punto de guardado dentro de una transacción: podés deshacer hasta ahí sin perder lo anterior. | Guardar partida antes del jefe final. |
-| **N+1** | Traer una lista con 1 consulta y después hacer 1 consulta más por cada elemento para cargar una relación. | Ir al súper una vez por cada ingrediente. |
-| **Expand/contract** | Cambiar una columna en dos (o más) migraciones: primero **agregás** lo nuevo y convivís con lo viejo, después migrás los datos y recién al final **quitás** lo viejo. | Construir el puente nuevo antes de demoler el viejo. |
-| **Soft delete** | "Borrar" marcando la fila (`archived_at`) en vez de eliminarla. | Mandar a la papelera en vez de vaciarla. |
+**Modelado**
 
-**Ya vistos, solo como refresco:** ACID y normalizar vs desnormalizar (M07·S06); índice compuesto y columna líder, `EXPLAIN ANALYZE`, cache-aside con TTL y `CachedTaskRepository` (M07·S06); `Protocol`, excepciones de dominio, 409 vs 422 y la tabla de transiciones (M07·S05); dependencias con `yield` y `get_db` (M07·S04); diagrama de clases y multiplicidades (MA·S05); trade-off journal `TJ-NNN` (M07·S01).
+- **Cardinalidad:** cuántas instancias de una entidad se relacionan con cuántas de otra, con mínimo y máximo: una tarea pertenece a **exactamente un** proyecto; un proyecto tiene **cero o más** tareas. _Analogía:_ cuántas llaves abren cuántas puertas.
+- **Tabla intermedia (N:M):** tabla con dos FK que representa una relación muchos-a-muchos: `task_labels` une tareas con etiquetas. _Analogía:_ el registro de inscripciones entre alumnos y materias.
+- **Association object:** una tabla intermedia que además lleva datos propios (el `role` de `project_members`) y por eso se mapea como una clase del ORM. _Analogía:_ la inscripción que además guarda la nota.
+- **Normalización:** organizar las tablas para que cada dato viva en un solo lugar y dependa solo de la clave de su tabla. Evita que actualizar un dato obligue a tocarlo en diez filas. _Analogía:_ tener un único contacto por persona en la agenda, no una copia por cada grupo de WhatsApp.
+- **`ON DELETE`:** qué hace la base con las filas que referencian a otra que se borra: impedirlo (`RESTRICT`/`NO ACTION`), borrarlas también (`CASCADE`) o dejar la referencia en `NULL` (`SET NULL`). _Analogía:_ qué pasa con los inquilinos cuando se demuele el edificio.
+
+**ORM y migraciones**
+
+- **ORM declarativo:** el segundo estilo de SQLAlchemy, que S04 nombró sin usar: en vez de `Table` + `Column` y consultas explícitas (Core), clases de Python mapeadas a tablas, y el ORM traduce las operaciones sobre esos objetos a SQL. _Analogía:_ un traductor simultáneo entre Python y SQL.
+- **Session (SQLAlchemy):** el objeto con el que el ORM habla con la base: lleva la transacción en curso, recuerda qué objetos cargaste (_identity map_) y qué cambiaste (_unit of work_), y lo manda todo junto en el flush/commit. _Analogía:_ el carrito de compras: vas agregando y recién al pagar se confirma todo.
+- **Identity map:** dentro de una sesión, cada fila se representa con **un solo objeto**: si pedís dos veces la tarea 1, recibís la misma instancia (mientras tu código la siga referenciando: ver el error común de 4.6). _Analogía:_ un único expediente por caso en la oficina.
+- **Migración (Alembic):** script versionado que lleva el esquema de una revisión a la siguiente (`upgrade`) y de vuelta (`downgrade`). Las revisiones se encadenan como commits. _Analogía:_ git, pero para la estructura de la base.
+- **Autogenerate:** alembic compara tus modelos con la base y **propone** una migración candidata. Es un borrador, no una verdad. _Analogía:_ el autocorrector: acierta mucho y a veces cambia "Lucía" por "Lucha".
+- **Expand/contract:** cambiar una columna en dos (o más) migraciones: primero **agregás** lo nuevo y convivís con lo viejo, después migrás los datos y recién al final **quitás** lo viejo. _Analogía:_ construir el puente nuevo antes de demoler el viejo.
+
+**Transacciones y concurrencia**
+
+- **Savepoint:** punto de guardado dentro de una transacción: podés deshacer hasta ahí sin perder lo anterior. _Analogía:_ guardar partida antes del jefe final.
+- **Lost update:** dos transacciones leen el mismo dato, cada una escribe en base a lo que leyó, y la segunda pisa a la primera sin saberlo. _Analogía:_ dos personas editando la misma planilla offline y subiendo su copia.
+- **Bloqueo optimista:** no bloquea nada: cada fila lleva una `version` y el `UPDATE` solo aplica si la versión sigue siendo la que leíste. Si no, falla y el cliente recarga. _Analogía:_ reservar asiento: si cuando pagás ya no está, te avisan y elegís otro.
+- **Bloqueo pesimista:** bloquea la fila al leerla (`SELECT … FOR UPDATE`) y los demás esperan hasta que termine tu transacción. _Analogía:_ llevarte la llave del baño.
+- **Nivel de aislamiento:** cuánto ve una transacción de lo que hacen las otras mientras corre. En PostgreSQL: Read Committed (el default), Repeatable Read, Serializable. _Analogía:_ qué tan gruesa es la pared entre dos oficinas.
+- **MVCC:** _Multi-Version Concurrency Control_: la base guarda varias versiones de cada fila para que cada sentencia vea una foto (_snapshot_) consistente. Por eso leer no bloquea escribir. _Analogía:_ mirar una foto del tablero mientras otro mueve las tarjetas reales.
+- **Deadlock:** dos transacciones esperan cada una un lock que tiene la otra. PostgreSQL lo detecta y aborta una. _Analogía:_ dos autos en un puente de una mano, ninguno retrocede.
+
+**Rendimiento y ciclo de vida**
+
+- **N+1:** traer una lista con 1 consulta y después hacer 1 consulta más por cada elemento para cargar una relación. _Analogía:_ ir al súper una vez por cada ingrediente.
+- **Soft delete:** "Borrar" marcando la fila (`archived_at`) en vez de eliminarla. _Analogía:_ mandar a la papelera en vez de vaciarla.
+
+**Ya vistos, solo como refresco:** ACID y normalizar vs desnormalizar (M07·S06); índice compuesto y columna líder, `EXPLAIN ANALYZE`, cache-aside con TTL y `CachedTaskRepository` (M07·S06); `Protocol`, excepciones de dominio, 409 vs 422 y la tabla de transiciones (M07·S05); dependencias con `yield` y `get_db` con `engine.begin()`, SQLAlchemy Core, la URL `postgresql+psycopg://` con `pool_pre_ping` y el límite de `create_all` (M07·S04); Docker Compose y por qué el host es `db` dentro de Compose y `localhost` desde tu máquina (M07·S04); diagrama de clases y multiplicidades (MA·S05); trade-off journal `TJ-NNN` (M07·S01).
 
 ---
 
@@ -74,7 +79,7 @@ Este es el diagrama ancla de la sesión. Compará con el de S05: el service y el
 
 ```mermaid
 flowchart LR
-    RT["routers/tasks.py"] --> SV["TaskService"]
+    RT["routes/tasks.py"] --> SV["TaskService"]
     SV --> PR["TaskRepository (Protocol)"]
     DEPS["dependencies.py"] -.->|"TASKFLOW_STORAGE=postgres"| PR
     PR -->|"implementa"| CR["CachedTaskRepository<br/>(S06, opcional)"]
@@ -98,14 +103,14 @@ Dos ideas para llevarte del dibujo: `models.py` alimenta **a la vez** al reposit
 **El procedimiento.** Ya lo aplicaste en MA·S05 para sacar clases de un PRD; para un modelo de datos es el mismo, con dos preguntas extra:
 
 1. **Sustantivos → entidades.** Del plan: Usuario, Equipo, Proyecto, Tarea, Comentario, Etiqueta.
-2. **Verbos → relaciones.** "Un equipo *agrupa* proyectos", "un proyecto *contiene* tareas", "un usuario *es responsable de* tareas", "una tarea *lleva* etiquetas".
+2. **Verbos → relaciones.** "Un equipo _agrupa_ proyectos", "un proyecto _contiene_ tareas", "un usuario _es responsable de_ tareas", "una tarea _lleva_ etiquetas".
 3. **Cardinalidad mínima y máxima de cada lado.** ¿Una tarea puede existir sin proyecto? No → mínimo 1. ¿Puede no tener responsable? Sí → mínimo 0. ¿Cuántas etiquetas? Muchas, y cada etiqueta en muchas tareas → N:M.
-4. **¿La relación tiene datos propios?** "Ana es *owner* del proyecto X" — el rol no es de Ana ni del proyecto: es **de la relación**. Cuando pasa eso, la relación se vuelve entidad (tabla con columnas propias).
+4. **¿La relación tiene datos propios?** "Ana es _owner_ del proyecto X" — el rol no es de Ana ni del proyecto: es **de la relación**. Cuando pasa eso, la relación se vuelve entidad (tabla con columnas propias).
 
 **Cómo se traduce cada cardinalidad a tablas:**
 
 - **1:N** → FK en el lado "muchos": `tasks.project_id` apunta a `projects.id`.
-- **1:N opcional** → FK *nullable*: `tasks.assignee_id` puede ser `NULL`.
+- **1:N opcional** → FK _nullable_: `tasks.assignee_id` puede ser `NULL`.
 - **N:M** → tabla intermedia con dos FK que forman la PK: `task_labels(task_id, label_id)`.
 - **N:M con datos** → tabla intermedia con columnas extra: `project_members(project_id, user_id, role)`.
 
@@ -198,7 +203,7 @@ erDiagram
     }
 ```
 
-**Cómo leerlo.** La notación es *crow's foot*: `||` es "exactamente uno", `|o` "cero o uno", `o{` "cero o más" y `|{` "uno o más". Entonces `PROJECTS ||--o{ TASKS` se lee "un proyecto tiene cero o más tareas; cada tarea pertenece exactamente a un proyecto", y `USERS |o--o{ TASKS` dice que la tarea puede no tener responsable. Los atributos llevan `PK`, `FK` o `UK` (unique).
+**Cómo leerlo.** La notación es _crow's foot_: `||` es "exactamente uno", `|o` "cero o uno", `o{` "cero o más" y `|{` "uno o más". Entonces `PROJECTS ||--o{ TASKS` se lee "un proyecto tiene cero o más tareas; cada tarea pertenece exactamente a un proyecto", y `USERS |o--o{ TASKS` dice que la tarea puede no tener responsable. Los atributos llevan `PK`, `FK` o `UK` (unique).
 
 **Dos tablas intermedias, dos estatus distintos.** `TEAM_MEMBERS` y `TASK_LABELS` son N:M puros: en el ORM se declaran con `secondary=`. `PROJECT_MEMBERS` lleva `role`, así que es un **association object**, una clase propia:
 
@@ -225,13 +230,13 @@ class ProjectMember(Base):                              # association object: ti
 
 Con el association object, agregar a Ana como owner es crear un objeto: `session.add(ProjectMember(project_id=1, user_id=ana.id, role="owner"))`.
 
-> ⚠️ **Gotcha:** no declares **a la vez** un `relationship(secondary="project_members")` y la clase `ProjectMember` escribiendo sobre la misma tabla. La doc de SQLAlchemy advierte que los datos se pueden leer y escribir de forma inconsistente; si necesitás las dos vistas, la de `secondary=` va con `viewonly=True`.
+> ⚠️ **Error común:** no declares **a la vez** un `relationship(secondary="project_members")` y la clase `ProjectMember` escribiendo sobre la misma tabla. La doc de SQLAlchemy advierte que los datos se pueden leer y escribir de forma inconsistente; si necesitás las dos vistas, la de `secondary=` va con `viewonly=True`.
 
 **Lo que el diagrama no puede expresar.** "Solo puede ser miembro de un proyecto quien es miembro del equipo del proyecto." Una FK simple no lo cubre: queda como regla en el service (o como FK compuesta, si querés profundizar). Es la frontera entre **lo que garantiza la base** y **lo que garantiza el código**, y conviene tenerla escrita.
 
 > 📝 **Nota para el profesor:** el modelo asume tres decisiones que conviene confirmar en clase: roles **por proyecto** (`project_members.role`) y `team_members` sin rol, siguiendo el plan ("roles por proyecto"); etiquetas **por proyecto** (`UNIQUE (project_id, name)`), mientras que el ejemplo de S06 las tenía globales; y que el grupo cursó MA·S05, porque la sección referencia multiplicidades como ya vistas. Si no lo cursó, sumá cinco minutos de multiplicidad.
 
-📚 Para profundizar: [Basic Relationship Patterns — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html) · [Entity Relationship Diagrams — Mermaid](https://mermaid.js.org/syntax/entityRelationshipDiagram.html)
+📎 Para profundizar: [Basic Relationship Patterns — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html) · [Entity Relationship Diagrams — Mermaid](https://mermaid.js.org/syntax/entityRelationshipDiagram.html)
 
 ---
 
@@ -271,15 +276,15 @@ El `CHECK` sobre `status` es el `TaskStatus` de S05 repetido en la base, y a pro
 
 **La política `ON DELETE` de TaskFlow, relación por relación.** No hay una respuesta universal: cada FK responde "¿qué significa esta fila si desaparece la otra?".
 
-| Relación | Acción | Por qué |
+|Relación|Acción|Por qué|
 |---|---|---|
-| `projects.team_id` → `teams` | `RESTRICT` | No se borra un equipo con proyectos vivos: primero hay que decidir qué pasa con ellos |
-| `tasks.project_id` → `projects` | `CASCADE` | Una tarea no tiene sentido fuera de su proyecto |
-| `tasks.assignee_id` → `users` | `SET NULL` | Si se va la persona, la tarea queda sin responsable, no desaparece |
-| `comments.task_id` → `tasks` | `CASCADE` | El comentario es parte de la tarea |
-| `comments.author_id` → `users` | `SET NULL` | Se conserva la conversación sin el dato personal ("usuario eliminado") |
-| `project_members.*`, `team_members.*`, `task_labels.*` | `CASCADE` | Filas de relación: sin uno de los extremos, no existen |
-| `labels.project_id` → `projects` | `CASCADE` | Las etiquetas son por proyecto |
+|`projects.team_id` → `teams`|`RESTRICT`|No se borra un equipo con proyectos vivos: primero hay que decidir qué pasa con ellos|
+|`tasks.project_id` → `projects`|`CASCADE`|Una tarea no tiene sentido fuera de su proyecto|
+|`tasks.assignee_id` → `users`|`SET NULL`|Si se va la persona, la tarea queda sin responsable, no desaparece|
+|`comments.task_id` → `tasks`|`CASCADE`|El comentario es parte de la tarea|
+|`comments.author_id` → `users`|`SET NULL`|Se conserva la conversación sin el dato personal ("usuario eliminado")|
+|`project_members.*`, `team_members.*`, `task_labels.*`|`CASCADE`|Filas de relación: sin uno de los extremos, no existen|
+|`labels.project_id` → `projects`|`CASCADE`|Las etiquetas son por proyecto|
 
 En el modelo, cada decisión es un argumento:
 
@@ -289,13 +294,13 @@ assignee_id: Mapped[int | None] = mapped_column(
 )
 ```
 
-> ⚠️ **Gotcha — "en SQLite andaba":** SQLite trae las FK **desactivadas por defecto** y hay que activarlas por conexión con `PRAGMA foreign_keys = ON`. El prototipo de S05 nunca lo hizo, así que tus datos pueden traer referencias rotas que PostgreSQL va a rechazar al copiarlas. Si el script de copia falla por una FK, es un hallazgo, no un bug del script.
+> ⚠️ **Error común — "en SQLite andaba":** SQLite trae las FK **desactivadas por defecto** y hay que activarlas por conexión con `PRAGMA foreign_keys = ON`. El prototipo de S05 nunca lo hizo, así que tus datos pueden traer referencias rotas que PostgreSQL va a rechazar al copiarlas. Si el script de copia falla por una FK, es un hallazgo, no un bug del script.
 
-> ⚠️ **Gotcha:** `SET NULL` sobre una columna `NOT NULL` es una contradicción que PostgreSQL te deja declarar y te explota recién cuando borrás. Si elegís `SET NULL`, la columna tiene que ser `Mapped[... | None]`.
+> ⚠️ **Error común:** `SET NULL` sobre una columna `NOT NULL` es una contradicción que PostgreSQL te deja declarar y te explota recién cuando borrás. Si elegís `SET NULL`, la columna tiene que ser `Mapped[... | None]`.
 
 > 📝 **Nota para el profesor:** la tabla es el default del material. Si preferís `CASCADE` en `comments.author_id` (borrar un usuario borra sus comentarios), cambia la discusión de ciclo de vida de 4.5: ahí se argumenta a favor de `SET NULL`.
 
-📚 Para profundizar: [5.4. Constraints — PostgreSQL 16](https://www.postgresql.org/docs/16/ddl-constraints.html) · [SQLite Foreign Key Support](https://www.sqlite.org/foreignkeys.html) (secciones 1–2)
+📎 Para profundizar: [5.4. Constraints — PostgreSQL 16](https://www.postgresql.org/docs/16/ddl-constraints.html) · [SQLite Foreign Key Support](https://www.sqlite.org/foreignkeys.html) (secciones 1–2)
 
 ---
 
@@ -308,7 +313,7 @@ En S06 definiste ACID. Hoy lo mapeás a TaskFlow, letra por letra:
 - **I — Aislamiento.** Lo que ve Beto mientras Ana está a mitad de mover una tarea. Es el tema de 4.4.
 - **D — Durabilidad.** Cuando `COMMIT` vuelve OK, el cambio sobrevive aunque se corte la luz.
 
-**Toda sentencia es una transacción.** PostgreSQL ejecuta **toda** sentencia dentro de una transacción; si no escribís `BEGIN`, pone un `BEGIN`/`COMMIT` implícito alrededor. Cuando necesitás que varias sentencias sean *all-or-nothing*, las envolvés vos:
+**Toda sentencia es una transacción.** PostgreSQL ejecuta **toda** sentencia dentro de una transacción; si no escribís `BEGIN`, pone un `BEGIN`/`COMMIT` implícito alrededor. Cuando necesitás que varias sentencias sean _all-or-nothing_, las envolvés vos:
 
 ```sql
 BEGIN;
@@ -354,7 +359,7 @@ session.commit()
 - **Abrir y cerrar la sesión:** `dependencies.py` (con `yield`), nunca el repository.
 - **Hacer `commit`:** explícito en los métodos de escritura del repository (`add`, `update_status`).
 
-¿Por qué no en el código de salida de la dependencia, que parece más prolijo? Por el gotcha central de la sesión: con una dependencia con `yield`, **por defecto el código de salida corre después de enviar la respuesta**. Si el `commit()` vive ahí y falla (un `UNIQUE` violado, un conflicto de versión), el cliente **ya recibió un 200** por un cambio que no se guardó.
+¿Por qué no en el código de salida de la dependencia, que parece más prolijo? Por la trampa central de la sesión: con una dependencia con `yield`, **por defecto el código de salida corre después de enviar la respuesta**. Si el `commit()` vive ahí y falla (un `UNIQUE` violado, un conflicto de versión), el cliente **ya recibió un 200** por un cambio que no se guardó.
 
 ```python
 # ❌ Parece prolijo, pero el commit corre DESPUÉS de mandar la respuesta
@@ -369,19 +374,21 @@ def update_status(self, task_id, status):
     self.session.commit()
 ```
 
+**¿Y el `get_db` de S04?** Hacía justamente lo del ❌: `with engine.begin()` alrededor del `yield`, con el commit en el código de salida. Para aquel CRUD alcanzaba, porque el error esperable (un email duplicado) lo detectaba el service antes de escribir y, si igual pasaba, Postgres lo rechazaba en el `execute`, dentro del handler. Con el ORM cambia: los cambios viajan en el flush, que ocurre recién en el `commit()`, y ahí es donde aparece el conflicto de versión de 4.4. Si ese commit corriera después de la respuesta, el cliente ya tendría su 200.
+
 FastAPI ofrece una alternativa, `Depends(..., scope="function")`, que corre el código de salida alrededor de la función del endpoint, **antes** de la respuesta. El material se queda con el commit explícito en el repository porque deja el error visible donde el router lo puede traducir.
 
 **El trade-off de esa decisión.** Con el commit en el repository, **cada método de escritura es su propia transacción**. Si mañana un caso de uso necesita dos escrituras atómicas (crear tarea + registrar actividad), el repository no alcanza: la transacción tiene que subir al service (una unidad de trabajo que abarque las dos). Anotalo: es la clase de decisión que el agente toma sin avisarte.
 
-> ⚠️ **Gotcha:** después de un error dentro de una transacción, PostgreSQL rechaza todo lo que sigue hasta que hagas `ROLLBACK`. En SQLAlchemy, si atrapás una excepción de la base y querés seguir usando la sesión, primero `session.rollback()`.
+> ⚠️ **Error común:** después de un error dentro de una transacción, PostgreSQL rechaza todo lo que sigue hasta que hagas `ROLLBACK`. En SQLAlchemy, si atrapás una excepción de la base y querés seguir usando la sesión, primero `session.rollback()`.
 
-📚 Para profundizar: [3.4. Transactions — tutorial de PostgreSQL 16](https://www.postgresql.org/docs/16/tutorial-transactions.html) · [Session Basics — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/session_basics.html) · [Transactions and Connection Management — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html) · [Dependencies with yield — FastAPI](https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/)
+📎 Para profundizar: [3.4. Transactions — tutorial de PostgreSQL 16](https://www.postgresql.org/docs/16/tutorial-transactions.html) · [Session Basics — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/session_basics.html) · [Transactions and Connection Management — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html) · [Dependencies with yield — FastAPI](https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/)
 
 ---
 
 ### 4.4 Concurrencia: lost update, optimista vs pesimista, aislamiento
 
-**El problema de TaskFlow no son las lecturas.** PostgreSQL usa MVCC: cada sentencia ve un *snapshot*, y según su doc, leer nunca bloquea escribir y escribir nunca bloquea leer. Por eso el tablero (lectura intensiva, el P1 de S06) no se frena mientras alguien mueve una tarjeta. El problema son **dos escrituras que se basan en una lectura vieja**.
+**El problema de TaskFlow no son las lecturas.** PostgreSQL usa MVCC: cada sentencia ve un _snapshot_, y según su doc, leer nunca bloquea escribir y escribir nunca bloquea leer. Por eso el tablero (lectura intensiva, el P1 de S06) no se frena mientras alguien mueve una tarjeta. El problema son **dos escrituras que se basan en una lectura vieja**.
 
 **Las anomalías, con un ejemplo TaskFlow cada una:**
 
@@ -391,7 +398,7 @@ FastAPI ofrece una alternativa, `Depends(..., scope="function")`, que corre el c
 - **Lost update:** Ana y Beto leen `in_progress`; Ana escribe `done`; Beto escribe `backlog` basándose en lo que leyó. El `done` de Ana desaparece.
 - **Write skew:** la regla es "todo proyecto tiene al menos un owner". Hay dos owners. Cada uno, en paralelo, cuenta owners (2), ve que puede irse y se pasa a `member`. Cada escritura toca **una fila distinta**, ninguna pisa a la otra… y el proyecto queda sin owners.
 
-**El lost update de TaskFlow no es solo "el último gana".** Mirá la regla de transiciones de S05: `in_progress → backlog` vale, `done → backlog` no. Beto valida su movimiento contra el estado que **leyó** (`in_progress`), pero cuando escribe la tarea ya está en `done`. Resultado: se aplicó una transición prohibida. Es un *check-then-act* sobre datos obsoletos, y es exactamente lo que hace el repository de S05:
+**El lost update de TaskFlow no es solo "el último gana".** Mirá la regla de transiciones de S05: `in_progress → backlog` vale, `done → backlog` no. Beto valida su movimiento contra el estado que **leyó** (`in_progress`), pero cuando escribe la tarea ya está en `done`. Resultado: se aplicó una transición prohibida. Es un _check-then-act_ sobre datos obsoletos, y es exactamente lo que hace el repository de S05:
 
 ```python
 # S05 (SQLite): lee en el service, escribe sin condición en el repo
@@ -432,7 +439,7 @@ sequenceDiagram
 
 ¿Por qué Beto no se queda esperando? En Read Committed, cuando su `UPDATE` encuentra la fila modificada por una transacción ya confirmada, PostgreSQL **reevalúa el `WHERE` sobre la versión nueva** de la fila. `version = 3` ya no se cumple, y el `UPDATE` afecta 0 filas.
 
-> ⚠️ **Gotcha — los masivos se saltean el control:** `version_id_col` **solo actúa en el flush** de objetos. Un `session.execute(update(Task).where(...).values(status="done"))` no pasa por ahí y pisa sin mirar la versión. Si el agente te genera un `update()` masivo para "optimizar", perdiste la protección.
+> ⚠️ **Error común — los masivos se saltean el control:** `version_id_col` **solo actúa en el flush** de objetos. Un `session.execute(update(Task).where(...).values(status="done"))` no pasa por ahí y pisa sin mirar la versión. Si el agente te genera un `update()` masivo para "optimizar", perdiste la protección.
 
 **Solución 2 — bloqueo pesimista con `SELECT … FOR UPDATE`.** Bloqueás la fila al leerla. Según la doc de PostgreSQL, `FOR UPDATE` bloquea a las demás transacciones que intenten `UPDATE`, `DELETE` o `SELECT FOR UPDATE` sobre esas filas **hasta que termine la transacción actual**:
 
@@ -448,15 +455,15 @@ En el ORM: `session.get(Task, task_id, with_for_update=True)` o `select(Task).wh
 
 **¿Cuál elegir?**
 
-| | Optimista (`version`) | Pesimista (`FOR UPDATE`) |
+||Optimista (`version`)|Pesimista (`FOR UPDATE`)|
 |---|---|---|
-| Supone | Conflictos raros | Conflictos frecuentes |
-| En el conflicto | El segundo falla (409) y recarga o reintenta | El segundo **espera** (o falla con `NOWAIT`) |
-| Costo | Cero locks; hay que manejar el reintento | Locks retenidos; riesgo de esperas y deadlocks |
-| Sirve entre requests (tablero abierto 5 min) | **Sí**, si la versión viaja con el cliente | **No**: no se retiene un lock entre requests |
-| Caso TaskFlow | Editar título, mover desde la UI | Reordenar posiciones de una columna (varias filas) |
+|Supone|Conflictos raros|Conflictos frecuentes|
+|En el conflicto|El segundo falla (409) y recarga o reintenta|El segundo **espera** (o falla con `NOWAIT`)|
+|Costo|Cero locks; hay que manejar el reintento|Locks retenidos; riesgo de esperas y deadlocks|
+|Sirve entre requests (tablero abierto 5 min)|**Sí**, si la versión viaja con el cliente|**No**: no se retiene un lock entre requests|
+|Caso TaskFlow|Editar título, mover desde la UI|Reordenar posiciones de una columna (varias filas)|
 
-**El caso "tablero abierto hace cinco minutos".** Ana abre el tablero, se va a tomar un café, vuelve y mueve una tarjeta que Beto editó en el medio. Ninguna transacción de base dura cinco minutos, así que el control tiene que **viajar con el cliente**: el front manda la `version` que vio, y el servidor la compara. Es el patrón *Optimistic Offline Lock*, de David Rice en el catálogo de *Patterns of Enterprise Application Architecture* de Martin Fowler: prevenir conflictos entre transacciones de negocio concurrentes detectando el conflicto y haciendo rollback. HTTP tiene su versión estándar: el cliente manda `If-Match` con el `ETag` que recibió y, si no coincide, el servidor responde `412 Precondition Failed`. La alternativa simple es un `expected_version` en el body y 409. El contrato definitivo se diseña en S10; hoy lo practicás en el ejercicio 🔴.
+**El caso "tablero abierto hace cinco minutos".** Ana abre el tablero, se va a tomar un café, vuelve y mueve una tarjeta que Beto editó en el medio. Ninguna transacción de base dura cinco minutos, así que el control tiene que **viajar con el cliente**: el front manda la `version` que vio, y el servidor la compara. Es el patrón _Optimistic Offline Lock_, de David Rice en el catálogo de _Patterns of Enterprise Application Architecture_ de Martin Fowler: prevenir conflictos entre transacciones de negocio concurrentes detectando el conflicto y haciendo rollback. HTTP tiene su versión estándar: el cliente manda `If-Match` con el `ETag` que recibió y, si no coincide, el servidor responde `412 Precondition Failed`. La alternativa simple es un `expected_version` en el body y 409. El contrato definitivo se diseña en S10; hoy lo practicás en el ejercicio 🔴.
 
 **Niveles de aislamiento en PostgreSQL.** Según la doc de PostgreSQL 16:
 
@@ -501,7 +508,7 @@ SELECT id FROM tasks WHERE project_id = 1 AND status = 'done' ORDER BY id FOR UP
 
 > 💡 **Tip:** la transacción abortada por deadlock también se reintenta entera. El mismo `run_with_retry` sirve si aceptás también el SQLSTATE `40P01` (`deadlock_detected`, según el apéndice de códigos de error de PostgreSQL), además del `40001`.
 
-📚 Para profundizar (PostgreSQL 16): [13.1. Introduction (MVCC)](https://www.postgresql.org/docs/16/mvcc-intro.html) · [13.2. Transaction Isolation](https://www.postgresql.org/docs/16/transaction-iso.html) · [13.3. Explicit Locking](https://www.postgresql.org/docs/16/explicit-locking.html) · [SELECT — The Locking Clause](https://www.postgresql.org/docs/16/sql-select.html) · [Appendix A. Error Codes](https://www.postgresql.org/docs/16/errcodes-appendix.html) · [Configuring a Version Counter — SQLAlchemy](https://docs.sqlalchemy.org/en/20/orm/versioning.html) · [Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html) · [If-Match — MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match)
+📎 Para profundizar (PostgreSQL 16): [13.1. Introduction (MVCC)](https://www.postgresql.org/docs/16/mvcc-intro.html) · [13.2. Transaction Isolation](https://www.postgresql.org/docs/16/transaction-iso.html) · [13.3. Explicit Locking](https://www.postgresql.org/docs/16/explicit-locking.html) · [SELECT — The Locking Clause](https://www.postgresql.org/docs/16/sql-select.html) · [Appendix A. Error Codes](https://www.postgresql.org/docs/16/errcodes-appendix.html) · [Configuring a Version Counter — SQLAlchemy](https://docs.sqlalchemy.org/en/20/orm/versioning.html) · [Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html) · [If-Match — MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match)
 
 ---
 
@@ -515,7 +522,7 @@ updated_at: Mapped[datetime] = mapped_column(
 )
 ```
 
-> ⚠️ **Gotcha:** `onupdate` lo aplica **el ORM** en cada `UPDATE` que pasa por el flush. Un `UPDATE` hecho a mano en `psql`, o un `update()` masivo, **no** lo toca. Si querés que lo garantice la base, eso es un trigger (fuera de alcance hoy).
+> ⚠️ **Error común:** `onupdate` lo aplica **el ORM** en cada `UPDATE` que pasa por el flush. Un `UPDATE` hecho a mano en `psql`, o un `update()` masivo, **no** lo toca. Si querés que lo garantice la base, eso es un trigger (fuera de alcance hoy).
 
 **La caché de S06 sobre el repo nuevo.** El `CachedTaskRepository` envuelve ahora al `SqlAlchemyTaskRepository` sin cambios: invalidar al escribir sigue siendo el mecanismo y el TTL la red de seguridad. El `get` previo a mover sigue **sin caché**, por la misma razón que en S06 (la regla de transiciones tiene que ver el estado real) y, desde hoy, por una razón más: **la `version` que se compara tiene que ser la de la base**. Un `get` cacheado con versión vieja convierte cada movimiento en un 409.
 
@@ -551,7 +558,7 @@ DELETE FROM users WHERE id = 7;
 
 Con `CASCADE` en `comments.author_id` borrarías también la conversación entera, y los demás miembros perderían contexto. `SET NULL` conserva el contexto sin el dato personal. Ojo: si el **cuerpo** del comentario tiene datos personales, `SET NULL` no alcanza; privacidad y gobierno en serio quedan fuera de esta sesión.
 
-📚 Para profundizar: [5.11. Table Partitioning — PostgreSQL 16](https://www.postgresql.org/docs/16/ddl-partitioning.html) (solo 5.11.1) · [Art. 17 RGPD](https://gdpr-info.eu/art-17-gdpr/) (compilación no oficial del texto, apartado 1)
+📎 Para profundizar: [5.11. Table Partitioning — PostgreSQL 16](https://www.postgresql.org/docs/16/ddl-partitioning.html) (solo 5.11.1) · [Art. 17 RGPD](https://gdpr-info.eu/art-17-gdpr/) (compilación no oficial del texto, apartado 1)
 
 ---
 
@@ -571,7 +578,7 @@ Otras tres piezas del modelo que conviene entender:
 - **`status` como `String` + `CHECK`**, no como `sqlalchemy.Enum`: repite la regla de `TaskStatus` en la base y esquiva una limitación de autogenerate con los enums.
 - **`DateTime(timezone=True)`** para que las fechas sean `timestamptz`, como dice el ER.
 
-**El engine y el driver.** Instalás psycopg 3 (`psycopg[binary]`), pero según la doc de SQLAlchemy 2.0 el dialecto PostgreSQL usa **psycopg2** por defecto. Con `postgresql://` a secas, SQLAlchemy busca psycopg2 y falla al no encontrarlo. La URL lleva siempre el driver explícito:
+**El engine y el driver.** Es el mismo `engine` de `config/db.py` en S04, y la URL lleva el driver explícito por el mismo motivo: instalás psycopg 3 (`psycopg[binary]`), pero según la doc de SQLAlchemy 2.0 el dialecto PostgreSQL usa **psycopg2** por defecto. Con `postgresql://` a secas, SQLAlchemy busca psycopg2 y falla al no encontrarlo. La URL lleva siempre el driver explícito:
 
 ```python
 engine = create_engine(
@@ -581,6 +588,8 @@ engine = create_engine(
 )
 SessionLocal = sessionmaker(engine)     # UNA vez, a nivel de módulo
 ```
+
+Lo nuevo respecto de S04 es `sessionmaker`: en vez de pedirle al engine una `Connection` (Core), le pedís una `Session` (ORM).
 
 **El repository nuevo.** Cumple el mismo `Protocol` de S05 (`add`, `list_tasks`, `get`, `update_status`) y convierte el objeto ORM al contrato Pydantic: **el objeto ORM nunca sale del repository**.
 
@@ -605,9 +614,9 @@ def update_status(self, task_id: int, status: TaskStatus) -> TaskOut:
 
 **Por qué funciona sin tocar el service.** `TaskService.move()` de S05 hace `repo.get(id)`, valida la transición y llama a `repo.update_status(id, nuevo)`. Las dos llamadas usan **la misma sesión** del request, así que `session.get()` en `update_status` devuelve la misma instancia del identity map, con la `version` que se validó. Si otro request confirmó en el medio, el `UPDATE` matchea 0 filas y la regla de transiciones **nunca se aplica sobre un estado viejo**. `ConcurrentUpdate` vive en un módulo neutro, `app/errors.py`: así el repository no importa nada del service (regla de dependencia de S04) y el router no importa nada de `repositories/` (lo exige `tests/test_arquitectura.py` de S05).
 
-> ⚠️ **Gotcha — el identity map guarda referencias débiles:** según la doc de SQLAlchemy, los objetos dentro de la sesión están *weakly referenced*: si tu código deja de apuntarlos, salen de la sesión y el garbage collector los libera (salvo los pendientes, los marcados para borrar o los que tienen cambios sin flushear). `get()` devuelve un `TaskOut`, no el objeto ORM, así que sin el `self._read[task_id] = task` la instancia se libera al salir de `get()`, y `update_status` **relee la fila de la base con la versión nueva**: el `UPDATE` pasa, y la transición prohibida también. Sin esa línea, un `PATCH` que compite con otro movimiento responde 200 y deja `done → backlog`; con ella, 409 (lo probás en el 🔴 Desafío 1).
+> ⚠️ **Error común — el identity map guarda referencias débiles:** según la doc de SQLAlchemy, los objetos dentro de la sesión están _weakly referenced_: si tu código deja de apuntarlos, salen de la sesión y el garbage collector los libera (salvo los pendientes, los marcados para borrar o los que tienen cambios sin flushear). `get()` devuelve un `TaskOut`, no el objeto ORM, así que sin el `self._read[task_id] = task` la instancia se libera al salir de `get()`, y `update_status` **relee la fila de la base con la versión nueva**: el `UPDATE` pasa, y la transición prohibida también. Sin esa línea, un `PATCH` que compite con otro movimiento responde 200 y deja `done → backlog`; con ella, 409 (lo probás en el 🔴 Desafío 1).
 
-**N+1: el tablero con etiquetas.** Por defecto, las relaciones se cargan *lazy*: el primer acceso a `task.labels` dispara un `SELECT`. Si el tablero muestra las etiquetas de 50 tarjetas, son 1 + 50 consultas:
+**N+1: el tablero con etiquetas.** Por defecto, las relaciones se cargan _lazy_: el primer acceso a `task.labels` dispara un `SELECT`. Si el tablero muestra las etiquetas de 50 tarjetas, son 1 + 50 consultas:
 
 ```python
 # ❌ N+1: una consulta por tarea al tocar t.labels
@@ -621,11 +630,11 @@ stmt = select(Task).where(Task.project_id == 1).options(selectinload(Task.labels
 
 La doc de SQLAlchemy describe `selectinload()` como en general la mejor estrategia para colecciones; `joinedload()` va mejor para muchos-a-uno (`task.project`). Y `raiseload()` convierte cualquier carga perezosa en error: ponelo en los tests y el N+1 deja de ser silencioso.
 
-> ⚠️ **Gotcha — lo que el agente va a imitar:** el tutorial oficial de FastAPI sobre bases SQL usa **SQLModel** (construido sobre SQLAlchemy y Pydantic) y `create_all` al arrancar. Para TaskFlow no sirve tal cual: `create_all` **no altera tablas existentes**, así que en cuanto hay datos lo reemplaza Alembic (el propio tutorial recomienda Alembic para producción). Y TaskFlow separa el contrato (`TaskOut`, Pydantic) del modelo de persistencia (ORM): esa es la decisión TJ-005.
+> ⚠️ **Error común — lo que el agente va a imitar:** el tutorial oficial de FastAPI sobre bases SQL usa **SQLModel** (construido sobre SQLAlchemy y Pydantic) y `create_all` al arrancar. Para TaskFlow no sirve tal cual: `create_all` **no altera tablas existentes** (lo viste en S04, donde el `lifespan` corría `meta.create_all(engine)`), así que en cuanto hay datos lo reemplaza Alembic (el propio tutorial recomienda Alembic para producción). Y TaskFlow separa el contrato (`TaskOut`, Pydantic) del modelo de persistencia (ORM): esa es la decisión TJ-005.
 
-> ⚠️ **Gotcha:** `order_by(Task.status)` ordena **alfabéticamente** (`backlog`, `done`, `in_progress`), el mismo gotcha de S06.
+> ⚠️ **Error común:** `order_by(Task.status)` ordena **alfabéticamente** (`backlog`, `done`, `in_progress`), el mismo error común de S06.
 
-📚 Para profundizar: [Table Configuration with Declarative](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html) · [Relationship Loading Techniques](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html) · [State Management — Session Referencing Behavior](https://docs.sqlalchemy.org/en/20/orm/session_state_management.html) · [PostgreSQL dialect](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html) · [Engine Configuration](https://docs.sqlalchemy.org/en/20/core/engines.html) · [Installation — psycopg 3](https://www.psycopg.org/psycopg3/docs/basic/install.html) · de contraste: [SQL (Relational) Databases — FastAPI](https://fastapi.tiangolo.com/tutorial/sql-databases/)
+📎 Para profundizar: [Table Configuration with Declarative](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html) · [Relationship Loading Techniques](https://docs.sqlalchemy.org/en/20/orm/queryguide/relationships.html) · [State Management — Session Referencing Behavior](https://docs.sqlalchemy.org/en/20/orm/session_state_management.html) · [PostgreSQL dialect](https://docs.sqlalchemy.org/en/20/dialects/postgresql.html) · [Engine Configuration](https://docs.sqlalchemy.org/en/20/core/engines.html) · [Installation — psycopg 3](https://www.psycopg.org/psycopg3/docs/basic/install.html) · de contraste: [SQL (Relational) Databases — FastAPI](https://fastapi.tiangolo.com/tutorial/sql-databases/)
 
 ---
 
@@ -633,7 +642,7 @@ La doc de SQLAlchemy describe `selectinload()` como en general la mejor estrateg
 
 **Por qué migraciones y no `create_all`.** Una migración es un archivo versionado que dice cómo pasar el esquema de la revisión N a la N+1 y de vuelta. Alembic guarda en la tabla `alembic_version` en qué revisión está cada base, así que tu laptop, la de tu compañero y producción pueden estar en revisiones distintas y saber exactamente qué les falta. Y PostgreSQL tiene **DDL transaccional**: si una migración falla a la mitad, no deja el esquema a medias.
 
-**Por qué "de" SQLite y no "sobre" SQLite.** SQLite casi no soporta `ALTER`; Alembic lo compensa con un *batch mode* que recrea la tabla y copia los datos. Solo lo necesitás si querés mantener Alembic también contra el SQLite de los tests. Para TaskFlow, el esquema nuevo nace en PostgreSQL y los datos viejos se **copian**.
+**Por qué "de" SQLite y no "sobre" SQLite.** SQLite casi no soporta `ALTER`; Alembic lo compensa con un _batch mode_ que recrea la tabla y copia los datos. Solo lo necesitás si querés mantener Alembic también contra el SQLite de los tests. Para TaskFlow, el esquema nuevo nace en PostgreSQL y los datos viejos se **copian**.
 
 **El flujo: generar → revisar → aplicar.**
 
@@ -645,7 +654,7 @@ alembic current                                                 # en qué revisi
 alembic downgrade -1                                            # volver una atrás
 ```
 
-La doc de Alembic es tajante: *"It is always necessary to manually review and correct the candidate migrations that autogenerate produces."* No es burocracia. Autogenerate detecta tablas y columnas agregadas o quitadas, cambios de nulabilidad, índices, `UNIQUE` con nombre, FK y cambios de tipo, pero **no detecta renames** (salen como *drop* + *add*) ni restricciones sin nombre.
+La doc de Alembic es tajante: _"It is always necessary to manually review and correct the candidate migrations that autogenerate produces."_ No es burocracia. Autogenerate detecta tablas y columnas agregadas o quitadas, cambios de nulabilidad, índices, `UNIQUE` con nombre, FK y cambios de tipo, pero **no detecta renames** (salen como _drop_ + _add_) ni restricciones sin nombre.
 
 **El rename que borra datos.** Supongamos que en el modelo renombrás `assignee` a `assignee_name`. Autogenerate propone:
 
@@ -703,13 +712,13 @@ def upgrade():
 - Se insertan los ids originales, así que la secuencia de la identity sigue en 1 y el próximo `INSERT` choca con `duplicate key`. Se corrige con `setval(pg_get_serial_sequence('tasks', 'id'), max(id))`: `pg_get_serial_sequence` devuelve la secuencia también para columnas identity.
 - La alternativa es **pgloader**, que migra SQLite → PostgreSQL en una línea y por defecto crea tablas, índices y resetea secuencias. Si lo usás, que cargue **solo datos** (`data only`) sobre el esquema de Alembic. Si pgloader crea el esquema, Alembic pierde el control de la historia.
 
-> ⚠️ **Gotcha:** si el `lifespan` de S05 crea tablas al arrancar, que lo haga solo para `sqlite`. Con `postgres`, Alembic y la app se pelearían por el esquema.
+> ⚠️ **Error común:** si el `lifespan` de S05 crea tablas al arrancar, que lo haga solo para `sqlite`. Con `postgres`, Alembic y la app se pelearían por el esquema: nada de `meta.create_all` como en el `lifespan` de S04 o en el de los ejercicios de S05.
 
-> ⚠️ **Gotcha:** si la password de la URL tiene `%`, `config.set_main_option` de Alembic la interpreta (usa la interpolación de `configparser`): duplicalo, `%%`.
+> ⚠️ **Error común:** si la password de la URL tiene `%`, `config.set_main_option` de Alembic la interpreta (usa la interpolación de `configparser`): duplicalo, `%%`.
 
-> 📝 **Nota para el profesor:** el material crea una **base nueva `taskflow_app`** en el mismo servidor de S06, gestionada solo por Alembic; la base `taskflow` queda como evidencia del `EXPLAIN` de TJ-004. El cambio `assignee` → `assignee_id` se deja en fase *expand* (backfill y drop, en S14). Si preferís resolverlo hoy, el backfill de arriba sirve, pero hace falta crear usuarios antes.
+> 📝 **Nota para el profesor:** el material crea una **base nueva `taskflow_app`** en el mismo servidor de S06, gestionada solo por Alembic; la base `taskflow` queda como evidencia del `EXPLAIN` de TJ-004. El cambio `assignee` → `assignee_id` se deja en fase _expand_ (backfill y drop, en S14). Si preferís resolverlo hoy, el backfill de arriba sirve, pero hace falta crear usuarios antes.
 
-📚 Para profundizar: [Tutorial — Alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) · [Auto Generating Migrations](https://alembic.sqlalchemy.org/en/latest/autogenerate.html) · [The Importance of Naming Constraints](https://alembic.sqlalchemy.org/en/latest/naming.html) · [Batch Migrations](https://alembic.sqlalchemy.org/en/latest/batch.html) · [SQLite to Postgres — pgloader](https://pgloader.readthedocs.io/en/latest/ref/sqlite.html) · [`pg_get_serial_sequence` — PostgreSQL 16](https://www.postgresql.org/docs/16/functions-info.html)
+📎 Para profundizar: [Tutorial — Alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) · [Auto Generating Migrations](https://alembic.sqlalchemy.org/en/latest/autogenerate.html) · [The Importance of Naming Constraints](https://alembic.sqlalchemy.org/en/latest/naming.html) · [Batch Migrations](https://alembic.sqlalchemy.org/en/latest/batch.html) · [SQLite to Postgres — pgloader](https://pgloader.readthedocs.io/en/latest/ref/sqlite.html) · [`pg_get_serial_sequence` — PostgreSQL 16](https://www.postgresql.org/docs/16/functions-info.html)
 
 ---
 
@@ -720,9 +729,9 @@ El ER de 4.1 va en `docs/datos/s07-modelo-er.md`, **junto a la tabla `ON DELETE`
 Y dos entradas nuevas en el trade-off journal:
 
 - **TJ-005 — ORM.** Alternativas: SQLAlchemy 2.0 puro, SQLModel (lo que usa el tutorial de FastAPI), SQL a mano con `psycopg`. Default propuesto: SQLAlchemy, con los modelos ORM separados del contrato Pydantic.
-- **TJ-006 — Concurrencia.** Optimista con `version_id_col` para mover y editar, pesimista con `FOR UPDATE` en orden de `id` para reordenar, Read Committed como aislamiento global. *Qué me haría cambiar de idea:* una tasa medida de 409 alta.
+- **TJ-006 — Concurrencia.** Optimista con `version_id_col` para mover y editar, pesimista con `FOR UPDATE` en orden de `id` para reordenar, Read Committed como aislamiento global. _Qué me haría cambiar de idea:_ una tasa medida de 409 alta.
 
-### Mapa de relaciones entre los recursos
+### Mapa de relaciones entre recursos
 
 Cómo se apoyan entre sí los recursos de la sesión. El nodo resaltado es el que une la teoría de concurrencia con el código:
 
@@ -767,7 +776,7 @@ Lo que el diagrama no muestra: el tutorial de FastAPI con SQLModel y el Full Sta
 **Prerrequisitos**
 
 - El repo `taskflow` con lo de S05–S06 (tag `s06`), el venv activado y los tests de S05 en verde.
-- Docker con el `compose.yaml` de S06 (servicio `db` con `postgres:16-alpine`, usuario y password `taskflow`, puerto `127.0.0.1:5432`). Está documentado en el material de S06; no se repite acá. Si ya tenés otro Postgres en el 5432, mapeá `5433:5432` y cambiá el puerto en `TASKFLOW_DATABASE_URL`.
+- Docker con el `docker-compose.yml` y el `.env` de S06 (servicio `db` con `postgres:16-alpine`, usuario y password `taskflow` por defecto, puerto `127.0.0.1:5432`). Está documentado en el material de S06; no se repite acá. Si ya tenés otro Postgres en el 5432, mapeá `5433:5432` y cambiá el puerto en `TASKFLOW_DATABASE_URL`.
 - El archivo `taskflow.db` del prototipo (si no lo tenés, el lab funciona igual: se copian 0 tareas).
 
 **Placeholders:** `<rev>` es el id que Alembic le asigna a tu migración; `<N>` es un número que depende de tus datos.
@@ -781,11 +790,11 @@ git checkout -b s07-postgres
 pip install "sqlalchemy>=2.0,<2.1" "psycopg[binary]" alembic
 ```
 
-- `sqlalchemy>=2.0,<2.1`: a la fecha de consulta del material (23/09/2026, PyPI), la última estable es la **2.0.54** y la 2.1 existe solo como *release candidate* (2.1.0rc2). Fijar `<2.1` evita traer una pre-release o, cuando salga, una versión mayor que no se probó en clase.
+- `sqlalchemy>=2.0,<2.1`: a la fecha de consulta del material (23/09/2026, PyPI), la última estable es la **2.0.54** y la 2.1 existe solo como _release candidate_ (2.1.0rc2). Fijar `<2.1` evita traer una pre-release o, cuando salga, una versión mayor que no se probó en clase.
 - `psycopg[binary]`: psycopg 3 en versión binaria, la que su doc recomienda para desarrollo (para producción recomienda la instalación local; lo retomás en S16). Soporta PostgreSQL 10 a 18 y Python 3.10 a 3.15.
 - `alembic`: el material sigue la doc de Alembic 1.20.
 
-Agregá las tres líneas a tu `requirements.txt`.
+Agregá las tres líneas a tu `requirements.txt`. Si hiciste los ejercicios de S05, `sqlalchemy` y `psycopg[binary]` ya están: solo sumás `alembic`.
 
 **✅ Verificación:**
 
@@ -806,6 +815,8 @@ export TASKFLOW_DATABASE_URL="postgresql+psycopg://taskflow:taskflow@localhost:5
 
 La base `taskflow` de S06 (con las 200.000 tareas del seed y el `schema.sql` a mano) queda intacta como evidencia de TJ-004. `taskflow_app` la va a manejar **solo Alembic**.
 
+`TASKFLOW_DATABASE_URL` cumple el papel de `DATABASE_URL` en S04; lleva el prefijo `TASKFLOW_` como el resto de las variables del proyecto. El host es `localhost` y no `db` porque la API corre en tu venv, fuera de la red de Compose: es la "alternativa sin Docker" de S04.
+
 **✅ Verificación:**
 
 ```bash
@@ -813,7 +824,7 @@ docker compose exec db psql -U taskflow -d taskflow_app -c "\dt"
 # salida esperada: "Did not find any relations." (la base existe y está vacía)
 ```
 
-> ⚠️ Las credenciales `taskflow:taskflow` son del compose local de S06. Nunca las uses fuera de tu máquina.
+> ⚠️ Las credenciales `taskflow:taskflow` son los defaults del `.env` local de S06. Nunca las uses fuera de tu máquina.
 
 ---
 
@@ -1120,7 +1131,7 @@ class SqlAlchemyTaskRepository:
     def __init__(self, session: Session, default_project_id: int = 1) -> None:
         self.session = session              # la sesión la abre y la cierra dependencies.py
         self.default_project_id = default_project_id
-        self._read: dict[int, Task] = {}     # lo que leyó get() en este request (gotcha de 4.6)
+        self._read: dict[int, Task] = {}     # lo que leyó get() en este request (error común de 4.6)
 
     @staticmethod
     def _to_out(t: Task) -> TaskOut:        # ORM -> contrato Pydantic: el ORM no sale del repo
@@ -1163,7 +1174,7 @@ class SqlAlchemyTaskRepository:
 En el router, el único cambio es un `except` más en el endpoint de mover (junto a los de `TaskNotFound` e `InvalidTransition` de S05), y el import correspondiente:
 
 ```python
-# app/routers/tasks.py
+# app/routes/tasks.py
 from ..errors import ConcurrentUpdate      # NO de repositories/: lo prohíbe test_arquitectura.py
 ...
     except ConcurrentUpdate:
@@ -1173,6 +1184,8 @@ from ..errors import ConcurrentUpdate      # NO de repositories/: lo prohíbe te
 ---
 
 ### Paso 8 — Enchufarlo en `dependencies.py`
+
+Si hiciste los ejercicios de S05, ya tenés una rama `postgres` con el `PostgresTaskRepository` (Core, `engine.begin()` y `create_all`). Esta versión la reemplaza. El `engine` pasa a apuntar a `taskflow_app`, el commit baja al repository (4.3) y el `lifespan` deja de crear tablas (4.7). `postgres.py` puede quedar en el repo como referencia, pero `dependencies.py` ya no lo usa.
 
 Agregá el engine y la rama `postgres` a `get_repository`. El resto del archivo (la rama `sqlite`, el repo en memoria, la caché de S06 y `get_task_service`) queda como estaba:
 
@@ -1288,7 +1301,7 @@ python -m scripts.lost_update        # con -m, la raíz del repo entra al path y
 # [con version] StaleDataError -> la API respondería 409
 ```
 
-> ⚠️ **Gotcha:** `python scripts/lost_update.py` falla con `ModuleNotFoundError: No module named 'app'`, porque Python pone en el path la carpeta del script (`scripts/`), no la raíz. Corré desde la raíz con `python -m scripts.lost_update` (o `PYTHONPATH=. python scripts/lost_update.py`). Lo mismo vale para los scripts de los ejercicios que importan `app`. `copy_sqlite_to_pg.py` no importa nada de `app`, por eso el paso 6 anda con `python scripts/...`.
+> ⚠️ **Error común:** `python scripts/lost_update.py` falla con `ModuleNotFoundError: No module named 'app'`, porque Python pone en el path la carpeta del script (`scripts/`), no la raíz. Corré desde la raíz con `python -m scripts.lost_update` (o `PYTHONPATH=. python scripts/lost_update.py`). Lo mismo vale para los scripts de los ejercicios que importan `app`. `copy_sqlite_to_pg.py` no importa nada de `app`, por eso el paso 6 anda con `python scripts/...`.
 
 Leé la parte 1 dos veces: no es solo "el último gana". Se aplicó `done → backlog`, **una transición prohibida por la regla de S05**. El script arma su propio engine, así que `TASKFLOW_SQL_ECHO` no lo afecta: si querés ver el `UPDATE … AND tasks.version = …` que emite el ORM, agregá `echo=True` al `create_engine` del script.
 
@@ -1318,7 +1331,7 @@ COMMIT;
 COMMIT;
 ```
 
-✅ Lo lograste si B quedó colgada hasta el `COMMIT` de A. Repetí con `FOR UPDATE NOWAIT` en B: en vez de esperar, tiene que fallar en el acto con `ERROR:  could not obtain lock on row in relation "tasks"` (SQLSTATE `55P03`).
+✅ Lo lograste si B quedó colgada hasta el `COMMIT` de A. Repetí con `FOR UPDATE NOWAIT` en B: en vez de esperar, tiene que fallar en el acto con `ERROR: could not obtain lock on row in relation "tasks"` (SQLSTATE `55P03`).
 
 **(b) Repeatable Read: error de serialización**
 
@@ -1343,7 +1356,7 @@ ROLLBACK;                                                     -- y reintentar la
 -- B: UPDATE tasks SET position = position + 1 WHERE id = 1;   -- ciclo
 ```
 
-✅ PostgreSQL detecta el ciclo y aborta **una** de las dos con `ERROR:  deadlock detected` (SQLSTATE `40P01`); la otra sigue. Hacé `ROLLBACK` en las dos para limpiar. (Necesitás al menos dos tareas: si solo copiaste una, creá otra con `curl`.)
+✅ PostgreSQL detecta el ciclo y aborta **una** de las dos con `ERROR: deadlock detected` (SQLSTATE `40P01`); la otra sigue. Hacé `ROLLBACK` en las dos para limpiar. (Necesitás al menos dos tareas: si solo copiaste una, creá otra con `curl`.)
 
 **(d) La forma correcta de reordenar el tablero:**
 
@@ -1426,7 +1439,7 @@ env -u TASKFLOW_DATABASE_URL pytest -q tests/test_concurrency.py   # 1 skipped
 3. Commit y tag:
 
 ```bash
-git add app/db app/errors.py app/repositories app/routers app/dependencies.py migrations alembic.ini \
+git add app/db app/errors.py app/repositories app/routes app/dependencies.py migrations alembic.ini \
         scripts tests docs requirements.txt
 git commit -m "S07: TaskFlow sobre PostgreSQL con Alembic y bloqueo optimista"
 git push -u origin s07-postgres
@@ -1435,11 +1448,15 @@ git tag s07 && git push origin s07
 
 **Stretch (si te sobra tiempo):** reproducí la carrera con hilos reales: dos hilos que llaman a `PATCH /tasks/1/status` a la vez, sincronizados con `threading.Barrier(2)` para que arranquen simultáneamente. El 409 va a aparecer "a veces", y vas a entender por qué el script determinístico del paso 9 es mucho mejor para debuggear.
 
-> 📝 **Nota para el profesor:** defaults del lab — los mismos equipos de 3 de S05–S06; entrega en la rama `s07-postgres` con `app/db/models.py`, `app/errors.py`, `migrations/`, `app/repositories/sqlalchemy_repo.py`, `scripts/copy_sqlite_to_pg.py`, `scripts/lost_update.py`, `tests/test_concurrency.py`, `docs/datos/s07-modelo-er.md` y TJ-005/TJ-006, con tag `s07`; variables `TASKFLOW_STORAGE=postgres` y `TASKFLOW_DATABASE_URL` con las credenciales locales del compose de S06; los tests de S05 siguen en memoria/SQLite y solo el de concurrencia corre contra Postgres. `models.py` usa `DateTime(timezone=True)` en los timestamps para que coincida con los `timestamptz` del ER.
+> 📝 **Nota para el profesor:** el reparto propuesto de los 180 min es el estándar de la semana 2: 40 min de concepto (modelado + concurrencia) / 60 min de taller guiado (modelos + Alembic + repository, pasos 1–8 de la guía) / 45 min de práctica autónoma (lost update y las dos terminales `psql`, pasos 9–11) / 20 min de puesta en común (ER entre equipos y TJ-006) / 15 min de cierre y entrega. Es mucho para 3 h: si hay que recortar, lo primero que sale es el deadlock (paso 10c) y el stretch de `If-Match`.
+> 
+> **Defaults del lab:** los mismos equipos de 3 de S05–S06; entrega en la rama `s07-postgres` con `app/db/models.py`, `app/errors.py`, `migrations/`, `app/repositories/sqlalchemy_repo.py`, `scripts/copy_sqlite_to_pg.py`, `scripts/lost_update.py`, `tests/test_concurrency.py`, `docs/datos/s07-modelo-er.md` y TJ-005/TJ-006, con tag `s07`; variables `TASKFLOW_STORAGE=postgres` y `TASKFLOW_DATABASE_URL` con las credenciales locales del compose de S06; los tests de S05 siguen en memoria/SQLite y solo el de concurrencia corre contra Postgres. `models.py` usa `DateTime(timezone=True)` en los timestamps para que coincida con los `timestamptz` del ER.
 
 ---
 
 ## 6. Ejercicios
+
+Todos los ejercicios corren contra el **Postgres del `docker-compose.yml`** (`docker compose up -d db`), en la base `taskflow_app` que maneja Alembic, con `TASKFLOW_DATABASE_URL` exportada como en el paso 2. Los tests nuevos de esta sección no se saltean: si Postgres está apagado, tienen que fallar.
 
 ### 🟢 Básico 1 — Probar que la base rechaza lo que no tiene sentido
 
@@ -1447,8 +1464,7 @@ Escribí `scripts/check_constraints.py` que intente, contra `taskflow_app`, cinc
 
 **Sabés que lo lograste cuando** la salida son cinco líneas `RECHAZADO: <qué intento> -> IntegrityError`, ninguna `ACEPTADO`, y al final `SELECT count(*) FROM labels WHERE name = 'bug'` no cambió respecto de antes de correrlo.
 
-<details>
-<summary>Pistas</summary>
+<details> <summary>Pistas</summary>
 
 - El esqueleto: `with Session(engine) as s:` y adentro, por cada intento, `try: with s.begin_nested(): s.add(...); s.flush()` / `except IntegrityError: print(...)`.
 - Sin `flush()` dentro del savepoint, el `INSERT` no se manda y no hay nada que falle.
@@ -1459,12 +1475,11 @@ Escribí `scripts/check_constraints.py` que intente, contra `taskflow_app`, cinc
 
 ### 🟢 Básico 2 — Verificar la política `ON DELETE` en `psql`
 
-En una transacción que termine con `ROLLBACK` (para no romper tus datos), creá un usuario, asignale una tarea (`assignee_id`), hacé que comente otra, y borralo. Después intentá borrar el equipo 1 (que tiene proyectos) y, por último, borrá el proyecto 1. Consultá el estado después de cada `DELETE`.
+En `psql` contra el contenedor (`docker compose exec db psql -U taskflow -d taskflow_app`), en una transacción que termine con `ROLLBACK` (para no romper tus datos), creá un usuario, asignale una tarea (`assignee_id`), hacé que comente otra, y borralo. Después intentá borrar el equipo 1 (que tiene proyectos) y, por último, borrá el proyecto 1. Consultá el estado después de cada `DELETE`.
 
 **Sabés que lo lograste cuando** tu archivo `docs/datos/s07-on-delete-check.sql` tiene las sentencias y, como comentario, lo que observaste: tras borrar el usuario, `assignee_id` y `author_id` quedan en `NULL` y sus filas de membresía desaparecen; borrar un equipo **con** proyectos falla por la FK (y explicás por qué con `RESTRICT`); tras borrar el proyecto, sus tareas, comentarios y etiquetas desaparecen. Todo coincide con la tabla de 4.2.
 
-<details>
-<summary>Pistas</summary>
+<details> <summary>Pistas</summary>
 
 - Empezá con `BEGIN;` y terminá con `ROLLBACK;`.
 - Para ver el efecto: `SELECT id, assignee_id FROM tasks WHERE id = …;` y `SELECT id, author_id FROM comments WHERE …;`.
@@ -1479,8 +1494,7 @@ Escribí `scripts/board_queries.py` que cree (si no existen) 3 etiquetas en el p
 
 **Sabés que lo lograste cuando** la salida muestra algo como `sin selectinload: 21 consultas` y `con selectinload: 2 consultas` (1 + N contra 2) y, como tercera variante, una versión con `raiseload(Task.labels)` que **falla** al tocar `t.labels`, lo que atrapás e imprimís como `raiseload: carga perezosa bloqueada`.
 
-<details>
-<summary>Pistas</summary>
+<details> <summary>Pistas</summary>
 
 - Reseteá el contador entre versiones y usá una **sesión nueva** para cada una: si reusás la sesión, el identity map ya tiene las etiquetas cargadas y la segunda versión "hace trampa".
 - La firma del listener recibe `(conn, cursor, statement, parameters, context, executemany)`.
@@ -1493,10 +1507,9 @@ Escribí `scripts/board_queries.py` que cree (si no existen) 3 etiquetas en el p
 
 Agregá a `Task` la columna `archived_at: Mapped[datetime | None]` (timestamptz), generá la migración con autogenerate, **revisala** con el checklist y aplicala. Después modificá `SqlAlchemyTaskRepository.list_tasks` para que no devuelva tareas archivadas, y agregá un método `archive(task_id)` al repository (fuera del `Protocol` por ahora) que ponga `archived_at = now()` y haga commit.
 
-**Sabés que lo lograste cuando:** `alembic history` muestra dos revisiones encadenadas (la segunda con `down_revision` apuntando a la primera); `alembic downgrade -1 && alembic upgrade head` corre sin error; y un test nuevo que se saltea sin Postgres (mismo `pytestmark` que `test_concurrency.py`) crea una tarea, la archiva y verifica que ya no aparece en `list_tasks()` pero sigue existiendo con `session.get(Task, id)`.
+**Sabés que lo lograste cuando:** `alembic history` muestra dos revisiones encadenadas (la segunda con `down_revision` apuntando a la primera); `alembic downgrade -1 && alembic upgrade head` corre sin error; y un test nuevo contra Postgres crea una tarea, la archiva y verifica que ya no aparece en `list_tasks()` pero sigue existiendo con `session.get(Task, id)`. Podés tomar la conexión de `test_concurrency.py`, pero **sin** su `skipif`: con Postgres apagado, el test tiene que fallar, no saltearse.
 
-<details>
-<summary>Pistas</summary>
+<details> <summary>Pistas</summary>
 
 - ¿Esta columna necesita `server_default`? Pensalo con el ítem 7 del checklist: es nullable.
 - En el filtro, `Task.archived_at.is_(None)`, no `Task.archived_at == None` (funciona, pero los linters lo marcan).
@@ -1515,10 +1528,9 @@ Llevá el control de versión hasta el cliente (el caso "tablero abierto hace ci
 4. Escribí un test con `TestClient` contra Postgres que simule la carrera **dentro** de un mismo request: usá `monkeypatch` para envolver `SqlAlchemyTaskRepository.get` de modo que, después de leer, otra sesión independiente modifique y confirme la misma tarea. El `PATCH` tiene que responder 409 aunque **no** mande `expected_version` (lo frena `version_id_col`).
 5. Registrá en TJ-006 por qué elegiste `expected_version` + 409 en vez de `If-Match` + 412 (o al revés).
 
-**Sabés que lo lograste cuando** tenés tres tests en verde contra Postgres: (a) `PATCH` con `expected_version` correcta → 200 y la `version` de la respuesta aumentó en 1; (b) `PATCH` con `expected_version` vieja → 409 y la tarea **no** cambió en la base; (c) la carrera simulada con `monkeypatch` → 409. Y los tests de S05 (memoria) siguen en verde: el repo en memoria no tiene `version`, así que decidí qué devuelve.
+**Sabés que lo lograste cuando** tenés tres tests en verde contra Postgres: (a) `PATCH` con `expected_version` correcta → 200 y la `version` de la respuesta aumentó en 1; (b) `PATCH` con `expected_version` vieja → 409 y la tarea **no** cambió en la base; (c) la carrera simulada con `monkeypatch` → 409. Y los tests de S05 siguen en verde, los de memoria y los de `pg_client` si hiciste sus ejercicios: el repo en memoria no tiene `version`, así que decidí qué devuelve.
 
-<details>
-<summary>Pistas</summary>
+<details> <summary>Pistas</summary>
 
 - Para (c), dentro del wrapper: llamá al `get` original, y después abrí `with Session(engine) as otra:` que cambie el título de la tarea y haga commit. El `update_status` siguiente va a encontrar otra versión.
 - En el repo en memoria, una opción simple es un contador que incrementás en `update_status`.
@@ -1533,8 +1545,7 @@ Implementá `PATCH /tasks/{id}/position` con body `{"status": "...", "position":
 
 **Sabés que lo lograste cuando** un test que lanza dos reordenamientos simultáneos sobre la misma columna con dos hilos y `threading.Barrier(2)` termina siempre con posiciones `0..N-1` sin huecos ni duplicados (verificalo con `SELECT position FROM tasks WHERE project_id = 1 AND status = 'done' ORDER BY position`), sin errores de deadlock, en 20 corridas seguidas.
 
-<details>
-<summary>Pistas</summary>
+<details> <summary>Pistas</summary>
 
 - Esta operación toca varias filas: el commit por método del repository no alcanza. ¿Dónde vive la transacción? (Releé el trade-off de 4.3.)
 - Mover la tarea también debería respetar la regla de transiciones de S05.
@@ -1572,9 +1583,9 @@ flowchart TD
 ```
 
 - **Antes de la clase (~2 h):** 1, 4, 5, 7 y 8. La doc de aislamiento (8) es la más densa y la que más rinde: leé 13.2.1 y 13.2.2 con calma; 13.2.3 (Serializable) es opcional.
-- **Durante el lab, de consulta:** la doc del dialecto PostgreSQL, *Engine Configuration* y la instalación de psycopg 3; se abren cuando las necesitás, no antes.
+- **Durante el lab, de consulta:** la doc del dialecto PostgreSQL, _Engine Configuration_ y la instalación de psycopg 3; se abren cuando las necesitás, no antes.
 - **Después (~2 h):** 2, 3, 9–13 para consolidar lo que hiciste, y 14–15 para comparar tus decisiones con las de otros.
-- **Opcionales sin dependencias:** Rice (*Optimistic Offline Lock*, 5 min) antes del 🔴 1; MDN `If-Match` y `threading.Barrier` para los stretch; partitioning y art. 17 RGPD para la discusión de ciclo de vida; Alembic batch y pgloader solo si los vas a usar.
+- **Opcionales sin dependencias:** Rice (_Optimistic Offline Lock_, 5 min) antes del 🔴 1; MDN `If-Match` y `threading.Barrier` para los stretch; partitioning y art. 17 RGPD para la discusión de ciclo de vida; Alembic batch y pgloader solo si los vas a usar.
 
 ---
 
@@ -1605,7 +1616,7 @@ flowchart TD
 
 ## 10. Recursos adicionales
 
-### Imprescindibles
+**Imprescindible**
 
 - [Session Basics — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/session_basics.html) — secciones "Basics of Using a Session" y "When do I construct a Session…" (30 min).
 - [13.2. Transaction Isolation — PostgreSQL 16](https://www.postgresql.org/docs/16/transaction-iso.html) — 13.2.1 y 13.2.2 (40 min).
@@ -1616,7 +1627,7 @@ flowchart TD
 - [Basic Relationship Patterns — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html) — one-to-many, many-to-one, many-to-many y association object (25 min).
 - [Table Configuration with Declarative — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html) — `mapped_column` y anotaciones `Mapped` (25 min).
 
-### Recomendados
+**Recomendado**
 
 - [3.4. Transactions — tutorial de PostgreSQL 16](https://www.postgresql.org/docs/16/tutorial-transactions.html) (10 min).
 - [13.1. Introduction (MVCC) — PostgreSQL 16](https://www.postgresql.org/docs/16/mvcc-intro.html) (5 min).
@@ -1634,9 +1645,9 @@ flowchart TD
 - [System Information Functions — `pg_get_serial_sequence` — PostgreSQL 16](https://www.postgresql.org/docs/16/functions-info.html) (3 min, de consulta).
 - [State Management — Session Referencing Behavior — SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/orm/session_state_management.html) — por qué el repository guarda lo que leyó (5 min).
 - [SQL (Relational) Databases — FastAPI](https://fastapi.tiangolo.com/tutorial/sql-databases/) — de contraste, después del lab (20 min).
-- Andrew Ng, *AI Engineering Skills Map* (The Batch, 2026), sección *Managing data* — biblioteca del profesor, sin enlace público (5 min).
+- Andrew Ng, _AI Engineering Skills Map_ (The Batch, 2026), sección _Managing data_ — biblioteca del profesor, sin enlace público (5 min).
 
-### Opcionales
+**Opcional**
 
 - [SELECT — The Locking Clause — PostgreSQL 16](https://www.postgresql.org/docs/16/sql-select.html) — `NOWAIT`, `SKIP LOCKED` (10 min).
 - [Appendix A. PostgreSQL Error Codes — PostgreSQL 16](https://www.postgresql.org/docs/16/errcodes-appendix.html) — `40001`, `40P01`, `55P03` (de consulta).
