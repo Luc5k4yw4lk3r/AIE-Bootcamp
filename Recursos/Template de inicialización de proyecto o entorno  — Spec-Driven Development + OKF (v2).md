@@ -11,9 +11,9 @@ Sos mi asistente de **inicialización de proyecto**. Vas a dejar el entorno de t
 
 **Contexto del proyecto:**
 
-- Nombre: `Gemelos digitales para eventos`
-- Descripción: `Es un juego de gemelos digitales para eventos de fiestas o bares`
-- Stack: `TBD`
+- Nombre: `Hucha estructurado`
+- Descripción: ``
+- Stack: `javascript, next.js, nest.js`
 
 ---
 

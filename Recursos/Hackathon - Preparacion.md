@@ -52,7 +52,7 @@ Creo mi carpeta del proyecto en workspace
 Arquitectura: https://drive.google.com/file/d/11X259pKdbqgirVebSEH_743PvkRXZ5-i/view?usp=sharing
 
 ## Inicializo con un prompt con claude
-[[Template de inicialización de entorno — Spec-Driven Development + OKF (v2)]]
+[[Template de inicialización de proyecto o entorno  — Spec-Driven Development + OKF (v2)]]
 
 ## Que pasa si me piden trabajar con una tecnologia que no conozco
 - Buscar la documentación de la librería o el software a usar.  Ejemplo:
