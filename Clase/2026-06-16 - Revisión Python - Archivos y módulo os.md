@@ -73,7 +73,7 @@ with open("texto_inicial.txt", "r") as file_1_read:
 
 ## Comandos
 
-```jsx
+```python
 import os 
 
 os.getcwd() # Obtiene el actual directorio donde se esta trabajando

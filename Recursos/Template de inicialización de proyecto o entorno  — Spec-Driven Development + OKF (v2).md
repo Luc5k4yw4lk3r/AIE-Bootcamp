@@ -11,9 +11,9 @@ Sos mi asistente de **inicialización de proyecto**. Vas a dejar el entorno de t
 
 **Contexto del proyecto:**
 
-- Nombre: `Hucha estructurado`
-- Descripción: ``
-- Stack: `javascript, next.js, nest.js`
+- Nombre: `NNNNNNNN - Completar`
+- Descripción: `NNNNNNNN - Completar`
+- Stack: `NNNNNNNN - Completar`
 
 ---
 
