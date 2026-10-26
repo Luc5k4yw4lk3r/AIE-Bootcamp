@@ -7,13 +7,18 @@ tags: [bootcamp]
 
 Guías docentes oficiales de Neoland, una por módulo. Es el temario que sigue el bootcamp.
 
-| | Guía | Qué cubre |
-|---|---|---|
-| **Prework** | [ai-engineering.html](https://neoland.es/prework/ai-engineering.html#b3) | Lo que había que traer sabido antes de empezar |
-| **Módulo 1** | [modulo-01-ai-eng.html](https://neoland.es/data026/dk421/modulo-01-ai-eng.html) | Fundamentos |
+|              | Guía                                                                                               | Qué cubre                                                                     |
+| ------------ | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Prework**  | [ai-engineering.html](https://neoland.es/prework/ai-engineering.html#b3)                           | Lo que había que traer sabido antes de empezar                                |
+| **Módulo 1** | [modulo-01-ai-eng.html](https://neoland.es/data026/dk421/modulo-01-ai-eng.html)                    | Fundamentos                                                                   |
 | **Módulo 2** | [guia-docente-mod-2.html](https://neoland.es/data026/dk421/guia-docente-ai-engineering-mod-2.html) | Python y sistemas operativos — ver [[M02·S03 - Python y Sistemas Operativos]] |
-| **Módulo 3** | [modulo-03-ai-eng.html](https://neoland.es/data026/dk421/modulo-03-ai-eng.html) | APIs |
-| **Módulo 4** | [modulo-04-ai-eng.html](https://neoland.es/data026/dk421/modulo-04-ai-eng.html) | — |
+| **Módulo 3** | [modulo-03-ai-eng.html](https://neoland.es/data026/dk421/modulo-03-ai-eng.html)                    | APIs                                                                          |
+| **Módulo 4** | [modulo-04-ai-eng.html](https://neoland.es/data026/dk421/modulo-04-ai-eng.html)                    | —                                                                             |
+| **Módulo 5** | https://neoland.es/data026/dk421/modulo-05-ai-eng.html                                             |                                                                               |
+| **Módulo 6** | https://neoland.es/data026/dk421/modulo-06-ai-eng.html                                             |                                                                               |
+| **Módulo 7** | https://neoland.es/data026/dk421/modulo-07-ai-eng.html                                             |                                                                               |
+| **Módulo 8** | https://neoland.es/data026/dk421/modulo-08-ai-eng.html                                             |                                                                               |
+| **Final**    | https://neoland.es/data026/dk421/proyecto-final-ai-engineering-pt.html                             |                                                                               |
 
 ## Relacionado
 
