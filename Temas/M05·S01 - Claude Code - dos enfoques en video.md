@@ -10,10 +10,10 @@ Oct 26, 2026 · @Luciano
 
 Dos videos muestran Claude Code desde ángulos opuestos: uno como asistente de programación en la terminal y otro como equipo de marketing automatizado. Verlos juntos ayuda a entender que las mismas piezas (contexto, skills, subagentes, MCP) sirven tanto para escribir código como para orquestar trabajo de negocio.
 
-| Video | Autor | Enfoque | Enlace |
-| --- | --- | --- | --- |
-| Claude Code: Curso completo desde cero en 3 horas | MoureDev | Ingeniería de software | [Ver en YouTube](https://www.youtube.com/watch?v=TCq7eZ9Lhc8) |
-| Claude Code: Build Your Full AI Marketing Team | Grace Leung | Automatización de marketing | [Ver en YouTube](https://www.youtube.com/watch?v=yLXLHnD4fco) |
+| Video                                             | Autor       | Enfoque                     | Enlace                                                        |
+| ------------------------------------------------- | ----------- | --------------------------- | ------------------------------------------------------------- |
+| Claude Code: Curso completo desde cero en 3 horas | MoureDev    | Ingeniería de software      | [Ver en YouTube](https://www.youtube.com/watch?v=TCq7eZ9Lhc8) |
+| Claude Code: Build Your Full AI Marketing Team    | Grace Leung | Automatización de marketing | [Ver en YouTube](https://www.youtube.com/watch?v=yLXLHnD4fco) |
 
 **Cómo usar este material:** recomendamos ver primero el video de MoureDev para entender los fundamentos y después el de Grace Leung para ver cómo esos fundamentos se combinan en un sistema multiagente.
 
