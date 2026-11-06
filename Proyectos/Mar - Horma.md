@@ -19,3 +19,10 @@ Dashboard para ver el flujo agentico.
 
 # Apps similes
 https://github.com/ai-job-search-dev/ai-job-search
+
+# Skills para el proyecto
+Vercel
+Claude design
+chrome dev tools
+playwrigth
+
