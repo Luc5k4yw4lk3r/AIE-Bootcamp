@@ -787,17 +787,17 @@ Una lista de requisitos responde "qué hay que hacer". El **PRD** responde adem�
 
 Los nueve apartados, con qué va dentro de cada uno y una frase de ejemplo de VEGA:
 
-| Apartado | Qué va dentro | Ejemplo de VEGA |
-|---|---|---|
-| **1. Contexto** | El problema de negocio, la situación actual con sus números, y por qué ahora | "42 agentes, ~1.900 contactos/día con picos de 3.400; el 60 % del tiempo del agente se va buscando en una intranet de 4.100 documentos" |
-| **2. Objetivos y métricas** | Qué cambia si esto funciona, con línea base y objetivo medible | "Reducir el tiempo medio de resolución desde los 11 min actuales hasta ___ min, medido sobre ___" |
-| **3. Personas** | Quién usa el sistema, con su contexto y su nivel de experiencia | "Agente con menos de 7 semanas en Nortia, todavía no autónomo, atendiendo en tiempo real" |
-| **4. Alcance** | Qué entra en esta entrega, por historias | "Consultas sobre facturación y sobre procedimiento regulatorio, en castellano, desde el puesto del agente" |
-| **5. Requisitos** | FR y NFR con sus IDs; enlaza a `02-requirements.md` | RF-001…RF-0nn, NFR-01…NFR-09 |
-| **6. Restricciones** | Decisiones ya tomadas que limitan la solución | "No se escribe en el CRM de producción (RES-01, fuente: Diego Amat)" |
-| **7. Fuera de alcance** | Lo que explícitamente **no** se hace en esta entrega | "VEGA no habla con el cliente final. No genera respuestas para enviar directamente" |
-| **8. Riesgos** | Qué puede salir mal, con impacto y mitigación | "El corpus de facturación puede no cubrir los casos reales → medir cobertura antes de comprometer NFR-05" |
-| **9. Dependencias** | De qué o de quién depende esto para poder avanzar | "Acceso de lectura al sistema de facturación; aprobación de la política de retención por Cristina Roa" |
+| Apartado                    | Qué va dentro                                                                | Ejemplo de VEGA                                                                                                                         |
+| --------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Contexto**             | El problema de negocio, la situación actual con sus números, y por qué ahora | "42 agentes, ~1.900 contactos/día con picos de 3.400; el 60 % del tiempo del agente se va buscando en una intranet de 4.100 documentos" |
+| **2. Objetivos y métricas** | Qué cambia si esto funciona, con línea base y objetivo medible               | "Reducir el tiempo medio de resolución desde los 11 min actuales hasta ___ min, medido sobre ___"                                       |
+| **3. Personas**             | Quién usa el sistema, con su contexto y su nivel de experiencia              | "Agente con menos de 7 semanas en Nortia, todavía no autónomo, atendiendo en tiempo real"                                               |
+| **4. Alcance**              | Qué entra en esta entrega, por historias                                     | "Consultas sobre facturación y sobre procedimiento regulatorio, en castellano, desde el puesto del agente"                              |
+| **5. Requisitos**           | FR y NFR con sus IDs; enlaza a `02-requirements.md`                          | RF-001…RF-0nn, NFR-01…NFR-09                                                                                                            |
+| **6. Restricciones**        | Decisiones ya tomadas que limitan la solución                                | "No se escribe en el CRM de producción (RES-01, fuente: Diego Amat)"                                                                    |
+| **7. Fuera de alcance**     | Lo que explícitamente **no** se hace en esta entrega                         | "VEGA no habla con el cliente final. No genera respuestas para enviar directamente"                                                     |
+| **8. Riesgos**              | Qué puede salir mal, con impacto y mitigación                                | "El corpus de facturación puede no cubrir los casos reales → medir cobertura antes de comprometer NFR-05"                               |
+| **9. Dependencias**         | De qué o de quién depende esto para poder avanzar                            | "Acceso de lectura al sistema de facturación; aprobación de la política de retención por Cristina Roa"                                  |
 
 > 💡 El apartado **7, "Fuera de alcance", es el que más discusiones evita** y el que más gente se salta. Es la versión escrita del *Won't have this time* de MoSCoW.
 
