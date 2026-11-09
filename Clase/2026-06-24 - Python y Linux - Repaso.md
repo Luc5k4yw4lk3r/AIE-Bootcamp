@@ -61,7 +61,7 @@ while i <= 5:
 **Consigna:** Escribe una función `horas_a_minutos_segundos` que reciba una cantidad de horas y devuelva una **tupla** con su equivalente en minutos y en segundos. Luego llama a la función y  los resultados en dos variables separadas imprimiéndolas.
 **Respuesta:**
 
-```jsx
+```python
 def horas_a_minutos_segundos(hora):
     minutos = hora * 60
     segundos = hora * 3600

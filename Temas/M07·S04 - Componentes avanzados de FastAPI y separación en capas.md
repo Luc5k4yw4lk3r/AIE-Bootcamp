@@ -130,12 +130,7 @@ flowchart LR
 
 - **Una sola definición:** "cómo se crea una conexión" se escribe una vez, no en cada archivo.
 - **Tests más simples:** en un test podés reemplazar la dependencia por una falsa, sin tocar una base real.
-- **Otros usos:** según la documentación oficial, también sirve para compartir lógica entre rutas y para forzar autenticación o permisos.
 
-**Por qué así (con `yield`).** Una dependencia con `yield` separa dos momentos:
-
-- lo que va **antes** del `yield` corre antes del handler (preparar el recurso);
-- lo que va **después** corre cuando el request termina (liberarlo), aunque el handler haya fallado.
 
 ```python
 # repositories/db.py
