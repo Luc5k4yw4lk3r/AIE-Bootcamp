@@ -9,12 +9,16 @@
 - Admin
 - Autogestor
 # Pendientes
+- Web
+	- Terminar los 2 modulos faltantes
+- Integracion
+	- Depende de la finalizacion de la web
 - Novedades fiscales
-	- El componenete mas importante es el actualizado de ahi  pueden salir muchos desarrollos. 
+	- El componente mas importante es el actualizador de ahi  pueden salir muchos desarrollos. 
 	- Pendiente  para fase 2
-- Agregar un usuarios gestores  y administradores
+- Agregar 2 de cada un de los perfiles de usuarios, gestor  y administrador
 - Agente validador de NIF o identificador 
-	- Tiene que ser un agente? o puede ser algo deterministico
+	- Tiene que ser un agente? o puede ser algo deterministico?
 	- Valida solo espana, euro, estados unidos y china. Resto del mundo fase 2.
 - Agentes
 	- Resumen trimestal que hace? Se puede hacer determinista?
