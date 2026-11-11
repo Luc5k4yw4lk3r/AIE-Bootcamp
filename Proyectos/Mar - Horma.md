@@ -16,6 +16,13 @@ Dashboard para ver el flujo agentico.
 - El pipeline de ingesta  que tome las postulaciones de las apis (como lo hacia anteriormente)
 - Seguir construyendo la web  como un dashboard
 - Validar que los datos se esten guardando en base de datos
+# Pasos Iniciales
+- Template de inicializacion
+	- Cambiar el nombre al proyecto en el template y **quitar n8n de no ser necesario**
+- Documento de requerimiento priorizado por fases
+- Pasar a Claude el documento de  inicializacion y  PRD
+# Pasos Intermedios
+
 
 # Apps similes
 https://github.com/ai-job-search-dev/ai-job-search

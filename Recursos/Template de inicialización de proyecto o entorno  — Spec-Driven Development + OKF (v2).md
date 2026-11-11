@@ -85,11 +85,18 @@ Adoptamos SDD. El flujo es:
 
 Los artefactos se escriben **antes** que el código de la app.
 
+Usamos Spec-anchored. Dividimos en spec de sistema (lo global) y spec de feature (la de cada cambio).
+
+Constitución mínima.
+
+“Cuando un pedido mío contradiga una spec, el pedido gana. Proponé el cambio en la spec y mostramelo antes de tocar código. con mi OK actualizá la spec y regenerá tasks.md.”
+
+Regenerar spec en vez de emparchar.
 #### 3.1 Clarify — GATE OBLIGATORIO (antes de escribir cualquier spec)
 
 Antes de redactar `spec.md`, `plan.md` o `tasks.md`:
 
-1. Haceme entre **3 y 7 preguntas puntuales** sobre lo ambiguo del feature `{{FEATURE_SLUG}}`: alcance, usuarios/actores, datos, edge cases, restricciones y criterios de aceptación.
+1. Haceme entre **3  preguntas puntuales** sobre lo ambiguo del feature `{{FEATURE_SLUG}}`: alcance, usuarios/actores, datos, edge cases, restricciones y criterios de aceptación.
 2. **PARÁ y esperá mis respuestas.** No escribas ningún spec hasta que yo responda.
 3. Registrá las preguntas y mis respuestas en `clarifications.md` (frontmatter OKF `type: clarifications`).
 4. Si respondo _"seguí con supuestos"_, documentá los **supuestos explícitos** en `clarifications.md` y recién ahí avanzá.
