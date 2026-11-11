@@ -1,6 +1,9 @@
 
 # Acta de proyecto, Requerimientos y Arquitectura
+## v1
 https://claude.ai/artifact/QYapVgfjiX7QgN7X1obrNd#s25
+## v2
+https://claude.ai/artifact/XgsxiP5gLvaR34W8QeqDoj#41fd5b2f-a67e.mfq5m9dv3v3.306
 
 # Repositorio
 https://github.com/mcaparrosgu/horma-jobs
