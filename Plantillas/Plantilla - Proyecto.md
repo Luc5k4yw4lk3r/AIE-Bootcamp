@@ -35,5 +35,5 @@ Qué se quiere construir, exactamente.
 
 ## Relacionado
 
-- [[Proyectos]]
+- [[Proyectos - Pasos generales]]
 - [[M02·S02 - Prompting - Crear una app en 30 minutos]] — de dónde sale este esquema de 5 bloques.

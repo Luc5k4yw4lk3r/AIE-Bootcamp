@@ -14,7 +14,7 @@ Reglas para que el vault no vuelva a degradarse. Si dudás, mirá una nota exist
 | `Clase/` | Un apunte por sesión en vivo | [[Clase]] |
 | `Tarea/` | Ejercicios con enunciado y solución | [[Tarea]] |
 | `Temas/` | Referencia por módulo y sesión, independiente de la fecha | — |
-| `Proyectos/` | Documentos de proyecto largos | [[Proyectos]] |
+| `Proyectos/` | Documentos de proyecto largos | [[Proyectos - Pasos generales]] |
 | `Recursos/` | Enlaces y material externo sin elaborar | — |
 | `Espacio de alumnos/` | Material aportado por compañeros | [[Espacio de alumnos]] |
 | `Plantillas/` | Plantillas del plugin Templates | — |

@@ -5,7 +5,7 @@ tags: [prompting, llm]
 
 # Prompting — Crear una app en 30 minutos
 
-Charla de Andrew Ng sobre cómo construir una app funcional conversando con la IA, sin escribir código a mano. De acá sale el esquema de 5 bloques que usamos para describir los [[Proyectos]].
+Charla de Andrew Ng sobre cómo construir una app funcional conversando con la IA, sin escribir código a mano. De acá sale el esquema de 5 bloques que usamos para describir los [[Proyectos - Pasos generales]].
 
 - [Build Your Own App In Just 30 Minutes! Full Course with Andrew Ng — DeepLearningAI](https://www.youtube.com/watch?v=ff3j4olCUig&list=PLxGfasXzB55F-QoNdUXGdenvwrG-vFfxN)
 
@@ -31,4 +31,4 @@ Para obtener mejores resultados, ya sea de forma incremental o en un único prom
 ## Relacionado
 
 - [[M02·S01 - Prompting - Curso de Andrew Ng]]
-- [[Proyectos]]
+- [[Proyectos - Pasos generales]]

@@ -26,7 +26,7 @@ Vault del bootcamp de AI Engineering de Neoland. Punto de entrada a todo: apunte
 
 - **[[Clase]]** — 15 sesiones, de junio a septiembre de 2026.
 - **[[Tarea]]** — ejercicios con enunciado y solución.
-- **[[Proyectos]]** — proyectos de los compañeros, en formato objetivo / entradas / salidas.
+- **[[Proyectos - Pasos generales]]** — proyectos de los compañeros, en formato objetivo / entradas / salidas.
 - **[[Espacio de alumnos]]** — material que aporta la clase.
 - **[[Backlog]]** — cosas para investigar más adelante.
 
@@ -39,7 +39,7 @@ Vault del bootcamp de AI Engineering de Neoland. Punto de entrada a todo: apunte
 ## AI
 
 - **[[M02·S01 - Prompting - Curso de Andrew Ng]]** — cómo pasar de usuario novato a avanzado: web search, deep research, modelos de razonamiento, visión, análisis de datos.
-- **[[M02·S02 - Prompting - Crear una app en 30 minutos]]** — los 5 bloques de construcción de un prompt (objetivo, entradas, salidas, diseño, extras). Es el esquema que usamos en [[Proyectos]].
+- **[[M02·S02 - Prompting - Crear una app en 30 minutos]]** — los 5 bloques de construcción de un prompt (objetivo, entradas, salidas, diseño, extras). Es el esquema que usamos en [[Proyectos - Pasos generales]].
 - **Tokens** → [Tokenizer de OpenAI](https://platform.openai.com/tokenizer) — para ver cómo se parte un texto en tokens.
 - **Redes neuronales** → [But what is a neural network? — 3Blue1Brown](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) — la explicación visual de referencia.
 - **Investigar con AI** → [My 17 Minute AI Workflow To Stand Out At Work — Vicky Zhao](https://www.youtube.com/watch?v=yqq_U2fxd2U).
