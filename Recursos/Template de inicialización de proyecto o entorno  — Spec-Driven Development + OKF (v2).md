@@ -294,10 +294,60 @@ Reglas OKF:
 - Enlaces entre documentos con links markdown relativos (`[plan](./plan.md)`).
 - Generá `specs/index.md` (`type: index`) que liste y enlace todos los specs por carpeta.
 - El formato es extensible: podés agregar claves extra al frontmatter sin romper nada.
+---
+
+### 5. Seguimiento del proyecto: MAPA.md y BITACORA.md
+
+Quien dirige este proyecto no es programador. Estos dos archivos son su forma de saber en qué parte del sistema está y por dónde va el trabajo. Créalos en la raíz del proyecto como parte de la inicialización y mantenlos durante todo el desarrollo.
+
+#### MAPA.md
+
+Traduce las carpetas del proyecto a las cajas del diagrama cliente-servidor. Secciones:
+
+1. "El sistema en una frase": qué hace el proyecto y para quién, en dos líneas.
+2. "Las cajas": las cajas que este proyecto va a usar (Frontend, Servidor/API, Base de datos, Servicios externos, Infraestructura, Documentación), cada una con una línea sobre su papel en ESTE proyecto y un estado: "existe" o "previsto".
+3. "Dónde vive cada cosa": tabla con las columnas
+   | Carpeta o archivo | Qué hace (una línea, sin jerga) | Caja del mapa | Fase en que apareció |
+   Solo carpetas y archivos principales, máximo 20 filas. En la inicialización incluye solo lo que realmente creaste.
+4. "Dónde mirar": para cada caja que ya existe, cómo comprobar a simple vista que funciona (qué dirección abrir, qué pestaña, qué tabla de la base).
+
+Si todavía no recibiste el PRD, marca las secciones 1 y 2 como "pendiente del PRD" y complétalas cuando lo recibas.
+
+#### BITACORA.md
+
+Es el diario del proyecto. Secciones:
+
+- "Estado actual" (se reescribe en cada cierre): fase actual y su objetivo, qué funciona hoy y se puede probar, próximo paso, bloqueos o dudas abiertas.
+- "Fuera de fase": ideas o pedidos que surgieron y quedan para más adelante.
+- "Sesiones" (la más nueva arriba; las anteriores no se borran ni se editan). Cada entrada lleva: fecha y fase, qué se hizo en lenguaje de negocio (2 a 4 líneas), qué cajas del MAPA se tocaron, qué se probó y con qué resultado, decisiones y su porqué, problemas y cómo se resolvieron, commit de cierre.
+
+Crea la primera entrada como "Fase 0: inicialización", con lo que quedó armado y lo que falta para empezar la Fase 1.
+
+#### Reglas de escritura para los dos archivos
+
+- Sin jerga. Si un término técnico es inevitable, explícalo entre paréntesis la primera vez.
+- Solo hechos. Lo que no se probó se anota como "sin probar".
+- No inventes: si algo no se puede saber, pregunta.
+- MAPA.md tiene que leerse en una pantalla o poco más.
+
+#### Reglas que debes agregar a CLAUDE.md
+
+Agrega este bloque tal cual, sin sumar estado del proyecto:
+
+"Seguimiento
+- Al empezar una sesión, lee BITACORA.md y MAPA.md y resume en cinco líneas: fase, qué funciona hoy, qué sigue y qué cajas se van a tocar. Espera el OK antes de cambiar algo.
+- Al explicar un cambio, di a qué caja del mapa pertenece.
+- Al cerrar una sesión, actualiza BITACORA.md. Al cerrar una fase, actualiza también MAPA.md. Muestra las actualizaciones antes del commit.
+- El estado del proyecto va en BITACORA.md, nunca en este archivo.
+- Lo que se pida fuera de la fase actual se anota en 'Fuera de fase' de la bitácora y no se implementa."
+
+#### Al terminar la inicialización
+
+Muestra MAPA.md y BITACORA.md, y di qué cajas quedaron como "previsto".
 
 ---
 
-### 5. Variables de entorno (`.env`)
+### 6. Variables de entorno (`.env`)
 
 - **Todas** las variables de entorno van en un único archivo `.env` en la raíz.
 - `.env` **nunca se commitea** (va en `.gitignore`, ver sección 7).
@@ -321,7 +371,7 @@ Cargá las variables desde `.env` en el código (p. ej. `python-dotenv` / `pydan
 
 ---
 
-### 6. Base de datos: Neon (Postgres serverless)
+### 7. Base de datos: Neon (Postgres serverless)
 
 Vamos a usar **Neon**. Hacé lo siguiente:
 
@@ -355,7 +405,7 @@ Vamos a usar **Neon**. Hacé lo siguiente:
 
 ---
 
-### 7. Git
+### 8. Git
 
 1. **Inicializá el repo** (`git init`) si no existe.
 2. **Generá un `.gitignore`** apropiado para el stack. Como mínimo debe incluir:
@@ -372,7 +422,7 @@ Vamos a usar **Neon**. Hacé lo siguiente:
 
 ---
 
-### 8. n8n — OPCIONAL (solo si `USE_N8N=true`)
+### 9. n8n — OPCIONAL (solo si `USE_N8N=true`)
 
 Si `USE_N8N=false`, **saltá esta sección** y dejá anotado en el checklist que quedó pendiente.
 
@@ -400,7 +450,7 @@ Si `USE_N8N=true`:
 
 ---
 
-### 9. README de onboarding
+### 10. README de onboarding
 
 Generá un `README.md` (en inglés) que sirva para vos-futuro, colaboradores o alumnos. Debe cubrir:
 
@@ -414,7 +464,7 @@ Generá un `README.md` (en inglés) que sirva para vos-futuro, colaboradores o a
 
 ---
 
-### 10. Verificación final (mostrame este checklist marcado)
+### 11. Verificación final (mostrame este checklist marcado)
 
 - [ ] **Pre-flight** hecho: inspeccioné el directorio y no sobrescribí nada sin tu OK.
 - [ ] `AGENTS.md` creado (reglas operativas) y `CLAUDE.md` apuntando a `AGENTS.md`.
