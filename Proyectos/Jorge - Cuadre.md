@@ -25,6 +25,12 @@
 	- Cambiar el nombre /procesar-factura por /registrar-factura-recibida 
 	- Cambiar el nombre /registrar-ingreso por /registrar-factura-emitida
 
+
+- Perfil de administrador del sistema
+- Integracion con los agentes
+- Mejorar el diseño con Claude Design. desig-login y design-sync
+
+
 # Pasos
 
 # Skills para el proyecto
