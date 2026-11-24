@@ -30,14 +30,14 @@ Dashboard para ver el flujo agentico.
 
 # Revision 2
 - un agente que agregue  el scrapeo  que le pasamos un link y obtiene l informacion del post
-- Prefil - Cual de todos los CVs modifica
-- Perfil - Cambiar que cambia?
-- Perfil - Los cambios mandan por sobre los curriculums de base
-- Ofertas - Condiciones
-- Ingesta de ofertas - el pegado - deberia verse  en una pestana mas
-- Ingesta de ofertas - las ofertas deberian verse en  en la pestana de ofertas
-- Ingesta de ofertas -  Las ofertas se deberian ver unicamente por el usuario que la ingesto
-- Ingesta de ofertas -  Nuevas fuentes de datos
+- ~~Prefil - Cual de todos los CVs modifica - **Lo que sube ahi es la fuente de verdad**~~
+- ~~Perfil - Cambiar que cambia?~~
+- ~~Perfil - Los cambios mandan por sobre los curriculums de base~~
+- ~~Ofertas - Condiciones~~
+- ~~Ingesta de ofertas - el pegado - deberia verse  en una pestana mas~~
+- ~~Ingesta de ofertas - las ofertas deberian verse en  en la pestana de ofertas~~
+- ~~Ingesta de ofertas -  Las ofertas se deberian ver unicamente por el usuario que la ingesto~~
+- ~~Ingesta de ofertas -  Nuevas fuentes de datos~~
 - Postulacion - Validar los CVs generados
 - 
 

@@ -5,6 +5,9 @@ https://claude.ai/artifact/F1eqtjGx8PRZ74W9fA8CLj#119a0994-df1f
 # Documento de requerimientos
 https://claude.ai/artifact/FPsy97wWHmrFiKZjXG2m5u#f810bc55-3270.mzk27n0w66x.7841
 
+# Arquitectura
+https://drive.google.com/file/d/1wOdv7m6PmqfTeSH8jPPMiGtuAlx69VqJ/view?usp=sharing
+
 # Pendientes
 - Crear el repositorio del proyecto
 
@@ -17,6 +20,7 @@ https://claude.ai/artifact/FPsy97wWHmrFiKZjXG2m5u#f810bc55-3270.mzk27n0w66x.7841
 - Luego pasarle el PRD del proyecto a Claude
 - Pasarle los datos para conectarse a la base de datos de Neon a Claude
 - Ingresar y ver datos en la base de datos de Neon
+
 
 
 # Skills para el proyecto

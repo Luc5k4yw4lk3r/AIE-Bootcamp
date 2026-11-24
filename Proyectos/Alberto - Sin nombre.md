@@ -7,15 +7,18 @@ https://drive.google.com/file/d/1FqkENF6dJ4_snR35xdPrZPm9ojSU5JGh/view?usp=shari
 
 # Pendientes
 - ~~Agregar boton de ver publicacion o hacerlo mas grande~~
-- Boton para que se ejecute la ingesta manualmente
-- Agregar sitios webs de donde obtener publicaciones - Done
-	- Crear agentes que scrapeen
-- Pensar como avanzamos
-- Agente
-	- Agente generador de presupuesto para respuesta de proyectos
+- ~~Boton para que se ejecute la ingesta manualmente~~
+- ~~Agregar sitios webs de donde obtener publicaciones - Done~~
+	- ~~Crear agentes que scrapeen~~
+- ~~Pensar como avanzamos~~
+- ~~Agente~~
+	- ~~Agente generador de presupuesto para respuesta de proyectos~~
 - ~~Repositorio en Github - **Hecho**~~
 - **Revisar el claude.md, quitar el prd y revisar las spec**
-- Compartir el proyecto con Tailscale
+- ~~Compartir el proyecto con Tailscale~~
+- Analizar como esta funcionando el flujo agentico de generación de contenido de instangram.
+	- Usar /archify para diagrama de estados, diagrama de flujo agentico, viaje de los datos y otros que se recomienden
+- Bajar el proyecto y darle estructura. Versionar con git, usar specs, ver como se puede mejorar la arquitectura.
 
 # Skills para el proyecto
 Vercel
